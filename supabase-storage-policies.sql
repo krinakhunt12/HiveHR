@@ -12,7 +12,8 @@
 
 -- OR run this SQL:
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('employee-files', 'employee-files', false);
+VALUES ('employee-files', 'employee-files', false)
+ON CONFLICT (id) DO NOTHING;
 
 -- ============================================
 -- STEP 2: Storage Policies for employee-files bucket
@@ -57,7 +58,7 @@ USING (
   bucket_id = 'employee-files'
   AND EXISTS (
     SELECT 1 FROM profiles
-    WHERE id = auth.uid()
+    WHERE id = auth.uid()::uuid
     AND role IN ('admin', 'hr')
   )
 );
@@ -72,8 +73,8 @@ USING (
     WHERE file_url LIKE '%' || name || '%'
     AND (
       is_public = true
-      OR auth.uid() = ANY(shared_with)
-      OR auth.uid() = user_id
+      OR auth.uid()::uuid = ANY(shared_with)
+      OR auth.uid()::uuid = user_id
     )
   )
 );
@@ -84,7 +85,8 @@ USING (
 -- For company policies, handbooks, announcements etc.
 
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('public-documents', 'public-documents', true);
+VALUES ('public-documents', 'public-documents', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- Everyone can read public documents
 CREATE POLICY "Public documents are viewable by all"
@@ -98,7 +100,7 @@ WITH CHECK (
   bucket_id = 'public-documents'
   AND EXISTS (
     SELECT 1 FROM profiles
-    WHERE id = auth.uid()
+    WHERE id = auth.uid()::uuid
     AND role IN ('admin', 'hr')
   )
 );

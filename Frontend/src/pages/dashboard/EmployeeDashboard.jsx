@@ -9,18 +9,18 @@ import UpcomingHolidaysCard from "../../components/dashboard/employee/UpcomingHo
 import FileListCard from "../../components/dashboard/employee/FileListCard";
 import KpiCard from "../../components/dashboard/employee/KpiCard";
 import KpiChart from "../../components/dashboard/employee/KpiChart";
-import NotificationBell from "../../components/notifications/NotificationBell";
+import TeamOverviewCard from "../../components/dashboard/employee/TeamOverviewCard";
 import { useEmployeeData } from "../../hooks/useEmployeeData";
 import { RefreshCw } from "lucide-react";
 
 const EmployeeDashboard = () => {
-  const { 
-    employeeData, 
-    isLoading, 
-    error, 
-    refetch, 
+  const {
+    employeeData,
+    isLoading,
+    error,
+    refetch,
     toggleAttendance,
-    markNotificationAsRead 
+    markNotificationAsRead
   } = useEmployeeData();
 
   if (isLoading) {
@@ -40,7 +40,7 @@ const EmployeeDashboard = () => {
         <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
           <div className="text-red-600 text-lg mb-4">Failed to load dashboard</div>
           <p className="text-slate-600 mb-4">{error}</p>
-          <button 
+          <button
             onClick={refetch}
             className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
@@ -65,15 +65,11 @@ const EmployeeDashboard = () => {
   return (
     <DashboardLayout>
       <div className="p-6 lg:p-8 space-y-6 bg-slate-50 min-h-screen">
-        <DashboardHeader 
-          title="Employee Dashboard" 
+        <DashboardHeader
+          title="Employee Dashboard"
           subtitle={`Welcome back, ${employeeData.personalInfo?.name || 'there'}! Here's your overview for today.`}
           actions={
             <div className="flex items-center gap-3">
-              <NotificationBell 
-                notifications={employeeData.notifications}
-                onMarkAsRead={markNotificationAsRead}
-              />
               <button
                 onClick={refetch}
                 className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
@@ -93,8 +89,8 @@ const EmployeeDashboard = () => {
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {employeeData.attendance && (
-            <AttendanceCard 
-              data={employeeData.attendance} 
+            <AttendanceCard
+              data={employeeData.attendance}
               onToggleAttendance={toggleAttendance}
             />
           )}
@@ -117,6 +113,9 @@ const EmployeeDashboard = () => {
             )}
           </div>
           <div className="space-y-6">
+            {employeeData.team && (
+              <TeamOverviewCard team={employeeData.team} />
+            )}
             {employeeData.holidays && (
               <UpcomingHolidaysCard holidays={employeeData.holidays} />
             )}

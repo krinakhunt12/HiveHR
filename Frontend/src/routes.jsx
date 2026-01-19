@@ -13,6 +13,7 @@ const Home = lazy(() => import("./pages/Home"));
 
 // Dashboard Pages
 const EmployeeDashboard = lazy(() => import("./pages/dashboard/EmployeeDashboard"));
+const HRDashboard = lazy(() => import("./pages/hr/HRDashboard"));
 
 // Error Pages
 const NotFound = lazy(() => import("./pages/errors/NotFound"));
@@ -49,17 +50,25 @@ const Loader = () => (
     </div>
 );
 
+import { useSupabaseAuth } from "./hooks/useSupabaseAuth";
+
 // ============================================
-// MOCK AUTH HOOK (Replace with real auth logic)
+// REAL AUTH HOOK (Supabase Integration)
 // ============================================
 function useAuth() {
-    // Simulate checking localStorage or context
-    const storedUser = localStorage.getItem("user");
+    const { isAuthenticated, user, profile, loading } = useSupabaseAuth();
+
+    // Construct user object compatible with existing code
+    const authUser = user ? {
+        id: user.id,
+        email: user.email,
+        roles: [profile?.role || 'employee']
+    } : null;
 
     return {
-        isAuthenticated: !!storedUser, // true if user exists
-        user: storedUser ? JSON.parse(storedUser) : null,
-        loading: false,
+        isAuthenticated,
+        user: authUser,
+        loading,
     };
 }
 
@@ -129,53 +138,29 @@ export default function AppRoutes() {
                 {/* PROTECTED DASHBOARD ROUTES */}
                 {/* ============================================ */}
 
-                {/* Employee Dashboard - requires 'employee' role */}
-                {/* <Route element={<ProtectedRoute requiredRoles={["employee", "hr", "admin"]} />}>
-          <Route path="/dashboard/employee" element={<EmployeeDashboard />} />
-        </Route> */}
-                <Route path="/dashboard/employee" element={<EmployeeDashboard />} />
-
-                {/* Add this route inside ProtectedRoute for employees */}
-                {/* <Route element={<ProtectedRoute requiredRoles={["employee", "hr", "admin"]} />}>
-  <Route path="/attendance" element={<AttendancePage />} />
-</Route> */}
-                <Route path="/attendance" element={<AttendancePage />} />
-                <Route path="/leaves" element={<LeavesPage />} />
-                <Route path="/performance" element={<PerformancePage />} />
-                <Route path="/kpi" element={<KPIPage />} />
-                 <Route path="/files" element={<FilesPage />} />
-                 <Route path="/people" element={<PeoplePage />} />
-                 <Route path="/admin" element={<AdminDashboard />} />
-
-
-                {/* HR Dashboard - requires 'hr' role (placeholder for future) */}
-                <Route element={<ProtectedRoute requiredRoles={["hr", "admin"]} />}>
-                    <Route
-                        path="/dashboard/hr"
-                        element={
-                            <div className="flex h-screen items-center justify-center">
-                                <div className="text-center">
-                                    <h1 className="text-3xl font-bold text-slate-900 mb-2">HR Dashboard</h1>
-                                    <p className="text-slate-600">Coming soon...</p>
-                                </div>
-                            </div>
-                        }
-                    />
+                {/* Admin Dashboard - restricted to admins */}
+                <Route element={<ProtectedRoute requiredRoles={["admin"]} />}>
+                    <Route path="/dashboard/admin" element={<AdminDashboard />} />
                 </Route>
 
-                {/* Admin Dashboard - requires 'admin' role (placeholder for future) */}
-                <Route element={<ProtectedRoute requiredRoles={["admin"]} />}>
-                    <Route
-                        path="/dashboard/admin"
-                        element={
-                            <div className="flex h-screen items-center justify-center">
-                                <div className="text-center">
-                                    <h1 className="text-3xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
-                                    <p className="text-slate-600">Coming soon...</p>
-                                </div>
-                            </div>
-                        }
-                    />
+                {/* HR Dashboard - restricted to HR and admins */}
+                <Route element={<ProtectedRoute requiredRoles={["hr", "admin"]} />}>
+                    <Route path="/dashboard/hr" element={<HRDashboard />} />
+                </Route>
+
+                {/* Employee Dashboard - accessible by all but mostly for employees */}
+                <Route element={<ProtectedRoute requiredRoles={["employee", "hr", "admin"]} />}>
+                    <Route path="/dashboard/employee" element={<EmployeeDashboard />} />
+                </Route>
+
+                {/* Shared Protected Routes */}
+                <Route element={<ProtectedRoute requiredRoles={["employee", "hr", "admin"]} />}>
+                    <Route path="/attendance" element={<AttendancePage />} />
+                    <Route path="/leaves" element={<LeavesPage />} />
+                    <Route path="/performance" element={<PerformancePage />} />
+                    <Route path="/kpi" element={<KPIPage />} />
+                    <Route path="/files" element={<FilesPage />} />
+                    <Route path="/people" element={<PeoplePage />} />
                 </Route>
 
                 {/* Default Dashboard Route - redirects based on role */}

@@ -31,7 +31,7 @@ CREATE POLICY "Users can view all profiles"
 -- Users can update their own profile
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
-  USING (auth.uid() = id);
+  USING ((auth.uid())::uuid = id);
 
 -- Only admins can insert new profiles (done via signup)
 CREATE POLICY "Service role can insert profiles"
@@ -53,7 +53,7 @@ CREATE POLICY "Admins can modify departments"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = (auth.uid())::uuid
       AND role IN ('admin', 'hr')
     )
   );
@@ -65,7 +65,7 @@ CREATE POLICY "Admins can modify departments"
 -- Users can view their own attendance
 CREATE POLICY "Users can view own attendance"
   ON attendance FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- Managers can view their team's attendance
 CREATE POLICY "Managers can view team attendance"
@@ -73,8 +73,8 @@ CREATE POLICY "Managers can view team attendance"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE profiles.manager_id = auth.uid()
-      AND profiles.id = attendance.user_id
+      WHERE profiles.manager_id = (auth.uid())::uuid
+      AND profiles.id = (attendance.user_id)::uuid
     )
   );
 
@@ -84,7 +84,7 @@ CREATE POLICY "HR can view all attendance"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role IN ('admin', 'hr')
     )
   );
@@ -92,13 +92,13 @@ CREATE POLICY "HR can view all attendance"
 -- Users can insert their own attendance
 CREATE POLICY "Users can create own attendance"
   ON attendance FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 -- Users can update their own attendance (within same day)
 CREATE POLICY "Users can update own attendance"
   ON attendance FOR UPDATE
   USING (
-    auth.uid() = user_id
+    auth.uid()::uuid = user_id
     AND date = CURRENT_DATE
   );
 
@@ -109,7 +109,7 @@ CREATE POLICY "Users can update own attendance"
 -- Users can view their own leaves
 CREATE POLICY "Users can view own leaves"
   ON leaves FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- Managers can view their team's leaves
 CREATE POLICY "Managers can view team leaves"
@@ -117,7 +117,7 @@ CREATE POLICY "Managers can view team leaves"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE profiles.manager_id = auth.uid()
+      WHERE profiles.manager_id = auth.uid()::uuid
       AND profiles.id = leaves.user_id
     )
   );
@@ -128,7 +128,7 @@ CREATE POLICY "HR can view all leaves"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role IN ('admin', 'hr')
     )
   );
@@ -136,13 +136,13 @@ CREATE POLICY "HR can view all leaves"
 -- Users can create their own leave requests
 CREATE POLICY "Users can create leave requests"
   ON leaves FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid()::uuid = user_id);
 
 -- Users can update their own pending leaves
 CREATE POLICY "Users can update own pending leaves"
   ON leaves FOR UPDATE
   USING (
-    auth.uid() = user_id
+    auth.uid()::uuid = user_id
     AND status = 'pending'
   );
 
@@ -152,10 +152,10 @@ CREATE POLICY "Managers can approve leaves"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = (auth.uid())::uuid
       AND (
         role IN ('admin', 'hr')
-        OR id = (SELECT manager_id FROM profiles WHERE id = leaves.user_id)
+        OR id = (SELECT manager_id FROM profiles WHERE id = (leaves.user_id)::uuid)
       )
     )
   );
@@ -167,7 +167,7 @@ CREATE POLICY "Managers can approve leaves"
 -- Users can view their own leave balance
 CREATE POLICY "Users can view own leave balance"
   ON leave_balance FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- HR can view all balances
 CREATE POLICY "HR can view all leave balances"
@@ -175,7 +175,7 @@ CREATE POLICY "HR can view all leave balances"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role IN ('admin', 'hr')
     )
   );
@@ -186,7 +186,7 @@ CREATE POLICY "System can manage leave balance"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role IN ('admin', 'hr')
     )
   );
@@ -198,12 +198,12 @@ CREATE POLICY "System can manage leave balance"
 -- Users can view their own reviews
 CREATE POLICY "Users can view own reviews"
   ON performance_reviews FOR SELECT
-  USING (auth.uid() = employee_id);
+  USING (auth.uid()::uuid = employee_id);
 
 -- Reviewers can view reviews they created
 CREATE POLICY "Reviewers can view their reviews"
   ON performance_reviews FOR SELECT
-  USING (auth.uid() = reviewer_id);
+  USING (auth.uid()::uuid = reviewer_id);
 
 -- HR/Admins can view all reviews
 CREATE POLICY "HR can view all reviews"
@@ -211,7 +211,7 @@ CREATE POLICY "HR can view all reviews"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role IN ('admin', 'hr')
     )
   );
@@ -220,11 +220,11 @@ CREATE POLICY "HR can view all reviews"
 CREATE POLICY "Managers can create team reviews"
   ON performance_reviews FOR INSERT
   WITH CHECK (
-    auth.uid() = reviewer_id
+    (auth.uid())::uuid = reviewer_id
     AND EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = employee_id
-      AND manager_id = auth.uid()
+      WHERE id = (employee_id)::uuid
+      AND manager_id = (auth.uid())::uuid
     )
   );
 
@@ -232,7 +232,7 @@ CREATE POLICY "Managers can create team reviews"
 CREATE POLICY "Reviewers can update draft reviews"
   ON performance_reviews FOR UPDATE
   USING (
-    auth.uid() = reviewer_id
+    auth.uid()::uuid = reviewer_id
     AND status = 'draft'
   );
 
@@ -243,14 +243,14 @@ CREATE POLICY "Reviewers can update draft reviews"
 -- Users can view their own KPIs
 CREATE POLICY "Users can view own KPIs"
   ON kpis FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- Users can view department KPIs
 CREATE POLICY "Users can view department KPIs"
   ON kpis FOR SELECT
   USING (
     department_id IN (
-      SELECT department_id FROM profiles WHERE id = auth.uid()
+      SELECT department_id FROM profiles WHERE id = (auth.uid())::uuid
     )
   );
 
@@ -260,7 +260,7 @@ CREATE POLICY "Managers can manage KPIs"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role IN ('admin', 'hr', 'manager')
     )
   );
@@ -272,7 +272,7 @@ CREATE POLICY "Managers can manage KPIs"
 -- Users can view their own files
 CREATE POLICY "Users can view own files"
   ON files FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- Users can view public files
 CREATE POLICY "Users can view public files"
@@ -282,7 +282,7 @@ CREATE POLICY "Users can view public files"
 -- Users can view files shared with them
 CREATE POLICY "Users can view shared files"
   ON files FOR SELECT
-  USING (auth.uid() = ANY(shared_with));
+  USING (auth.uid()::uuid = ANY(shared_with));
 
 -- HR/Admins can view all files
 CREATE POLICY "HR can view all files"
@@ -290,7 +290,7 @@ CREATE POLICY "HR can view all files"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role IN ('admin', 'hr')
     )
   );
@@ -298,17 +298,17 @@ CREATE POLICY "HR can view all files"
 -- Users can upload files
 CREATE POLICY "Users can upload files"
   ON files FOR INSERT
-  WITH CHECK (auth.uid() = uploaded_by);
+  WITH CHECK (auth.uid()::uuid = uploaded_by);
 
 -- Users can update their own files
 CREATE POLICY "Users can update own files"
   ON files FOR UPDATE
-  USING (auth.uid() = user_id OR auth.uid() = uploaded_by);
+  USING (auth.uid()::uuid = user_id OR auth.uid()::uuid = uploaded_by);
 
 -- Users can delete their own files
 CREATE POLICY "Users can delete own files"
   ON files FOR DELETE
-  USING (auth.uid() = user_id OR auth.uid() = uploaded_by);
+  USING (auth.uid()::uuid = user_id OR auth.uid()::uuid = uploaded_by);
 
 -- ============================================
 -- NOTIFICATIONS TABLE POLICIES
@@ -317,12 +317,12 @@ CREATE POLICY "Users can delete own files"
 -- Users can view their own notifications
 CREATE POLICY "Users can view own notifications"
   ON notifications FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- Users can update their own notifications (mark as read)
 CREATE POLICY "Users can update own notifications"
   ON notifications FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- System can insert notifications for any user
 CREATE POLICY "System can create notifications"
@@ -332,7 +332,7 @@ CREATE POLICY "System can create notifications"
 -- Users can delete their own notifications
 CREATE POLICY "Users can delete own notifications"
   ON notifications FOR DELETE
-  USING (auth.uid() = user_id);
+  USING (auth.uid()::uuid = user_id);
 
 -- ============================================
 -- SYSTEM SETTINGS TABLE POLICIES
@@ -349,7 +349,7 @@ CREATE POLICY "Admins can modify system settings"
   USING (
     EXISTS (
       SELECT 1 FROM profiles
-      WHERE id = auth.uid()
+      WHERE id = auth.uid()::uuid
       AND role = 'admin'
     )
   );
@@ -364,7 +364,7 @@ RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM profiles
-    WHERE id = auth.uid()
+    WHERE id = auth.uid()::uuid
     AND role = 'admin'
   );
 END;
@@ -376,7 +376,7 @@ RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM profiles
-    WHERE id = auth.uid()
+    WHERE id = auth.uid()::uuid
     AND role IN ('admin', 'hr')
   );
 END;
@@ -389,7 +389,7 @@ BEGIN
   RETURN EXISTS (
     SELECT 1 FROM profiles
     WHERE id = employee_id
-    AND manager_id = auth.uid()
+    AND manager_id = auth.uid()::uuid
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

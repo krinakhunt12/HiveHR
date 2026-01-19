@@ -8,7 +8,21 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================
--- 1. PROFILES TABLE (Extended User Info)
+-- 1. DEPARTMENTS TABLE (Created first to avoid dependency issues)
+-- ============================================
+CREATE TABLE departments (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  description TEXT,
+  head_id UUID, -- Reference added after profiles table creation
+  budget DECIMAL(15, 2),
+  employee_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- 2. PROFILES TABLE (Extended User Info)
 -- ============================================
 -- Links to auth.users table in Supabase
 CREATE TABLE profiles (
@@ -40,19 +54,8 @@ CREATE TABLE profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ============================================
--- 2. DEPARTMENTS TABLE
--- ============================================
-CREATE TABLE departments (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  description TEXT,
-  head_id UUID REFERENCES profiles(id),
-  budget DECIMAL(15, 2),
-  employee_count INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Add head_id reference to departments after profiles table exists
+ALTER TABLE departments ADD CONSTRAINT fk_departments_head FOREIGN KEY (head_id) REFERENCES profiles(id);
 
 -- ============================================
 -- 3. ATTENDANCE TABLE
@@ -411,7 +414,8 @@ INSERT INTO departments (name, description) VALUES
   ('Finance', 'Financial planning and accounting'),
   ('Operations', 'Business operations and logistics'),
   ('Product', 'Product management and strategy'),
-  ('Design', 'UI/UX and creative design');
+  ('Design', 'UI/UX and creative design')
+ON CONFLICT (name) DO NOTHING;
 
 -- Insert default system settings
 INSERT INTO system_settings (key, value, description) VALUES
@@ -420,7 +424,8 @@ INSERT INTO system_settings (key, value, description) VALUES
   ('working_hours_end', '"18:00"', 'Standard work end time'),
   ('late_arrival_threshold', '15', 'Minutes after start time considered late'),
   ('leave_approval_required', 'true', 'Whether leaves require approval'),
-  ('max_file_size_mb', '50', 'Maximum file upload size in MB');
+  ('max_file_size_mb', '50', 'Maximum file upload size in MB')
+ON CONFLICT (key) DO NOTHING;
 
 -- ============================================
 -- SUCCESS MESSAGE

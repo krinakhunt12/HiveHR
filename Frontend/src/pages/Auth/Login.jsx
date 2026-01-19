@@ -1,32 +1,35 @@
 import React, { useState } from "react";
-import { BarChart3, Mail, Lock, ArrowRight, Chrome } from "lucide-react";
+import { BarChart3, Mail, Lock, ArrowRight, Chrome, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useSupabaseAuth } from "../../hooks/useSupabaseAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, loading: isLoading, error: authError } = useSupabaseAuth();
+  const [localError, setLocalError] = useState("");
+  const navigate = useNavigate();
 
-  const handleEmailLogin = () => {
+  const handleEmailLogin = async () => {
+    setLocalError("");
     if (!email || !password) {
-      alert("Please fill in all fields");
+      setLocalError("Please fill in all fields");
       return;
     }
-    setIsLoading(true);
-    setTimeout(() => {
-      console.log("Email login:", { email, password, rememberMe });
-      alert("Login successful! (Demo mode)");
-      setIsLoading(false);
-    }, 1500);
+
+    try {
+      await login(email, password);
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Login failed:", err);
+      // Error is handled by the hook and exposed via authError
+    }
   };
 
   const handleGoogleSSO = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      console.log("Google SSO login initiated");
-      alert("Google SSO initiated! (Demo mode)");
-      setIsLoading(false);
-    }, 1500);
+    setLocalError("Google SSO is coming soon!");
   };
 
   const handleKeyPress = (e) => {
@@ -42,7 +45,7 @@ const Login = () => {
         {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-slate-700 rounded-full blur-3xl opacity-20"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-600 rounded-full blur-3xl opacity-20"></div>
-        
+
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-16">
             <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg">
@@ -98,6 +101,14 @@ const Login = () => {
               <h2 className="text-3xl font-bold text-slate-900 mb-2">Sign in</h2>
               <p className="text-slate-600">Access your HiveHR account</p>
             </div>
+
+            {/* Error Message */}
+            {(localError || authError) && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700 text-sm animate-shake">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <p>{localError || authError}</p>
+              </div>
+            )}
 
             {/* Google SSO Button */}
             <button

@@ -3,7 +3,6 @@ import React from 'react';
 import { Menu, Bell, Search, User } from 'lucide-react';
 import ThemeToggle from '../ui/ThemeToggle';
 import GlobalSearch from '../search/GlobalSearch';
-import NotificationBell from '../notifications/NotificationBell';
 
 const Header = ({ onMenuClick }) => {
   return (
@@ -47,9 +46,6 @@ const Header = ({ onMenuClick }) => {
 
             {/* Theme Toggle */}
             <ThemeToggle />
-
-            {/* Notifications */}
-            <NotificationBell />
 
             {/* User Profile */}
             <div className="flex items-center gap-3 pl-3 border-l border-gray-200 dark:border-gray-700">

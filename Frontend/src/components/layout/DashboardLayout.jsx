@@ -1,10 +1,17 @@
 import React from "react";
 import { BarChart3, LogOut, User, Settings, Clock } from "lucide-react";
-import { useNavigate } from "react-router-dom"
-import NotificationBell from "../notifications/NotificationBell";
+import { useNavigate } from "react-router-dom";
+import { useSupabaseAuth } from "../../hooks/useSupabaseAuth";
 
 const DashboardLayout = ({ children }) => {
     const navigate = useNavigate();
+    const { profile, logout } = useSupabaseAuth();
+    const isAdmin = profile?.role === 'admin';
+
+    const handleLogout = async () => {
+        await logout();
+        navigate("/login");
+    };
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -16,16 +23,34 @@ const DashboardLayout = ({ children }) => {
                             <div className="w-10 h-10 bg-gradient-to-br from-slate-800 to-slate-600 rounded-lg flex items-center justify-center">
                                 <BarChart3 className="w-5 h-5 text-white" />
                             </div>
-                            <h1 className="text-xl font-bold text-slate-900">HiveHR</h1>
+                            <h1 className="text-xl font-bold text-slate-900 cursor-pointer" onClick={() => navigate("/dashboard")}>
+                                HiveHR
+                            </h1>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="hidden md:flex items-center gap-2">
-                                <button
-                                    onClick={() => navigate("/dashboard/employee")}
-                                    className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
-                                >
-                                    Dashboard
-                                </button>
+                                {isAdmin ? (
+                                    <button
+                                        onClick={() => navigate("/dashboard/admin")}
+                                        className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                                    >
+                                        Admin Panel
+                                    </button>
+                                ) : profile?.role === 'hr' ? (
+                                    <button
+                                        onClick={() => navigate("/dashboard/hr")}
+                                        className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                                    >
+                                        HR Panel
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => navigate("/dashboard/employee")}
+                                        className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                                    >
+                                        Dashboard
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => navigate("/attendance")}
                                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
@@ -40,15 +65,32 @@ const DashboardLayout = ({ children }) => {
                                     <Clock className="w-4 h-4" />
                                     Leave
                                 </button>
-                                <NotificationBell />
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => navigate("/people")}
+                                        className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                                    >
+                                        Employee Management
+                                    </button>
+                                )}
                             </div>
                             <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
                                 <Settings className="w-5 h-5 text-slate-600" />
                             </button>
-                            <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                                <User className="w-5 h-5 text-slate-600" />
-                            </button>
-                            <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-red-600">
+                            <div className="flex items-center gap-3 px-3 py-1 bg-slate-50 border border-slate-200 rounded-full">
+                                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden">
+                                  <User className="w-5 h-5 text-slate-500" />
+                                </div>
+                                <div className="hidden lg:block text-left pr-2">
+                                  <p className="text-xs font-bold text-slate-900 truncate max-w-[100px]">{profile?.full_name || 'User'}</p>
+                                  <p className="text-[10px] text-slate-500 uppercase tracking-wider">{profile?.role}</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={handleLogout}
+                                className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-red-600"
+                                title="Logout"
+                            >
                                 <LogOut className="w-5 h-5" />
                             </button>
                         </div>

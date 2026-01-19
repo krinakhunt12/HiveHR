@@ -10,7 +10,7 @@ export const useEmployeeData = () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Simulate API call with potential error
         await new Promise((resolve, reject) => {
           setTimeout(() => {
@@ -103,61 +103,67 @@ export const useEmployeeData = () => {
             { day: "Sun", hours: 0, target: 0, tasks: 0, efficiency: "0%" },
           ],
           holidays: [
-            { 
-              name: "Thanksgiving Day", 
-              date: "Nov 28, 2024", 
+            {
+              name: "Thanksgiving Day",
+              date: "Nov 28, 2024",
               type: "Federal",
               daysUntil: 8,
               isUpcoming: true
             },
-            { 
-              name: "Christmas Day", 
-              date: "Dec 25, 2024", 
+            {
+              name: "Christmas Day",
+              date: "Dec 25, 2024",
               type: "Federal",
               daysUntil: 35,
               isUpcoming: true
             },
-            { 
-              name: "New Year's Day", 
-              date: "Jan 1, 2025", 
+            {
+              name: "New Year's Day",
+              date: "Jan 1, 2025",
               type: "Federal",
               daysUntil: 42,
               isUpcoming: true
             },
           ],
           files: [
-            { 
+            {
               id: 1,
-              name: "Payslip_October_2024.pdf", 
-              size: "245 KB", 
+              name: "Payslip_October_2024.pdf",
+              size: "245 KB",
               date: "Oct 31, 2024",
               type: "payslip",
               category: "Finance"
             },
-            { 
+            {
               id: 2,
-              name: "Resume_Updated.pdf", 
-              size: "1.2 MB", 
+              name: "Resume_Updated.pdf",
+              size: "1.2 MB",
               date: "Sep 15, 2024",
               type: "resume",
               category: "Personal"
             },
-            { 
+            {
               id: 3,
-              name: "Tax_Form_W2.pdf", 
-              size: "180 KB", 
+              name: "Tax_Form_W2.pdf",
+              size: "180 KB",
               date: "Jan 20, 2024",
               type: "tax",
               category: "Finance"
             },
-            { 
+            {
               id: 4,
-              name: "Performance_Review_Q3_2024.pdf", 
-              size: "320 KB", 
+              name: "Performance_Review_Q3_2024.pdf",
+              size: "320 KB",
               date: "Oct 15, 2024",
               type: "performance",
               category: "HR"
             },
+          ],
+          team: [
+            { name: "Sarah Johnson", role: "Engineering Manager", status: "online" },
+            { name: "Michael Chen", role: "Backend Engineer", status: "away" },
+            { name: "Emma Wilson", role: "UI Designer", status: "offline" },
+            { name: "David Miller", role: "QA Engineer", status: "online" }
           ],
           notifications: {
             unread: 3,
@@ -186,7 +192,7 @@ export const useEmployeeData = () => {
             ]
           }
         });
-        
+
       } catch (err) {
         setError(err.message);
         console.error("Failed to fetch employee data:", err);
@@ -202,7 +208,7 @@ export const useEmployeeData = () => {
   const refetch = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     // Simulate API call
     setTimeout(() => {
       setEmployeeData(prevData => ({
@@ -210,10 +216,10 @@ export const useEmployeeData = () => {
         attendance: {
           ...prevData.attendance,
           status: "checked-in",
-          checkInTime: new Date().toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
+          checkInTime: new Date().toLocaleTimeString('en-US', {
+            hour: '2-digit',
             minute: '2-digit',
-            hour12: true 
+            hour12: true
           })
         }
       }));
@@ -226,10 +232,10 @@ export const useEmployeeData = () => {
     if (!employeeData) return;
 
     const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
+    const timeString = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     });
 
     setEmployeeData(prev => ({
@@ -265,9 +271,9 @@ export const useEmployeeData = () => {
     }));
   };
 
-  return { 
-    employeeData, 
-    isLoading, 
+  return {
+    employeeData,
+    isLoading,
     error,
     refetch,
     toggleAttendance,

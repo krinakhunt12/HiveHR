@@ -1,4 +1,4 @@
-import { supabase, signIn, signUp, signOut, getCurrentUser, getSession } from '../lib/supabaseClient';
+import { supabase, signIn, signUp, signOut, getSession } from '../lib/supabaseClient';
 import { useState, useEffect } from 'react';
 
 /**
@@ -11,81 +11,120 @@ export const useSupabaseAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Check for existing session on mount
+  // Safety Break: Force loading to false after 3 seconds
   useEffect(() => {
-    checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth event:', event);
-        
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-        
+    const timer = setTimeout(() => {
+      if (loading) {
+        console.log('⏰ Auth Safety Break: Forcing loading to false');
         setLoading(false);
       }
-    );
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, []);
-
-  // Check current user
-  const checkUser = async () => {
-    try {
-      const session = await getSession();
-      
-      if (session?.user) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
-      }
-    } catch (err) {
-      console.error('Error checking user:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch user profile from profiles table
   const fetchProfile = async (userId) => {
+    console.log('🔍 Fetching profile for:', userId);
     try {
-      const { data, error } = await supabase
+      const { data, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (profileError) {
+        if (profileError.code === 'PGRST116') {
+          console.log('ℹ️ No profile record found in database');
+          return null;
+        }
+        throw profileError;
+      }
+
+      console.log('✅ Profile found:', data.role);
       setProfile(data);
+      return data;
     } catch (err) {
-      console.error('Error fetching profile:', err);
+      console.error('❌ Profile fetch failed:', err.message);
+      return null;
     }
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initialize = async () => {
+      console.log('🚀 Initializing Auth...');
+      try {
+        // 1. Check current session immediately
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (isMounted) {
+          if (session?.user) {
+            console.log('👤 Session found:', session.user.email);
+            setUser(session.user);
+            await fetchProfile(session.user.id);
+          } else {
+            console.log('anonymous user detected');
+          }
+          setLoading(false);
+          console.log('🏁 Initial Load Complete');
+        }
+      } catch (err) {
+        console.error('💥 Auth Initialization Error:', err);
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    initialize();
+
+    // 2. Auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('🔔 Auth Event:', event);
+
+        if (isMounted) {
+          if (session?.user) {
+            setUser(session.user);
+            // Don't await here to avoid blocking the UI
+            fetchProfile(session.user.id).then(() => {
+              if (isMounted) setLoading(false);
+            });
+          } else {
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+          }
+        }
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   // Login function
   const login = async (email, password) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const data = await signIn(email, password);
-      
-      // Store user in localStorage for compatibility with existing code
+
+      const sessionData = await signIn(email, password);
+
+      if (!sessionData?.user) {
+        throw new Error('Login failed: No user returned');
+      }
+
+      const userProfile = await fetchProfile(sessionData.user.id);
+
+      // Store in localStorage for legacy code compatibility
       localStorage.setItem('user', JSON.stringify({
-        id: data.user.id,
-        email: data.user.email,
-        roles: [profile?.role || 'employee'], // Will be updated when profile loads
+        id: sessionData.user.id,
+        email: sessionData.user.email,
+        roles: [userProfile?.role || 'employee'],
       }));
-      
-      return data;
+
+      return { ...sessionData, profile: userProfile };
     } catch (err) {
       setError(err.message);
       throw err;
@@ -99,18 +138,21 @@ export const useSupabaseAuth = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Sign up user
+
       const { user } = await signUp(email, password, {
         full_name: profileData.full_name,
       });
 
-      // Create profile
-      await supabase.from('profiles').insert([{
+      if (!user) throw new Error('Registration failed');
+
+      // Create profile record
+      const { error: profileError } = await supabase.from('profiles').insert([{
         id: user.id,
         email: user.email,
         ...profileData,
       }]);
+
+      if (profileError) throw profileError;
 
       return user;
     } catch (err) {
@@ -129,8 +171,7 @@ export const useSupabaseAuth = () => {
       setUser(null);
       setProfile(null);
     } catch (err) {
-      setError(err.message);
-      throw err;
+      console.error('Logout error:', err);
     }
   };
 

@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useWebSocket } from './useWebSocket';
 import { mockNotifications } from '../data/mockNotifications';
-
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // WebSocket hook for real-time notifications
-  const { lastMessage, readyState } = useWebSocket('ws://localhost:3001/notifications');
+
+  // WebSocket hook for real-time notifications removed
+  // const { lastMessage, readyState } = useWebSocket('ws://localhost:3001/notifications');
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -28,25 +26,7 @@ export const useNotifications = () => {
     loadNotifications();
   }, []);
 
-  // Handle new real-time notifications
-  useEffect(() => {
-    if (lastMessage) {
-      try {
-        const newNotification = JSON.parse(lastMessage.data);
-        setNotifications(prev => [newNotification, ...prev]);
-        
-        // Show browser notification if permitted
-        if (Notification.permission === 'granted') {
-          new Notification(newNotification.title || 'New Notification', {
-            body: newNotification.message,
-            icon: '/favicon.ico'
-          });
-        }
-      } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
-      }
-    }
-  }, [lastMessage]);
+  // Handle new real-time notifications removed
 
   // Request notification permissions
   useEffect(() => {
@@ -98,6 +78,6 @@ export const useNotifications = () => {
     markAllAsRead,
     deleteNotification,
     addNotification,
-    webSocketStatus: readyState
+    webSocketStatus: 3 // WebSocket.CLOSED
   };
 };
