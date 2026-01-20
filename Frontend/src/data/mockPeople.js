@@ -2,7 +2,7 @@ export const mockUsers = [
   {
     id: '1',
     name: 'Sarah Johnson',
-    email: 'sarah.j@comline.com',
+    email: 'sarah.j@hivehr.com',
     phone: '+1 (555) 123-4567',
     employeeId: 'CLN-2020-001',
     role: 'Senior Software Engineer',
@@ -17,7 +17,7 @@ export const mockUsers = [
   {
     id: '2',
     name: 'Michael Chen',
-    email: 'michael.chen@comline.com',
+    email: 'michael.chen@hivehr.com',
     phone: '+1 (555) 234-5678',
     employeeId: 'CLN-2019-015',
     role: 'Engineering Manager',
@@ -32,7 +32,7 @@ export const mockUsers = [
   {
     id: '3',
     name: 'Emily Davis',
-    email: 'emily.davis@comline.com',
+    email: 'emily.davis@hivehr.com',
     phone: '+1 (555) 345-6789',
     employeeId: 'CLN-2021-045',
     role: 'Product Manager',
@@ -47,7 +47,7 @@ export const mockUsers = [
   {
     id: '4',
     name: 'David Wilson',
-    email: 'david.wilson@comline.com',
+    email: 'david.wilson@hivehr.com',
     phone: '+1 (555) 456-7890',
     employeeId: 'CLN-2022-078',
     role: 'UI/UX Designer',
@@ -62,7 +62,7 @@ export const mockUsers = [
   {
     id: '5',
     name: 'Lisa Wang',
-    email: 'lisa.wang@comline.com',
+    email: 'lisa.wang@hivehr.com',
     phone: '+1 (555) 567-8901',
     employeeId: 'CLN-2018-005',
     role: 'Director of Engineering',
@@ -77,7 +77,7 @@ export const mockUsers = [
   {
     id: '6',
     name: 'Robert Brown',
-    email: 'robert.brown@comline.com',
+    email: 'robert.brown@hivehr.com',
     phone: '+1 (555) 678-9012',
     employeeId: 'CLN-2020-023',
     role: 'Head of Product',
@@ -92,7 +92,7 @@ export const mockUsers = [
   {
     id: '7',
     name: 'Maria Garcia',
-    email: 'maria.garcia@comline.com',
+    email: 'maria.garcia@hivehr.com',
     phone: '+1 (555) 789-0123',
     employeeId: 'CLN-2021-067',
     role: 'Design Lead',
@@ -107,7 +107,7 @@ export const mockUsers = [
   {
     id: '8',
     name: 'James Miller',
-    email: 'james.miller@comline.com',
+    email: 'james.miller@hivehr.com',
     phone: '+1 (555) 890-1234',
     employeeId: 'CLN-2023-112',
     role: 'HR Manager',

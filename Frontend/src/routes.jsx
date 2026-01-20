@@ -7,13 +7,32 @@ import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 
 // Auth Pages
 const Login = lazy(() => import("./pages/Auth/Login"));
+const AdminLogin = lazy(() => import("./pages/Auth/AdminLogin"));
+const HRLogin = lazy(() => import("./pages/Auth/HRLogin"));
+const EmployeeLogin = lazy(() => import("./pages/Auth/EmployeeLogin"));
+const AdminSignup = lazy(() => import("./pages/Auth/AdminSignup"));
 
 // Public Pages
 const Home = lazy(() => import("./pages/Home"));
 
 // Dashboard Pages
-const EmployeeDashboard = lazy(() => import("./pages/dashboard/EmployeeDashboard"));
+const EmployeeDashboard = lazy(() => import("./pages/employee/EmployeeDashboard"));
+const EmployeeProfile = lazy(() => import("./pages/employee/EmployeeProfile"));
 const HRDashboard = lazy(() => import("./pages/hr/HRDashboard"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+
+// HR Specific Management Pages
+const HREmployeeManagement = lazy(() => import("./pages/hr/HREmployeeManagement"));
+const HRAttendanceManagement = lazy(() => import("./pages/hr/HRAttendanceManagement"));
+const HRLeaveManagement = lazy(() => import("./pages/hr/HRLeaveManagement"));
+const HRReports = lazy(() => import("./pages/hr/HRReports"));
+const HRProfile = lazy(() => import("./pages/hr/HRProfile"));
+
+// Admin Specific Management Pages
+const HRManagement = lazy(() => import("./pages/admin/HRManagement"));
+const EmployeeManagement = lazy(() => import("./pages/admin/EmployeeManagement"));
+const RolePermissions = lazy(() => import("./pages/admin/RolePermissions"));
+const AdminProfile = lazy(() => import("./pages/admin/AdminProfile"));
 
 // Error Pages
 const NotFound = lazy(() => import("./pages/errors/NotFound"));
@@ -37,7 +56,6 @@ const FilesPage = React.lazy(() => import('./pages/files/FilesPage'));
 // People page
 const PeoplePage = React.lazy(() => import('./pages/people/PeoplePage'));
 
-const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'));
 // ============================================
 // LOADER COMPONENT
 // ============================================
@@ -69,6 +87,7 @@ function useAuth() {
         isAuthenticated,
         user: authUser,
         loading,
+        profile
     };
 }
 
@@ -81,9 +100,16 @@ function ProtectedRoute({ requiredRoles = [], children }) {
 
     if (loading) return <Loader />;
 
-    // Redirect unauthenticated users to login
+    // Redirect unauthenticated users to their respective login pages
     if (!isAuthenticated) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        // Find out which dashboard they were trying to access to redirect to the right login
+        if (location.pathname.startsWith('/admin')) {
+            return <Navigate to="/admin/login" state={{ from: location }} replace />;
+        }
+        if (location.pathname.startsWith('/hr')) {
+            return <Navigate to="/hr/login" state={{ from: location }} replace />;
+        }
+        return <Navigate to="/employee/login" state={{ from: location }} replace />;
     }
 
     // Role-based access check
@@ -104,12 +130,12 @@ function PublicRoute({ children }) {
     if (isAuthenticated) {
         // Redirect authenticated users to their dashboard
         if (user?.roles?.includes("admin")) {
-            return <Navigate to="/dashboard/admin" replace />;
+            return <Navigate to="/admin/dashboard" replace />;
         }
         if (user?.roles?.includes("hr")) {
-            return <Navigate to="/dashboard/hr" replace />;
+            return <Navigate to="/hr/dashboard" replace />;
         }
-        return <Navigate to="/dashboard/employee" replace />;
+        return <Navigate to="/employee/dashboard" replace />;
     }
 
     return children ? children : <Outlet />;
@@ -132,6 +158,10 @@ export default function AppRoutes() {
                 {/* Auth Routes - redirect if already logged in */}
                 <Route element={<PublicRoute />}>
                     <Route path="/login" element={<Login />} />
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin/signup" element={<AdminSignup />} />
+                    <Route path="/hr/login" element={<HRLogin />} />
+                    <Route path="/employee/login" element={<EmployeeLogin />} />
                 </Route>
 
                 {/* ============================================ */}
@@ -140,17 +170,30 @@ export default function AppRoutes() {
 
                 {/* Admin Dashboard - restricted to admins */}
                 <Route element={<ProtectedRoute requiredRoles={["admin"]} />}>
-                    <Route path="/dashboard/admin" element={<AdminDashboard />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/hr-management" element={<HRManagement />} />
+                    <Route path="/admin/employee-management" element={<EmployeeManagement />} />
+                    <Route path="/admin/roles" element={<RolePermissions />} />
+                    <Route path="/admin/profile" element={<AdminProfile />} />
+                    <Route path="/dashboard/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 </Route>
 
                 {/* HR Dashboard - restricted to HR and admins */}
                 <Route element={<ProtectedRoute requiredRoles={["hr", "admin"]} />}>
-                    <Route path="/dashboard/hr" element={<HRDashboard />} />
+                    <Route path="/hr/dashboard" element={<HRDashboard />} />
+                    <Route path="/hr/employees" element={<HREmployeeManagement />} />
+                    <Route path="/hr/attendance" element={<HRAttendanceManagement />} />
+                    <Route path="/hr/leaves" element={<HRLeaveManagement />} />
+                    <Route path="/hr/reports" element={<HRReports />} />
+                    <Route path="/hr/profile" element={<HRProfile />} />
+                    <Route path="/dashboard/hr" element={<Navigate to="/hr/dashboard" replace />} />
                 </Route>
 
                 {/* Employee Dashboard - accessible by all but mostly for employees */}
                 <Route element={<ProtectedRoute requiredRoles={["employee", "hr", "admin"]} />}>
-                    <Route path="/dashboard/employee" element={<EmployeeDashboard />} />
+                    <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+                    <Route path="/employee/profile" element={<EmployeeProfile />} />
+                    <Route path="/dashboard/employee" element={<Navigate to="/employee/dashboard" replace />} />
                 </Route>
 
                 {/* Shared Protected Routes */}
@@ -196,80 +239,10 @@ function DashboardRedirect() {
 
     // Redirect to appropriate dashboard based on user role
     if (user?.roles?.includes("admin")) {
-        return <Navigate to="/dashboard/admin" replace />;
+        return <Navigate to="/admin/dashboard" replace />;
     }
     if (user?.roles?.includes("hr")) {
-        return <Navigate to="/dashboard/hr" replace />;
+        return <Navigate to="/hr/dashboard" replace />;
     }
-    return <Navigate to="/dashboard/employee" replace />;
+    return <Navigate to="/employee/dashboard" replace />;
 }
-
-// ============================================
-// USAGE EXAMPLE: Login Component Update
-// ============================================
-/*
-// Update your Login component to set user data after successful login:
-
-const handleEmailLogin = () => {
-  if (!email || !password) {
-    alert("Please fill in all fields");
-    return;
-  }
-  setIsLoading(true);
-
-  // Simulate API call
-  setTimeout(() => {
-    // Mock user data - replace with actual API response
-    const userData = {
-      id: "emp-001",
-      name: "John Anderson",
-      email: email,
-      roles: ["employee"], // Can be ["hr"], ["admin"], or multiple roles
-      token: "mock-jwt-token"
-    };
-
-    // Store user in localStorage
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    // Navigate to dashboard - the route will handle role-based redirect
-    window.location.href = "/dashboard";
-
-    setIsLoading(false);
-  }, 1500);
-};
-
-// Logout function (add to your DashboardLayout or wherever needed):
-const handleLogout = () => {
-  localStorage.removeItem("user");
-  window.location.href = "/login";
-};
-*/
-
-
-// ============================================
-// ROUTE STRUCTURE SUMMARY
-// ============================================
-/*
-PUBLIC ROUTES:
-- / (Home/Landing page)
-- /login (redirects to dashboard if authenticated)
-
-PROTECTED ROUTES:
-- /dashboard (auto-redirects based on role)
-- /dashboard/employee (accessible by employee, hr, admin)
-- /dashboard/hr (accessible by hr, admin)
-- /dashboard/admin (accessible by admin only)
-
-ERROR ROUTES:
-- /403 (Forbidden - no access)
-- /404 (Not Found)
-- * (catch-all → redirect to 404)
-
-AUTHENTICATION FLOW:
-1. User lands on /login
-2. After login, user data stored in localStorage
-3. Redirected to appropriate /dashboard/* based on role
-4. Protected routes check auth & roles
-5. Unauthorized access → /403
-6. Invalid routes → /404
-*/

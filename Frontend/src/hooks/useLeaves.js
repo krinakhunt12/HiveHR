@@ -26,7 +26,7 @@ export const useLeaves = () => {
       id: Date.now().toString(),
       employeeId: 'current-user',
       employeeName: 'Current User',
-      employeeEmail: 'user@comline.com',
+      employeeEmail: 'user@hivehr.com',
       type: leaveData.type,
       startDate: leaveData.startDate,
       endDate: leaveData.endDate,
@@ -41,16 +41,16 @@ export const useLeaves = () => {
   };
 
   const approveLeave = async (leaveId) => {
-    setLeaves(prev => 
-      prev.map(leave => 
+    setLeaves(prev =>
+      prev.map(leave =>
         leave.id === leaveId ? { ...leave, status: 'approved' } : leave
       )
     );
   };
 
   const rejectLeave = async (leaveId) => {
-    setLeaves(prev => 
-      prev.map(leave => 
+    setLeaves(prev =>
+      prev.map(leave =>
         leave.id === leaveId ? { ...leave, status: 'rejected' } : leave
       )
     );

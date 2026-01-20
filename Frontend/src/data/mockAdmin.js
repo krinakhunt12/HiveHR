@@ -27,7 +27,7 @@ export const mockAdminData = {
     {
       id: '1',
       name: 'Sarah Johnson',
-      email: 'sarah.j@comline.com',
+      email: 'sarah.j@hivehr.com',
       role: 'Senior Software Engineer',
       department: 'Engineering',
       status: 'active',
@@ -36,7 +36,7 @@ export const mockAdminData = {
     {
       id: '2',
       name: 'Michael Chen',
-      email: 'michael.chen@comline.com',
+      email: 'michael.chen@hivehr.com',
       role: 'Engineering Manager',
       department: 'Engineering',
       status: 'active',
@@ -45,7 +45,7 @@ export const mockAdminData = {
     {
       id: '3',
       name: 'Emily Davis',
-      email: 'emily.davis@comline.com',
+      email: 'emily.davis@hivehr.com',
       role: 'Product Manager',
       department: 'Product',
       status: 'active',
@@ -54,7 +54,7 @@ export const mockAdminData = {
     {
       id: '4',
       name: 'David Wilson',
-      email: 'david.wilson@comline.com',
+      email: 'david.wilson@hivehr.com',
       role: 'UI/UX Designer',
       department: 'Design',
       status: 'inactive',
@@ -63,7 +63,7 @@ export const mockAdminData = {
     {
       id: '5',
       name: 'Lisa Wang',
-      email: 'lisa.wang@comline.com',
+      email: 'lisa.wang@hivehr.com',
       role: 'Director of Engineering',
       department: 'Engineering',
       status: 'active',

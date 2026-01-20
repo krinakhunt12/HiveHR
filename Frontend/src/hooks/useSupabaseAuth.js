@@ -1,5 +1,6 @@
 import { supabase, signIn, signUp, signOut, getSession } from '../lib/supabaseClient';
 import { useState, useEffect } from 'react';
+import AppLogger from '../utils/AppLogger';
 
 /**
  * Custom hook for Supabase authentication
@@ -15,7 +16,7 @@ export const useSupabaseAuth = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (loading) {
-        console.log('⏰ Auth Safety Break: Forcing loading to false');
+        AppLogger.warn('Auth Safety Break: Forcing loading to false');
         setLoading(false);
       }
     }, 3000);
@@ -23,7 +24,7 @@ export const useSupabaseAuth = () => {
   }, [loading]);
 
   const fetchProfile = async (userId) => {
-    console.log('🔍 Fetching profile for:', userId);
+    AppLogger.info('Fetching profile for:', userId);
     try {
       const { data, error: profileError } = await supabase
         .from('profiles')
@@ -33,17 +34,17 @@ export const useSupabaseAuth = () => {
 
       if (profileError) {
         if (profileError.code === 'PGRST116') {
-          console.log('ℹ️ No profile record found in database');
+          AppLogger.info('No profile record found in database for user');
           return null;
         }
         throw profileError;
       }
 
-      console.log('✅ Profile found:', data.role);
+      AppLogger.info('Profile synchronized:', data.role);
       setProfile(data);
       return data;
     } catch (err) {
-      console.error('❌ Profile fetch failed:', err.message);
+      AppLogger.error('Profile fetch failed:', err.message);
       return null;
     }
   };
@@ -52,39 +53,35 @@ export const useSupabaseAuth = () => {
     let isMounted = true;
 
     const initialize = async () => {
-      console.log('🚀 Initializing Auth...');
+      AppLogger.info('Initializing System Auth...');
       try {
-        // 1. Check current session immediately
         const { data: { session } } = await supabase.auth.getSession();
 
         if (isMounted) {
           if (session?.user) {
-            console.log('👤 Session found:', session.user.email);
+            AppLogger.info('Session restored:', session.user.email);
             setUser(session.user);
             await fetchProfile(session.user.id);
           } else {
-            console.log('anonymous user detected');
+            AppLogger.info('No active session found.');
           }
           setLoading(false);
-          console.log('🏁 Initial Load Complete');
         }
       } catch (err) {
-        console.error('💥 Auth Initialization Error:', err);
+        AppLogger.error('Auth Initialization Failure:', err);
         if (isMounted) setLoading(false);
       }
     };
 
     initialize();
 
-    // 2. Auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔔 Auth Event:', event);
+        AppLogger.info('Auth Event Detected:', event);
 
         if (isMounted) {
           if (session?.user) {
             setUser(session.user);
-            // Don't await here to avoid blocking the UI
             fetchProfile(session.user.id).then(() => {
               if (isMounted) setLoading(false);
             });
@@ -103,7 +100,6 @@ export const useSupabaseAuth = () => {
     };
   }, []);
 
-  // Login function
   const login = async (email, password) => {
     try {
       setLoading(true);
@@ -112,20 +108,17 @@ export const useSupabaseAuth = () => {
       const sessionData = await signIn(email, password);
 
       if (!sessionData?.user) {
-        throw new Error('Login failed: No user returned');
+        throw new Error('Login failed: Authentication provider returned no user');
       }
 
       const userProfile = await fetchProfile(sessionData.user.id);
 
-      // Store in localStorage for legacy code compatibility
-      localStorage.setItem('user', JSON.stringify({
-        id: sessionData.user.id,
-        email: sessionData.user.email,
-        roles: [userProfile?.role || 'employee'],
-      }));
+      // Store minimal data for persistence bridge if needed
+      localStorage.setItem('hive_session_active', 'true');
 
       return { ...sessionData, profile: userProfile };
     } catch (err) {
+      AppLogger.error('Login Error:', err.message);
       setError(err.message);
       throw err;
     } finally {
@@ -133,7 +126,6 @@ export const useSupabaseAuth = () => {
     }
   };
 
-  // Register function
   const register = async (email, password, profileData) => {
     try {
       setLoading(true);
@@ -145,7 +137,6 @@ export const useSupabaseAuth = () => {
 
       if (!user) throw new Error('Registration failed');
 
-      // Create profile record
       const { error: profileError } = await supabase.from('profiles').insert([{
         id: user.id,
         email: user.email,
@@ -154,8 +145,10 @@ export const useSupabaseAuth = () => {
 
       if (profileError) throw profileError;
 
+      AppLogger.info('New Admin account registered successfully');
       return user;
     } catch (err) {
+      AppLogger.error('Registration Error:', err.message);
       setError(err.message);
       throw err;
     } finally {
@@ -163,15 +156,33 @@ export const useSupabaseAuth = () => {
     }
   };
 
-  // Logout function
   const logout = async () => {
     try {
+      AppLogger.info('Executing system-wide logout...');
       await signOut();
-      localStorage.removeItem('user');
+      localStorage.clear(); // Clear all data as requested
       setUser(null);
       setProfile(null);
     } catch (err) {
-      console.error('Logout error:', err);
+      AppLogger.error('Logout Failure:', err);
+    }
+  };
+
+  const updateProfile = async (updates) => {
+    if (!user) return;
+    try {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+      await fetchProfile(user.id);
+      AppLogger.info('Profile updated successfully');
+      return true;
+    } catch (err) {
+      AppLogger.error('Update Profile Failure:', err);
+      throw err;
     }
   };
 
@@ -183,6 +194,7 @@ export const useSupabaseAuth = () => {
     login,
     register,
     logout,
+    updateProfile,
     isAuthenticated: !!user,
   };
 };

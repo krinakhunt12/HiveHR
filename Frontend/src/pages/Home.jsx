@@ -3,7 +3,7 @@ import { BarChart3, Users, ArrowRight, Shield, Rocket, Clock, TrendingUp, Award,
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleLoginRedirect = () => {
     navigate("/login");
@@ -108,8 +108,8 @@ const Home = () => {
                     <span className="text-slate-700">Intelligence</span>
                   </h1>
                   <p className="text-xl text-slate-600 leading-relaxed">
-                    HiveHR is a comprehensive human resource management system that combines powerful analytics, 
-                    streamlined workflows, and intelligent automation to help organizations manage their most 
+                    HiveHR is a comprehensive human resource management system that combines powerful analytics,
+                    streamlined workflows, and intelligent automation to help organizations manage their most
                     valuable asset — their people.
                   </p>
                 </div>
@@ -327,7 +327,7 @@ const Home = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-slate-800 text-center text-slate-400 text-sm">
-            © {new Date().getFullYear()} Comline Auto Parts Ltd. All Rights Reserved.
+            © {new Date().getFullYear()} hivehr Auto Parts Ltd. All Rights Reserved.
           </div>
         </div>
       </footer>

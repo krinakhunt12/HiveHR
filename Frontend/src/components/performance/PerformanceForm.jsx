@@ -17,9 +17,9 @@ const PerformanceForm = ({ onSubmit, onCancel }) => {
   });
 
   const employees = [
-    { id: 'emp-001', name: 'Sarah Johnson', email: 'sarah.j@comline.com' },
-    { id: 'emp-002', name: 'Mike Chen', email: 'mike.chen@comline.com' },
-    { id: 'emp-003', name: 'Emily Davis', email: 'emily.d@comline.com' },
+    { id: 'emp-001', name: 'Sarah Johnson', email: 'sarah.j@hivehr.com' },
+    { id: 'emp-002', name: 'Mike Chen', email: 'mike.chen@hivehr.com' },
+    { id: 'emp-003', name: 'Emily Davis', email: 'emily.d@hivehr.com' },
   ];
 
   const handleSubmit = (e) => {
@@ -112,8 +112,8 @@ const PerformanceForm = ({ onSubmit, onCancel }) => {
               Overall Rating
             </label>
             <div className="flex items-center gap-4">
-              <RatingStars 
-                rating={formData.overallRating} 
+              <RatingStars
+                rating={formData.overallRating}
                 onRatingChange={(rating) => handleChange('overallRating', rating)}
                 interactive={true}
               />
@@ -136,7 +136,7 @@ const PerformanceForm = ({ onSubmit, onCancel }) => {
                 Add Goal
               </button>
             </div>
-            
+
             <div className="space-y-4">
               {formData.goals.map((goal, index) => (
                 <div key={index} className="p-4 border border-gray-300 rounded-lg">
@@ -152,7 +152,7 @@ const PerformanceForm = ({ onSubmit, onCancel }) => {
                       </button>
                     )}
                   </div>
-                  
+
                   <div className="space-y-3">
                     <input
                       type="text"
@@ -162,7 +162,7 @@ const PerformanceForm = ({ onSubmit, onCancel }) => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                       required
                     />
-                    
+
                     <div>
                       <label className="block text-xs text-gray-600 mb-2">Progress</label>
                       <ProgressBar progress={goal.progress} />
@@ -176,11 +176,11 @@ const PerformanceForm = ({ onSubmit, onCancel }) => {
                       />
                       <div className="text-xs text-gray-500 text-right">{goal.progress}%</div>
                     </div>
-                    
+
                     <div>
                       <label className="block text-xs text-gray-600 mb-2">Rating</label>
-                      <RatingStars 
-                        rating={goal.rating} 
+                      <RatingStars
+                        rating={goal.rating}
                         onRatingChange={(rating) => handleGoalChange(index, 'rating', rating)}
                         interactive={true}
                         size="sm"
