@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
+import { cn } from '../../lib/utils';
+import { Button } from '../ui/button';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
@@ -33,25 +35,25 @@ const Sidebar = ({ isOpen, onClose }) => {
   const menuItems = {
     admin: [
       { name: 'Dashboard Overview', href: '/admin/dashboard', icon: LayoutDashboard },
-      { name: 'Manage HR', href: '/admin/hr-management', icon: ShieldCheck },
+      { name: 'Manage HR Managers', href: '/admin/hr-management', icon: ShieldCheck },
       { name: 'Manage Employees', href: '/admin/employee-management', icon: Users },
       { name: 'User Roles & Access', href: '/admin/roles', icon: ShieldAlert },
-      { name: 'Profile / Settings', href: '/admin/profile', icon: Settings },
+      { name: 'Global Settings', href: '/admin/profile', icon: Settings },
     ],
     hr: [
       { name: 'Dashboard Overview', href: '/hr/dashboard', icon: LayoutDashboard },
-      { name: 'Employee Management', href: '/hr/employees', icon: Users },
-      { name: 'Attendance Management', href: '/hr/attendance', icon: Clock },
-      { name: 'Leave Management', href: '/hr/leaves', icon: Calendar },
-      { name: 'Reports', href: '/hr/reports', icon: FileText },
-      { name: 'Profile / Settings', href: '/hr/profile', icon: Settings },
+      { name: 'Personnel Files', href: '/hr/employees', icon: Users },
+      { name: 'Time Tracking', href: '/hr/attendance', icon: Clock },
+      { name: 'Leave Control', href: '/hr/leaves', icon: Calendar },
+      { name: 'Intelligence Reports', href: '/hr/reports', icon: FileText },
+      { name: 'System Settings', href: '/hr/profile', icon: Settings },
     ],
     employee: [
-      { name: 'My Dashboard', href: '/employee/dashboard', icon: LayoutDashboard },
-      { name: 'Attendance', href: '/attendance', icon: Calendar },
-      { name: 'My Leaves', href: '/leaves', icon: Clock },
-      { name: 'Performance', href: '/performance', icon: BarChart3 },
-      { name: 'Personal Profile', href: '/employee/profile', icon: UserCircle },
+      { name: 'Worker Dashboard', href: '/employee/dashboard', icon: LayoutDashboard },
+      { name: 'Attendance Record', href: '/attendance', icon: Calendar },
+      { name: 'Leave Requests', href: '/leaves', icon: Clock },
+      { name: 'My Performance', href: '/performance', icon: BarChart3 },
+      { name: 'Identity Profile', href: '/employee/profile', icon: UserCircle },
     ]
   };
 
@@ -63,26 +65,26 @@ const Sidebar = ({ isOpen, onClose }) => {
 
 
   return (
-    <div className={`
-      fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 text-slate-300 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-      ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-    `}>
+    <div className={cn(
+      "fixed inset-y-0 left-0 z-50 w-72 bg-black border-r border-white/10 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
       <div className="flex flex-col h-full">
         {/* Brand */}
-        <div className="flex h-20 items-center px-8 border-b border-slate-800">
+        <div className="flex h-20 items-center px-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <BarChart3 className="w-6 h-6 text-white" />
+            <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+              <BarChart3 className="w-4 h-4 text-black" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">HiveHR</h1>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-indigo-400 font-bold">{userRole} Engine</p>
+              <h1 className="text-lg font-black tracking-tighter uppercase">HiveHR</h1>
+              <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold">{userRole} Engine</p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-4 py-8 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -94,31 +96,42 @@ const Sidebar = ({ isOpen, onClose }) => {
                   navigate(item.href);
                   if (onClose) onClose();
                 }}
-                className={`
-                  w-full group flex items-center gap-x-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200
-                  ${active
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                  }
-                `}
+                className={cn(
+                  "w-full group flex items-center gap-x-3 rounded-md px-4 py-3 text-[11px] font-bold uppercase tracking-widest transition-all duration-200",
+                  active
+                    ? "bg-white text-black shadow-lg"
+                    : "text-white/50 hover:bg-white/5 hover:text-white"
+                )}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-white' : 'group-hover:text-white'}`} />
+                <Icon className={cn("w-4 h-4 flex-shrink-0", active ? "text-black" : "group-hover:text-white")} />
                 <span className="flex-1 text-left">{item.name}</span>
-                {active && <ChevronRight className="w-4 h-4 ml-auto" />}
+                {active && <ChevronRight className="w-3 h-3 ml-auto opacity-50" />}
               </button>
             );
           })}
         </nav>
 
-        {/* Logout at bottom */}
-        <div className="p-4 border-t border-slate-800">
-          <button
+        {/* User identification */}
+        <div className="px-6 py-4 flex items-center gap-3 border-t border-white/10 mx-2 mb-2 rounded-xl bg-white/5">
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+            {profile?.full_name?.charAt(0) || 'U'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold truncate uppercase tracking-wider">{profile?.full_name || 'System User'}</p>
+            <p className="text-[8px] text-white/40 truncate uppercase tracking-widest">Active Session</p>
+          </div>
+        </div>
+
+        {/* Logout */}
+        <div className="p-4">
+          <Button
+            variant="ghost"
             onClick={handleLogout}
-            className="w-full flex items-center gap-x-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
+            className="w-full justify-start gap-3 h-12 text-white/50 hover:bg-white/5 hover:text-white rounded-md text-[10px] font-bold uppercase tracking-[0.2em]"
           >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
-          </button>
+            <LogOut className="w-4 h-4" />
+            <span>Terminate</span>
+          </Button>
         </div>
       </div>
     </div>

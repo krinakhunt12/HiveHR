@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useSupabaseAuth } from "../../hooks/useSupabaseAuth";
 import { useToast } from "../../hooks/useToast";
 import AppLogger from "../../utils/AppLogger";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 
 const EmployeeLogin = () => {
     const [email, setEmail] = useState("");
@@ -34,102 +36,95 @@ const EmployeeLogin = () => {
     };
 
     return (
-        <div className="min-h-screen flex bg-slate-50">
-            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-800 to-indigo-950 p-12 flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl opacity-10"></div>
-
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-16">
-                        <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg">
-                            <BarChart3 className="text-slate-800 w-6 h-6" />
+        <div className="min-h-screen flex bg-background text-foreground uppercase tracking-widest font-black">
+            {/* Minimalist branding side */}
+            <div className="hidden lg:flex lg:w-1/2 bg-black p-16 flex-col justify-between border-r border-white/10">
+                <div>
+                    <div className="flex items-center gap-4 mb-24">
+                        <div className="w-10 h-10 bg-white rounded-sm flex items-center justify-center">
+                            <BarChart3 className="text-black w-6 h-6" />
                         </div>
-                        <h1 className="text-3xl font-bold text-white">HiveHR</h1>
+                        <h1 className="text-2xl font-black text-white tracking-tighter uppercase">HiveHR</h1>
                     </div>
 
-                    <div className="space-y-8">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-sm font-medium mb-4">
-                            Employee Self-Service
+                    <div className="space-y-10">
+                        <div className="text-[10px] px-3 py-1 bg-white text-black inline-block">
+                            EMPLOYEE_SELF_SERVICE
                         </div>
-                        <h2 className="text-4xl font-bold text-white leading-tight">
-                            Your Career Journey, Managed by You.
+                        <h2 className="text-5xl font-black text-white leading-tight uppercase">
+                            PERSONNEL_RESOURCE_HUB
                         </h2>
-                        <p className="text-xl text-slate-300 leading-relaxed">
-                            Track your growth, manage leaves, and stay connected with your team through our integrated employee portal.
+                        <p className="text-xs text-white/50 leading-loose max-w-sm font-bold normal-case tracking-normal">
+                            Monitor personal development cycles, submit operational leave data, and Synchronize with enterprise objectives.
                         </p>
                     </div>
                 </div>
 
-                <div className="relative z-10">
-                    <p className="text-slate-400 text-sm">
-                        © {new Date().getFullYear()} HiveHR. Connecting People & Purpose.
+                <div>
+                    <p className="text-white/20 text-[10px]">
+                        HIVEHR_ENGINE.BUILD_V2.SECTOR_EMP.
                     </p>
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center justify-center p-8">
-                <div className="w-full max-w-md">
-                    <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-                        <div className="mb-8">
-                            <h2 className="text-3xl font-bold text-slate-900 mb-2">Employee Login</h2>
-                            <p className="text-slate-600">Enter your credentials to access your portal</p>
+            {/* Login form side */}
+            <div className="flex-1 flex items-center justify-center p-12 lg:p-24">
+                <div className="w-full max-w-sm space-y-12">
+                    <div className="space-y-4">
+                        <h2 className="text-4xl font-black tracking-tighter uppercase">Portal_Access</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Authorized_Personnel_Identification</p>
+                    </div>
+
+                    {authError && (
+                        <div className="p-4 bg-muted border border-foreground/10 flex items-center gap-3 text-foreground text-[10px] animate-fade-in">
+                            <AlertCircle className="w-4 h-4" />
+                            <p>{authError}</p>
+                        </div>
+                    )}
+
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase text-muted-foreground">Internal Email</label>
+                            <Input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                placeholder="USER@ORGANIZATION.GRID"
+                                className="h-12 border-foreground/10 bg-muted/50 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+                            />
                         </div>
 
-                        {(authError) && (
-                            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700 text-sm">
-                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                                <p>{authError}</p>
-                            </div>
-                        )}
-
-                        <div className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Employee Email</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-slate-400" />
-                                    </div>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        placeholder="employee@company.com"
-                                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-800 outline-none transition-all"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Lock className="h-5 w-5 text-slate-400" />
-                                    </div>
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-800 outline-none transition-all"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={handleLogin}
-                                disabled={isLoading}
-                                className="w-full group bg-slate-800 hover:bg-slate-900 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 shadow-md"
-                            >
-                                {isLoading ? (
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <>
-                                        Sign In to Portal
-                                        <LogIn className="w-5 h-5" />
-                                    </>
-                                )}
-                            </button>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase text-muted-foreground">Standard Passkey</label>
+                            <Input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                placeholder="••••••••"
+                                className="h-12 border-foreground/10 bg-muted/50 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+                            />
                         </div>
+
+                        <Button
+                            onClick={handleLogin}
+                            disabled={isLoading}
+                            className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none text-xs font-black uppercase tracking-[0.3em] transition-all"
+                        >
+                            {isLoading ? "LOADING_SESSION..." : (
+                                <span className="flex items-center gap-3">
+                                    INITIATE_WORKSTATION
+                                    <LogIn className="w-4 h-4" />
+                                </span>
+                            )}
+                        </Button>
+                    </div>
+
+                    <div className="pt-8 border-t border-muted text-center">
+                        <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest leading-relaxed">
+                            Secured via Enterprise Encryption Protocol. Unauthorized access logged.
+                        </p>
                     </div>
                 </div>
             </div>

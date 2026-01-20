@@ -6,77 +6,94 @@ import {
     PieChart as PieChartIcon,
     Users,
     TrendingUp,
-    Files
+    Files,
+    Command
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { Button } from '../../components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
 
 const HRReports = () => {
     const reportCategories = [
         {
-            title: 'Workforce Analytics',
-            desc: 'Employee distribution, turnover rates, and demographic breakdowns.',
+            title: 'WORKFORCE_ANALYTICS',
+            desc: 'Personnel distribution, churn rates, and demographic breakdowns.',
             icon: Users,
-            color: 'bg-indigo-50 text-indigo-600',
-            reports: ['Organization Chart', 'Headcount Report', 'Diversity Matrix']
+            reports: ['Organization_Ledger', 'Headcount_Report', 'Diversity_Matrix']
         },
         {
-            title: 'Attendance Intelligence',
-            desc: 'Daily logs, overtime reports, and late-arrival patterns.',
+            title: 'ATTENDANCE_INTEL',
+            desc: 'Temporal logs, overtime reports, and late-arrival patterns.',
             icon: BarChart3,
-            color: 'bg-emerald-50 text-emerald-600',
-            reports: ['Monthly Summary', 'Clock-in Logs', 'Overtime Audit']
+            reports: ['Monthly_Summary', 'Clock-in_Logs_Audit', 'Overtime_Ledger']
         },
         {
-            title: 'Leave & Absence',
-            desc: 'Leave utilization, sick leave trends, and balance summaries.',
+            title: 'LEAVE_PROTECT',
+            desc: 'Balance summaries, sick leave trends, and utilization metrics.',
             icon: Files,
-            color: 'bg-rose-50 text-rose-600',
-            reports: ['Utilization Report', 'Absence Trends', 'Balance Export']
+            reports: ['Cycle_Utilization', 'Absence_Patterns', 'Balance_Export']
         }
     ];
 
     return (
         <DashboardLayout>
-            <div className="space-y-10 animate-in fade-in duration-500">
-                <div className="text-center max-w-2xl mx-auto space-y-4">
-                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Reporting Vault</h1>
-                    <p className="text-lg text-slate-500 font-medium leading-relaxed">
-                        Generate and download mission-critical data exports for workforce planning and compliance auditing.
-                    </p>
+            <div className="space-y-12 animate-fade-in text-foreground uppercase tracking-widest font-black">
+                {/* Header */}
+                <div className="relative h-48 w-full bg-foreground flex items-center justify-center border-b border-white/5 overflow-hidden">
+                    <div className="absolute inset-0 opacity-10">
+                        <div className="flex flex-wrap h-full w-full">
+                            {Array(100).fill(0).map((_, i) => (
+                                <div key={i} className="w-10 h-10 border-[0.5px] border-background"></div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="relative z-10 text-center space-y-2">
+                        <h1 className="text-4xl font-black text-background tracking-[0.3em]">REPORT_VAULT</h1>
+                        <p className="text-[9px] text-background/50 font-bold tracking-[0.5em]">SYSTEM_DATA_EXPORTS</p>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Categories */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {reportCategories.map((cat, i) => (
-                        <div key={i} className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-10 flex flex-col group hover:shadow-2xl hover:shadow-slate-200/50 transition-all">
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-8 ${cat.color} group-hover:scale-110 transition-transform`}>
-                                <cat.icon className="w-8 h-8" />
+                        <Card key={i} className="rounded-none border-foreground/10 bg-background shadow-none hover:border-foreground transition-all group p-10 flex flex-col">
+                            <div className="w-14 h-14 bg-foreground text-background flex items-center justify-center mb-10 group-hover:invert transition-all">
+                                <cat.icon className="w-6 h-6" />
                             </div>
-                            <h3 className="text-2xl font-black text-slate-900 mb-2">{cat.title}</h3>
-                            <p className="text-sm font-medium text-slate-400 mb-8">{cat.desc}</p>
+                            <h3 className="text-xl font-black mb-4 tracking-tighter">{cat.title}</h3>
+                            <p className="text-[10px] font-bold text-muted-foreground mb-10 leading-relaxed lowercase tracking-normal">
+                                {cat.desc}
+                            </p>
 
                             <div className="flex-1 space-y-3">
+                                <p className="text-[8px] font-black text-muted-foreground mb-4 tracking-[0.3em]">SELECT_FILE:</p>
                                 {cat.reports.map(report => (
-                                    <button key={report} className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all group/btn">
-                                        <span className="text-sm font-bold text-slate-600 group-hover/btn:text-slate-900">{report}</span>
-                                        <Download className="w-4 h-4 text-slate-300 group-hover/btn:text-indigo-500" />
+                                    <button
+                                        key={report}
+                                        className="w-full flex items-center justify-between p-4 border border-foreground/5 bg-secondary/20 hover:bg-foreground hover:text-background transition-all group/btn"
+                                    >
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{report}</span>
+                                        <Download className="w-3.5 h-3.5 opacity-30 group-hover/btn:opacity-100" />
                                     </button>
                                 ))}
                             </div>
-                        </div>
+                        </Card>
                     ))}
                 </div>
 
-                <div className="p-10 bg-slate-900 rounded-[3rem] text-white flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl shadow-indigo-200">
+                {/* Bottom Action */}
+                <div className="p-12 border-2 border-foreground bg-foreground text-background flex flex-col lg:flex-row items-center justify-between gap-10 rounded-none shadow-[20px_20px_0px_0px_rgba(0,0,0,0.1)]">
                     <div className="space-y-4 text-center lg:text-left">
-                        <h2 className="text-3xl font-black">Ready for a Custom Extraction?</h2>
-                        <p className="text-slate-400 font-medium max-w-lg">
-                            Can't find the specific metric you need? Use our advanced query builder to construct a tailored workforce report.
+                        <div className="inline-block px-3 py-1 bg-background text-foreground text-[9px] font-black mb-2">CUSTOM_EXTRACTION</div>
+                        <h2 className="text-3xl font-black tracking-tighter">INITIATE_SQL_QUERY?</h2>
+                        <p className="text-[11px] text-background/60 font-medium max-w-lg leading-loose normal-case tracking-normal">
+                            Unmatched metrics in current files can be addressed through the institutional query builder. Request specific workforce data structures via manual override.
                         </p>
                     </div>
-                    <button className="px-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-indigo-900/50 flex items-center gap-3">
-                        <TrendingUp className="w-5 h-5" />
-                        Initialize Query Builder
-                    </button>
+                    <Button variant="outline" className="h-16 px-12 bg-background text-foreground hover:invert rounded-none font-black uppercase tracking-[0.3em] text-[11px] transition-all flex items-center gap-4">
+                        <TrendingUp className="w-4 h-4" />
+                        ACCESS_BUILDER
+                    </Button>
                 </div>
             </div>
         </DashboardLayout>

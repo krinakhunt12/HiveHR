@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useSupabaseAuth } from "../../hooks/useSupabaseAuth";
 import { useToast } from "../../hooks/useToast";
 import AppLogger from "../../utils/AppLogger";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 
 const HRLogin = () => {
     const [email, setEmail] = useState("");
@@ -34,108 +36,95 @@ const HRLogin = () => {
     };
 
     return (
-        <div className="min-h-screen flex bg-slate-50">
-            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-800 to-slate-900 p-12 flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500 rounded-full blur-3xl opacity-20"></div>
-
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-16">
-                        <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg">
-                            <BarChart3 className="text-emerald-800 w-6 h-6" />
+        <div className="min-h-screen flex bg-background text-foreground uppercase tracking-widest font-black">
+            {/* Branding side */}
+            <div className="hidden lg:flex lg:w-1/2 bg-black p-16 flex-col justify-between border-r border-white/10">
+                <div>
+                    <div className="flex items-center gap-4 mb-24">
+                        <div className="w-10 h-10 bg-white rounded-sm flex items-center justify-center">
+                            <BarChart3 className="text-black w-6 h-6" />
                         </div>
-                        <h1 className="text-3xl font-bold text-white">HiveHR</h1>
+                        <h1 className="text-2xl font-black text-white tracking-tighter uppercase">HiveHR</h1>
                     </div>
 
-                    <div className="space-y-8">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-sm font-medium mb-4">
-                            HR Command Center
+                    <div className="space-y-10">
+                        <div className="text-[10px] px-3 py-1 bg-white text-black inline-block">
+                            HR_MANAGEMENT_STATION
                         </div>
-                        <h2 className="text-4xl font-bold text-white leading-tight">
-                            Nurture Talent & Optimize Workforce Efficiency
+                        <h2 className="text-5xl font-black text-white leading-tight uppercase">
+                            OPTIMIZE_HUMAN_CAPITAL
                         </h2>
-                        <p className="text-xl text-slate-300 leading-relaxed">
-                            Approve leaves, track performance metrics, and manage employee lifecycle with our intelligent HR suite.
+                        <p className="text-xs text-white/50 leading-loose max-w-sm font-bold normal-case tracking-normal">
+                            Access operational personnel files, coordinate leave protocols, and monitoring workforce sentiment across the enterprise grid.
                         </p>
                     </div>
                 </div>
 
-                <div className="relative z-10">
-                    <p className="text-slate-400 text-sm">
-                        © {new Date().getFullYear()} HiveHR. Empowering People Operations.
+                <div>
+                    <p className="text-white/20 text-[10px]">
+                        HIVEHR_ENGINE.BUILD_V2.SECTOR_HR.
                     </p>
                 </div>
             </div>
 
-            <div className="flex-1 flex items-center justify-center p-8">
-                <div className="w-full max-w-md">
-                    <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-                        <div className="mb-8 text-center lg:text-left">
-                            <h2 className="text-3xl font-bold text-slate-900 mb-2">HR Login</h2>
-                            <p className="text-slate-600">Manage your workforce environment</p>
+            {/* Login form side */}
+            <div className="flex-1 flex items-center justify-center p-12 lg:p-24">
+                <div className="w-full max-w-sm space-y-12">
+                    <div className="space-y-4">
+                        <h2 className="text-4xl font-black tracking-tighter">ACCESS_SESSION</h2>
+                        <p className="text-[10px] text-muted-foreground font-bold">HR_CREDENTIALS_REQUIRED</p>
+                    </div>
+
+                    {authError && (
+                        <div className="p-4 bg-muted border border-foreground/10 flex items-center gap-3 text-foreground text-[10px] animate-pulse">
+                            <AlertCircle className="w-4 h-4" />
+                            <p>{authError}</p>
+                        </div>
+                    )}
+
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase text-muted-foreground">Personnel Email</label>
+                            <Input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                placeholder="HR@HIVEHR.SYSTEM"
+                                className="h-12 border-foreground/10 bg-muted/50 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+                            />
                         </div>
 
-                        {(authError) && (
-                            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700 text-sm">
-                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                                <p>{authError}</p>
-                            </div>
-                        )}
-
-                        <div className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Work Email</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-slate-400" />
-                                    </div>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        placeholder="hr@company.com"
-                                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Lock className="h-5 w-5 text-slate-400" />
-                                    </div>
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={handleLogin}
-                                disabled={isLoading}
-                                className="w-full group bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 shadow-md"
-                            >
-                                {isLoading ? (
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <>
-                                        Enter HR Center
-                                        <ShieldCheck className="w-5 h-5" />
-                                    </>
-                                )}
-                            </button>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase text-muted-foreground">Secure Passkey</label>
+                            <Input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                placeholder="••••••••"
+                                className="h-12 border-foreground/10 bg-muted/50 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+                            />
                         </div>
 
-                        <div className="mt-8 pt-6 border-t border-slate-200 text-center">
-                            <p className="text-sm text-slate-500 italic">
-                                Account creation is managed by Corporate IT.
-                            </p>
-                        </div>
+                        <Button
+                            onClick={handleLogin}
+                            disabled={isLoading}
+                            className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none text-xs font-black uppercase tracking-[0.3em] transition-all"
+                        >
+                            {isLoading ? "AUTHORIZING..." : (
+                                <span className="flex items-center gap-3">
+                                    INITIATE_SQUAD_COMMAND
+                                    <ShieldCheck className="w-4 h-4" />
+                                </span>
+                            )}
+                        </Button>
+                    </div>
+
+                    <div className="pt-8 border-t border-muted text-center">
+                        <p className="text-[9px] text-muted-foreground font-black italic uppercase tracking-widest leading-relaxed">
+                            System access restricted to authorized HR personnel. Institutional logging active.
+                        </p>
                     </div>
                 </div>
             </div>

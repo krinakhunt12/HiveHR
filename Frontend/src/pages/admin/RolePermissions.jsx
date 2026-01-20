@@ -1,13 +1,16 @@
 import React from 'react';
-import { Shield, ShieldAlert, ShieldCheck, Lock, Check, X } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldCheck, Lock, Check, X, Command } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { Button } from '../../components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
+import { cn } from '../../lib/utils';
 
 const RolePermissions = () => {
     const roles = [
         {
-            name: 'Administrator',
-            icon: <ShieldAlert className="w-8 h-8 text-rose-500" />,
-            description: 'Full system governance, security controls, and role management.',
+            name: 'ADMINISTRATOR',
+            icon: <ShieldAlert className="w-7 h-7" />,
+            description: 'Global system governance, security gates, and role orchestration.',
             permissions: {
                 'Add/Edit Users': true,
                 'Manage Roles': true,
@@ -16,12 +19,12 @@ const RolePermissions = () => {
                 'Delete Accounts': true,
                 'HR Controls': true
             },
-            color: 'border-rose-100 bg-rose-50/30'
+            status: 'ROOT_ACCESS'
         },
         {
-            name: 'HR Manager',
-            icon: <ShieldCheck className="w-8 h-8 text-emerald-500" />,
-            description: 'Workforce management, leave approvals, and employee records.',
+            name: 'HR_MANAGER',
+            icon: <ShieldCheck className="w-7 h-7" />,
+            description: 'Personnel life-cycle management, leave gates and audits.',
             permissions: {
                 'Add/Edit Users': true,
                 'Manage Roles': false,
@@ -30,12 +33,12 @@ const RolePermissions = () => {
                 'Delete Accounts': false,
                 'HR Controls': true
             },
-            color: 'border-emerald-100 bg-emerald-50/30'
+            status: 'OPERATIONAL'
         },
         {
-            name: 'Employee',
-            icon: <Shield className="w-8 h-8 text-indigo-500" />,
-            description: 'Self-service dashboard, attendance tracking, and personal files.',
+            name: 'EMPLOYEE_NODE',
+            icon: <Shield className="w-7 h-7" />,
+            description: 'Self-service terminal, temporal tracking and personal files.',
             permissions: {
                 'Add/Edit Users': false,
                 'Manage Roles': false,
@@ -44,7 +47,7 @@ const RolePermissions = () => {
                 'Delete Accounts': false,
                 'HR Controls': false
             },
-            color: 'border-indigo-100 bg-indigo-50/30'
+            status: 'LIMITED_GATE'
         }
     ];
 
@@ -59,59 +62,75 @@ const RolePermissions = () => {
 
     return (
         <DashboardLayout>
-            <div className="space-y-10">
-                <div className="text-center max-w-2xl mx-auto">
-                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">RBAC Control Center</h1>
-                    <p className="text-lg text-slate-500 font-medium leading-relaxed">
-                        Role-Based Access Control (RBAC) ensures that only authorized personnel can access sensitive system functions.
+            <div className="space-y-12 animate-fade-in text-foreground uppercase tracking-widest font-black">
+                {/* Header */}
+                <div className="text-center max-w-3xl mx-auto space-y-4">
+                    <div className="inline-block px-4 py-1 border border-foreground text-[10px] font-black mb-4">RBAC_PROTOCOLS</div>
+                    <h1 className="text-5xl font-black tracking-tighter">ACCESS_GOVERNANCE</h1>
+                    <p className="text-[11px] text-muted-foreground font-bold leading-relaxed normal-case tracking-normal px-12">
+                        Role-Based Access Control (RBAC) enforces security by restricting session capabilities to authorized personnel profiles only. Modifications require institutional authorization codes.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Roles Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {roles.map((role) => (
-                        <div key={role.name} className={`rounded-3xl border-2 p-8 transition-all hover:shadow-2xl hover:shadow-slate-200/50 ${role.color}`}>
-                            <div className="mb-6 p-4 bg-white rounded-2xl shadow-sm inline-block">
-                                {role.icon}
+                        <Card key={role.name} className="rounded-none border-foreground/10 bg-background shadow-none hover:border-foreground transition-all group flex flex-col p-8">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="w-14 h-14 border border-foreground bg-secondary/50 flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors">
+                                    {role.icon}
+                                </div>
+                                <div className="text-[9px] font-black underline underline-offset-4 decoration-2">{role.status}</div>
                             </div>
-                            <h2 className="text-2xl font-black text-slate-900 mb-2">{role.name}</h2>
-                            <p className="text-sm font-medium text-slate-500 mb-8 h-10">{role.description}</p>
 
-                            <div className="space-y-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Permissions Matrix</p>
+                            <h2 className="text-2xl font-black tracking-tighter mb-4">{role.name}</h2>
+                            <p className="text-[10px] font-bold text-muted-foreground mb-10 leading-relaxed normal-case h-10">{role.description}</p>
+
+                            <div className="space-y-4 flex-1">
+                                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6">PERMISSION_MATRIX:</p>
                                 {permissionList.map(permission => (
-                                    <div key={permission} className="flex items-center justify-between group">
-                                        <span className={`text-sm font-bold ${role.permissions[permission] ? 'text-slate-700' : 'text-slate-400'}`}>
-                                            {permission}
+                                    <div key={permission} className="flex items-center justify-between py-2 border-b border-foreground/5 group-hover:border-foreground/10">
+                                        <span className={cn(
+                                            "text-[10px] font-black tracking-widest",
+                                            role.permissions[permission] ? "opacity-100" : "opacity-20"
+                                        )}>
+                                            {permission.toUpperCase().replace(' ', '_')}
                                         </span>
                                         {role.permissions[permission] ? (
-                                            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-200">
-                                                <Check className="w-3.5 h-3.5 text-white stroke-[4]" />
+                                            <div className="w-4 h-4 bg-foreground flex items-center justify-center">
+                                                <Check className="w-3 h-3 text-background stroke-[4]" />
                                             </div>
                                         ) : (
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-                                                <X className="w-3.5 h-3.5 text-slate-400 stroke-[4]" />
+                                            <div className="w-4 h-4 border border-foreground/10 flex items-center justify-center">
+                                                <X className="w-3 h-3 text-foreground/20 stroke-[4]" />
                                             </div>
                                         )}
                                     </div>
                                 ))}
                             </div>
 
-                            <button className="w-full mt-10 py-4 rounded-2xl bg-white border border-slate-200 text-slate-400 font-black uppercase tracking-widest text-[10px] cursor-not-allowed">
-                                Read Only Access
-                            </button>
-                        </div>
+                            <Button disabled className="w-full mt-10 h-12 rounded-none bg-secondary/50 text-muted-foreground font-black uppercase tracking-[0.2em] text-[9px] border-none">
+                                READ_ONLY_LOG
+                            </Button>
+                        </Card>
                     ))}
                 </div>
 
-                <div className="p-8 bg-indigo-600 rounded-3xl text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl shadow-indigo-200">
-                    <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                        <Lock className="w-10 h-10 text-white" />
+                {/* Governance Alert */}
+                <Card className="p-10 rounded-none border-2 border-foreground bg-secondary/30 flex flex-col md:flex-row items-center gap-10">
+                    <div className="w-20 h-20 bg-foreground flex items-center justify-center shrink-0">
+                        <Lock className="w-10 h-10 text-background" />
                     </div>
-                    <div className="flex-1 text-center md:text-left">
-                        <h3 className="text-2xl font-bold mb-2">Need to modify role schemas?</h3>
-                        <p className="text-indigo-100 font-medium">System policies are currently locked at the kernel level for security. Contact Corporate Infrastructure to request structural changes.</p>
+                    <div className="flex-1 text-center md:text-left space-y-3">
+                        <h3 className="text-2xl font-black tracking-tighter uppercase">STRUCTURAL_MODIFICATION_LOCKED</h3>
+                        <p className="text-[11px] text-muted-foreground font-bold tracking-tight normal-case leading-relaxed">
+                            System schemas and kernel permissions are hard-coded into the protocol for institutional stability. Structural redesign must be initialized via Corporate Infrastructure Bypass.
+                        </p>
                     </div>
-                </div>
+                    <Button variant="outline" className="h-14 px-8 border-foreground rounded-none font-black uppercase tracking-[0.2em] text-[10px] opacity-40 cursor-not-allowed">
+                        REQUEST_OVERRIDE
+                    </Button>
+                </Card>
             </div>
         </DashboardLayout>
     );

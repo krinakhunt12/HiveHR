@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Shield, Key, Bell, Globe, Camera, Briefcase } from 'lucide-react';
+import { User, Mail, Shield, Key, Bell, Globe, Camera, Briefcase, Command, Save, Lock } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
 import { useToast } from '../../hooks/useToast';
 import AppLogger from '../../utils/AppLogger';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
+import { cn } from '../../lib/utils';
 
 const HRProfile = () => {
     const { profile, updateProfile } = useSupabaseAuth();
@@ -20,7 +24,7 @@ const HRProfile = () => {
         setLoading(true);
         try {
             await updateProfile({ full_name: name });
-            showToast('HR Profile updated.', 'success');
+            showToast('Identity records updated.', 'success');
             setIsEditing(false);
         } catch (err) {
             AppLogger.error('HR profile update failure', err);
@@ -32,163 +36,133 @@ const HRProfile = () => {
 
     return (
         <DashboardLayout>
-            <div className="max-w-4xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-                {/* Profile Header */}
-                <div className="relative">
-                    <div className="h-56 w-full bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[3rem] shadow-xl"></div>
-                    <div className="absolute -bottom-12 left-12 flex items-end gap-8">
-                        <div className="relative">
-                            <div className="w-36 h-36 rounded-[2.5rem] bg-white p-2 shadow-2xl">
-                                <div className="w-full h-full rounded-[2rem] bg-slate-100 flex items-center justify-center text-5xl font-black text-slate-300 overflow-hidden">
-                                    {profile?.full_name?.charAt(0) || <User className="w-16 h-16" />}
-                                </div>
-                            </div>
-                            <button className="absolute bottom-2 right-2 p-2.5 bg-white rounded-2xl shadow-lg border border-slate-100 text-slate-600 hover:text-emerald-600 transition-all">
-                                <Camera className="w-5 h-5" />
-                            </button>
+            <div className="max-w-5xl mx-auto space-y-12 animate-fade-in text-foreground uppercase tracking-widest font-black">
+                {/* Visual Header */}
+                <div className="relative h-64 w-full bg-foreground flex items-center justify-center overflow-hidden border-b border-white/5">
+                    <div className="absolute inset-0 opacity-5">
+                        <div className="flex flex-wrap h-full w-full">
+                            {Array(200).fill(0).map((_, i) => (
+                                <div key={i} className="w-10 h-10 border-[0.2px] border-background"></div>
+                            ))}
                         </div>
-                        <div className="pb-6">
-                            <h1 className="text-4xl font-black text-slate-900 tracking-tight">{profile?.full_name || 'HR Manager'}</h1>
-                            <div className="flex items-center gap-3 mt-2">
-                                <p className="text-xs font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-full">
-                                    <Shield className="w-4 h-4" />
-                                    {profile?.job_title || 'HR Specialist'}
-                                </p>
-                                <p className="text-sm font-bold text-slate-400 flex items-center gap-2">
-                                    <Briefcase className="w-4 h-4" />
-                                    Human Resources
-                                </p>
-                            </div>
-                        </div>
+                    </div>
+                    <div className="relative z-10 text-center space-y-4">
+                        <h1 className="text-6xl font-black text-background tracking-[0.2em] uppercase">HR_STATION</h1>
+                        <p className="text-[10px] text-background/50 font-bold tracking-[0.5em] uppercase">PERSONNEL_DATA_ADMINISTRATION</p>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-24">
-                    {/* Identity Info */}
-                    <div className="md:col-span-2 space-y-10">
-                        <section className="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm space-y-10">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-2xl font-black flex items-center gap-4 text-slate-900">
-                                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
-                                        <User className="w-6 h-6 text-emerald-500" />
-                                    </div>
-                                    Personnel Identity
-                                </h2>
-                                {!isEditing ? (
-                                    <button
-                                        onClick={() => setIsEditing(true)}
-                                        className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 underline underline-offset-8"
-                                    >
-                                        Update Identity
-                                    </button>
-                                ) : (
-                                    <div className="flex gap-4">
-                                        <button
-                                            onClick={() => setIsEditing(false)}
-                                            className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            onClick={handleSave}
-                                            disabled={loading}
-                                            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700"
-                                        >
-                                            {loading ? <div className="w-3 h-3 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div> : <Key className="w-3 h-3" />}
-                                            Commit Changes
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="grid grid-cols-2 gap-10">
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Assigned Name</label>
-                                    <input
-                                        type="text"
-                                        readOnly={!isEditing}
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className={`w-full px-6 py-4 border-none rounded-2xl font-bold transition-all ${isEditing ? 'bg-slate-50 ring-2 ring-emerald-500/10 text-slate-900' : 'bg-slate-50 text-slate-700'}`}
-                                    />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 -mt-24 relative z-20 px-4 md:px-0">
+                    {/* Identity Module */}
+                    <div className="lg:col-span-2 space-y-12">
+                        <Card className="rounded-none border-foreground shadow-[20px_20px_0px_0px_rgba(0,0,0,1)] bg-background">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b pb-8">
+                                <div className="space-y-1">
+                                    <CardTitle className="text-2xl font-black uppercase">Identity_Markers</CardTitle>
+                                    <CardDescription className="text-[10px] font-bold uppercase text-muted-foreground">Primary recognition codes for HR personnel.</CardDescription>
                                 </div>
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Staff Serial</label>
-                                    <input type="text" readOnly value={profile?.employee_id || 'HR-SEC-09'} className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500/20" />
-                                </div>
-                                <div className="col-span-2 space-y-3">
-                                    <label className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Corporate Correspondence</label>
-                                    <div className="flex gap-3">
-                                        <input type="text" readOnly value={profile?.email || ''} className="flex-1 px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold text-slate-700" />
-                                        <button className="px-8 bg-emerald-50 text-emerald-600 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-emerald-100 transition-all border border-emerald-100">Synchronize</button>
+                                <Button
+                                    variant={isEditing ? "default" : "outline"}
+                                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                                    disabled={loading}
+                                    className="h-10 px-6 rounded-none text-[10px] uppercase font-black tracking-widest border-foreground"
+                                >
+                                    {loading ? "COMMITTING..." : (isEditing ? "CONFIRM_SIG" : "REVISE_PROFILE")}
+                                </Button>
+                            </CardHeader>
+                            <CardContent className="pt-10 space-y-10">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase text-muted-foreground">Full Legal Identification</label>
+                                        <Input
+                                            readOnly={!isEditing}
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className={cn(
+                                                "h-14 rounded-none border-foreground/10 bg-secondary/30 font-black uppercase tracking-widest text-xs px-6",
+                                                isEditing && "border-foreground bg-background focus-visible:ring-0"
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase text-muted-foreground">Operational STAFF ID</label>
+                                        <Input
+                                            readOnly
+                                            value={profile?.employee_id || 'HR_SEC_000'}
+                                            className="h-14 rounded-none border-foreground/5 bg-secondary text-muted-foreground font-black uppercase tracking-widest text-xs px-6 cursor-not-allowed"
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2 space-y-3">
+                                        <label className="text-[10px] font-black uppercase text-muted-foreground">Corporate Comms Terminal</label>
+                                        <div className="flex gap-2">
+                                            <Input readOnly value={profile?.email || ''} className="h-14 rounded-none border-foreground/5 bg-secondary text-muted-foreground font-black uppercase tracking-widest text-xs px-6 cursor-not-allowed flex-1" />
+                                            <Button variant="outline" className="h-14 rounded-none h-14 px-6 border-foreground/10 opacity-30 cursor-not-allowed text-[10px]">AUTH_SYNC</Button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </section>
+                            </CardContent>
+                        </Card>
 
-                        <section className="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm space-y-10">
-                            <h2 className="text-2xl font-black flex items-center gap-4 text-slate-900">
-                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
-                                    <Key className="w-6 h-6 text-indigo-500" />
-                                </div>
-                                Governance & Security
-                            </h2>
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between p-8 bg-slate-50/50 rounded-[2rem] border border-slate-100 group hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all">
+                        <Card className="rounded-none border-foreground shadow-none bg-background">
+                            <CardHeader className="border-b">
+                                <CardTitle className="text-xl font-black uppercase">Gate_Security</CardTitle>
+                                <CardDescription className="text-[10px] font-bold uppercase text-muted-foreground">Personnel access and authentication protocols.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="pt-8 space-y-4">
+                                <div className="flex items-center justify-between p-6 border border-foreground/5 bg-secondary/20">
                                     <div className="flex items-center gap-6">
-                                        <div className="p-4 bg-white rounded-2xl text-slate-400 shadow-sm">
-                                            <Bell className="w-6 h-6" />
-                                        </div>
+                                        <Lock className="w-5 h-5 opacity-40" />
                                         <div>
-                                            <p className="font-bold text-slate-900 text-lg">System Key</p>
-                                            <p className="text-sm font-medium text-slate-400 mt-1">Manage your terminal authentication passkey.</p>
+                                            <p className="text-xs font-black uppercase">STATION_PASSKEY</p>
+                                            <p className="text-[9px] font-bold text-muted-foreground mt-1 lowercase">Manage personnel terminal authentication keys.</p>
                                         </div>
                                     </div>
-                                    <button className="px-8 py-4 bg-white border border-slate-200 text-slate-900 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all shadow-sm">Reset</button>
+                                    <Button variant="outline" className="h-10 rounded-none text-[9px] font-black border-foreground/20 uppercase tracking-widest">Update</Button>
                                 </div>
-                                <div className="flex items-center justify-between p-8 bg-slate-50/50 rounded-[2rem] border border-slate-100 group hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all">
+                                <div className="flex items-center justify-between p-6 border border-foreground/5 bg-secondary/20">
                                     <div className="flex items-center gap-6">
-                                        <div className="p-4 bg-white rounded-2xl text-slate-400 shadow-sm">
-                                            <Shield className="w-6 h-6" />
-                                        </div>
+                                        <Shield className="w-5 h-5 opacity-40" />
                                         <div>
-                                            <p className="font-bold text-slate-900 text-lg">Multi-Factor Protocol</p>
-                                            <p className="text-sm font-medium text-slate-400 mt-1">Status: <span className="text-amber-500 font-bold uppercase tracking-widest text-xs">Vulnerable</span></p>
+                                            <p className="text-xs font-black uppercase">MFA_ENFORCEMENT</p>
+                                            <p className="text-[9px] font-bold text-muted-foreground mt-1 lowercase">Standard institutional verification protocol.</p>
                                         </div>
                                     </div>
-                                    <button className="px-8 py-4 bg-indigo-600 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100">Activate MFA</button>
+                                    <Button className="h-10 rounded-none bg-foreground text-background text-[9px] font-black uppercase tracking-widest hover:invert">Activate</Button>
                                 </div>
-                            </div>
-                        </section>
+                            </CardContent>
+                        </Card>
                     </div>
 
-                    {/* Regional Settings */}
-                    <div className="space-y-10">
-                        <section className="bg-slate-900 p-10 rounded-[3rem] text-white shadow-2xl shadow-emerald-100 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-[60px] -mr-24 -mt-24 transition-all group-hover:bg-emerald-500/20"></div>
-                            <h2 className="text-xl font-black mb-8 flex items-center gap-4 relative z-10">
-                                <Globe className="w-6 h-6 text-emerald-400" />
-                                Localize
-                            </h2>
-                            <div className="space-y-8 relative z-10">
-                                <div className="flex items-center justify-between group/item cursor-pointer">
-                                    <span className="text-sm font-bold text-slate-500 group-hover/item:text-white transition-colors">Locale</span>
-                                    <span className="text-sm font-black uppercase tracking-widest text-emerald-400">EN-IN</span>
+                    {/* Regional Module */}
+                    <div className="space-y-12">
+                        <Card className="rounded-none border-foreground bg-foreground text-background shadow-none">
+                            <CardHeader>
+                                <CardTitle className="text-lg font-black tracking-tighter uppercase">STATION_VARS</CardTitle>
+                                <CardDescription className="text-background/40 text-[10px] font-bold uppercase">Localized terminal parameters.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-8 pt-4">
+                                <div className="flex items-center justify-between border-b border-background/10 pb-4 text-[10px]">
+                                    <span className="font-bold text-background/50">DIALECT_SET</span>
+                                    <span className="font-black tracking-widest underline underline-offset-4">EN_IN</span>
                                 </div>
-                                <div className="flex items-center justify-between group/item cursor-pointer">
-                                    <span className="text-sm font-bold text-slate-500 group-hover/item:text-white transition-colors">Precision</span>
-                                    <span className="text-sm font-black uppercase tracking-widest text-emerald-400">UTC +05:30</span>
+                                <div className="flex items-center justify-between border-b border-background/10 pb-4 text-[10px]">
+                                    <span className="font-bold text-background/50">CHRONO_UNIT</span>
+                                    <span className="font-black tracking-widest underline underline-offset-4">UTC_+5.30</span>
                                 </div>
-                                <div className="flex items-center justify-between group/item cursor-pointer">
-                                    <span className="text-sm font-bold text-slate-500 group-hover/item:text-white transition-colors">Visual State</span>
-                                    <span className="text-sm font-black uppercase tracking-widest text-emerald-400">Emerald Clean</span>
+                                <div className="flex items-center justify-between border-b border-background/10 pb-4 text-[10px]">
+                                    <span className="font-bold text-background/50">OS_THEME</span>
+                                    <span className="font-black tracking-widest underline underline-offset-4">PURE_MINIMAL</span>
                                 </div>
-                            </div>
-                        </section>
+                                <Button variant="secondary" className="w-full h-12 rounded-none bg-background text-foreground text-[10px] font-black uppercase tracking-widest">SYNC_PREF</Button>
+                            </CardContent>
+                        </Card>
 
-                        <div className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100">
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Termination Protocol</h4>
-                            <p className="text-slate-500 text-xs font-medium leading-relaxed mb-8">Initiating a profile shutdown will revoke all HR clearance and notify Corporate Security.</p>
-                            <button className="w-full py-5 text-[10px] font-black uppercase tracking-widest text-white bg-slate-900 rounded-2xl hover:bg-rose-600 transition-all shadow-lg hover:shadow-rose-100">Revoke Clearance</button>
+                        <div className="p-10 border-2 border-foreground/10 rounded-none space-y-6">
+                            <h4 className="font-black text-[11px] uppercase tracking-[0.3em] text-foreground underline decoration-double underline-offset-4">TERMINATION_GATE</h4>
+                            <p className="text-muted-foreground text-[10px] font-bold leading-loose normal-case">Initializing a profile revocation will terminate all HR clearance tokens and notify institutional security. Action is audited.</p>
+                            <Button variant="ghost" className="w-full h-12 rounded-none border border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-[10px] font-black uppercase tracking-widest">
+                                REVOKE_STATION_ACCESS
+                            </Button>
                         </div>
                     </div>
                 </div>
