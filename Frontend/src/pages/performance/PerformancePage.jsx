@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
-import { Star, Users, FileText, Plus } from 'lucide-react';
+import { Star, Users, Plus } from 'lucide-react';
 import MyReviews from './MyReviews';
 import TeamReviews from './TeamReviews';
 import AddReview from './AddReview';
 import PerformanceStats from '../../components/performance/PerformanceStats';
 import { useToast } from '../../hooks/useToast';
+import { useCurrentUser } from '../../hooks/api/useAuthQueries';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const PerformancePage = () => {
   const [activeTab, setActiveTab] = useState('my-reviews');
   const { showToast } = useToast();
-  const userRole = localStorage.getItem('userRole') || 'employee';
+  const { data: userData } = useCurrentUser();
+  const profile = userData?.data?.profile;
+  const userRole = profile?.role || 'employee';
 
   const tabs = [
     { id: 'my-reviews', label: 'My Reviews', icon: Star },
-    ...(userRole === 'manager' || userRole === 'admin' 
+    ...(userRole === 'manager' || userRole === 'hr' || userRole === 'admin'
       ? [
-          { id: 'team-reviews', label: 'Team Reviews', icon: Users },
-          { id: 'add-review', label: 'Add Review', icon: Plus }
-        ]
+        { id: 'team-reviews', label: 'Team Reviews', icon: Users },
+        { id: 'add-review', label: 'Add Review', icon: Plus }
+      ]
       : []),
   ];
 
@@ -45,11 +48,10 @@ const PerformancePage = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeTab === tab.id
-                          ? 'border-gray-900 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-400'
-                      }`}
+                      className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                        ? 'border-gray-900 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-400'
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       {tab.label}

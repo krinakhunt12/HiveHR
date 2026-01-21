@@ -3,27 +3,37 @@ import { Users, Search, Filter } from 'lucide-react';
 import UserTable from '../../components/people/UserTable';
 import SearchBar from '../../components/people/SearchBar';
 import DepartmentFilter from '../../components/people/DepartmentFilter';
-import { usePeople } from '../../hooks/usePeople';
+import { usePeople } from '../../hooks/api/useHRQueries';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const PeoplePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const { users, departments, loading, error } = usePeople();
+  const { data: usersData, isLoading: loading, error } = usePeople();
+
+  const users = (usersData || []).map(u => ({
+    ...u,
+    name: u.full_name,
+    department: u.departments?.name || u.department_id || 'General',
+    status: u.status || 'active'
+  }));
+
+  // Mock departments for now or fetch them
+  const departments = ['Engineering', 'Design', 'Marketing', 'HR', 'Sales'];
 
   // Filter users based on search and filters
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+    const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.department.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesDepartment = 
+    const matchesDepartment =
       selectedDepartment === 'all' || user.department === selectedDepartment;
 
-    const matchesStatus = 
+    const matchesStatus =
       selectedStatus === 'all' || user.status === selectedStatus;
 
     return matchesSearch && matchesDepartment && matchesStatus;

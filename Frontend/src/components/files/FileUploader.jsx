@@ -1,17 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import Modal from '../shared/Modal';
-import { useFiles } from '../../hooks/useFiles';
+import { useUploadFile } from '../../hooks/api/useFileQueries';
 import { FILE_TYPES, MAX_FILE_SIZE } from '../../constants/fileConstants';
 
 const FileUploader = ({ onSuccess, onError, onCancel }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const [fileType, setFileType] = useState('resume');
   const [description, setDescription] = useState('');
   const fileInputRef = useRef(null);
-  const { uploadFile } = useFiles();
+  const { mutateAsync: uploadFile, isLoading: uploading } = useUploadFile();
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -27,7 +26,7 @@ const FileUploader = ({ onSuccess, onError, onCancel }) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     const files = e.dataTransfer.files;
     if (files && files[0]) {
       processFile(files[0]);
@@ -51,7 +50,7 @@ const FileUploader = ({ onSuccess, onError, onCancel }) => {
     // Validate file type
     const fileExtension = file.name.split('.').pop().toLowerCase();
     const allowedExtensions = FILE_TYPES.flatMap(type => type.extensions);
-    
+
     if (!allowedExtensions.includes(fileExtension)) {
       onError('File type not supported. Please upload PDF, DOC, DOCX, JPG, or PNG files.');
       return;
@@ -63,25 +62,17 @@ const FileUploader = ({ onSuccess, onError, onCancel }) => {
   const handleUpload = async () => {
     if (!selectedFile) return;
 
-    setUploading(true);
     try {
       const fileData = {
         file: selectedFile,
-        type: fileType,
+        category: fileType,
         description: description || selectedFile.name
       };
-      
+
       await uploadFile(fileData);
-      onSuccess({
-        name: selectedFile.name,
-        type: fileType,
-        size: selectedFile.size,
-        uploadedAt: new Date().toISOString()
-      });
+      onSuccess();
     } catch (error) {
       onError(error.message || 'Upload failed');
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -149,9 +140,8 @@ const FileUploader = ({ onSuccess, onError, onCancel }) => {
         {/* Upload Area */}
         {!selectedFile ? (
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive ? 'border-gray-900 bg-gray-50' : 'border-gray-300 hover:border-gray-400'
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive ? 'border-gray-900 bg-gray-50' : 'border-gray-300 hover:border-gray-400'
+              }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}

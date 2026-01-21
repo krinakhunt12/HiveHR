@@ -176,7 +176,7 @@ const HRLeaveManagement = () => {
                                             Deny
                                         </Button>
                                         <Button
-                                            disabled={updateMutation.isLoading}
+                                            disabled={approveMutation.isLoading || rejectMutation.isLoading}
                                             onClick={() => handleAction(leave.id, 'approved')}
                                             className="h-12 bg-foreground text-background rounded-none font-black uppercase tracking-[0.2em] text-[10px] hover:bg-neutral-800 transition-all"
                                         >

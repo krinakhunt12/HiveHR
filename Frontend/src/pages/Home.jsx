@@ -1,75 +1,39 @@
 import React from "react";
 import { BarChart3, Users, ArrowRight, Shield, Rocket, Clock, TrendingUp, Award, FileText, Target, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLandingPageData } from "../hooks/api/useMiscQueries";
+import { PageLoading } from "../components/ui/skeleton";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { data: landingResponse, isLoading } = useLandingPageData();
+
+  if (isLoading) return <PageLoading />;
+
+  const landingData = landingResponse?.data || {
+    features: [],
+    benefits: [],
+    stats: { uptime: "99.9%", activeUsers: "10K+", support: "24/7" },
+    trustCompanies: []
+  };
+
+  // Map icon names to Lucide components
+  const iconMap = {
+    BarChart3: <BarChart3 className="w-6 h-6" />,
+    Users: <Users className="w-6 h-6" />,
+    Clock: <Clock className="w-6 h-6" />,
+    TrendingUp: <TrendingUp className="w-6 h-6" />,
+    FileText: <FileText className="w-6 h-6" />,
+    Shield: <Shield className="w-6 h-6" />,
+    Target: <Target className="w-5 h-5" />,
+    Zap: <Zap className="w-5 h-5" />,
+    Award: <Award className="w-5 h-5" />,
+    Rocket: <Rocket className="w-4 h-4 text-slate-600" />
+  };
 
   const handleLoginRedirect = () => {
     navigate("/login");
   };
-
-  const features = [
-    {
-      icon: <BarChart3 className="w-6 h-6" />,
-      title: "Advanced Analytics",
-      description: "Powerful dashboards with real-time KPIs, predictive analytics, and customizable reports to track workforce performance and trends.",
-      color: "from-blue-600 to-cyan-600"
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "Employee Management",
-      description: "Complete employee lifecycle management from onboarding to offboarding with centralized records and compliance tracking.",
-      color: "from-emerald-600 to-teal-600"
-    },
-    {
-      icon: <Clock className="w-6 h-6" />,
-      title: "Time & Attendance",
-      description: "Automated time tracking, shift scheduling, and attendance monitoring with integration to payroll systems.",
-      color: "from-violet-600 to-purple-600"
-    },
-    {
-      icon: <TrendingUp className="w-6 h-6" />,
-      title: "Performance Reviews",
-      description: "360-degree feedback system, goal tracking, and continuous performance evaluation to drive employee development.",
-      color: "from-orange-600 to-amber-600"
-    },
-    {
-      icon: <FileText className="w-6 h-6" />,
-      title: "Leave Management",
-      description: "Streamlined leave requests, approvals, and balance tracking with policy automation and calendar integration.",
-      color: "from-pink-600 to-rose-600"
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: "Compliance & Security",
-      description: "Enterprise-grade security with SSO, RBAC, audit trails, and compliance with GDPR, SOC 2, and industry standards.",
-      color: "from-indigo-600 to-blue-600"
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: <Target className="w-5 h-5" />,
-      title: "Increase Productivity",
-      description: "Automate repetitive HR tasks and reduce administrative overhead by up to 60%"
-    },
-    {
-      icon: <Zap className="w-5 h-5" />,
-      title: "Faster Decision Making",
-      description: "Access real-time insights and reports to make informed strategic decisions quickly"
-    },
-    {
-      icon: <Award className="w-5 h-5" />,
-      title: "Improve Retention",
-      description: "Identify at-risk employees early and implement targeted retention strategies"
-    },
-    {
-      icon: <Users className="w-5 h-5" />,
-      title: "Better Employee Experience",
-      description: "Self-service portals and mobile access empower employees to manage their own data"
-    }
-  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans">
@@ -129,15 +93,15 @@ const Home = () => {
 
                 <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-200">
                   <div>
-                    <div className="text-3xl font-bold text-slate-800">99.9%</div>
+                    <div className="text-3xl font-bold text-slate-800">{landingData.stats.uptime}</div>
                     <div className="text-sm text-slate-500 mt-1">Uptime SLA</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-slate-800">10K+</div>
+                    <div className="text-3xl font-bold text-slate-800">{landingData.stats.activeUsers}</div>
                     <div className="text-sm text-slate-500 mt-1">Active Users</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-slate-800">24/7</div>
+                    <div className="text-3xl font-bold text-slate-800">{landingData.stats.support}</div>
                     <div className="text-sm text-slate-500 mt-1">Support</div>
                   </div>
                 </div>
@@ -205,13 +169,13 @@ const Home = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
+              {landingData.features.map((feature, index) => (
                 <div
-                  key={index}
+                  key={feature.id || index}
                   className="group p-8 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300"
                 >
                   <div className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${feature.color} text-white mb-4 shadow-md`}>
-                    {feature.icon}
+                    {iconMap[feature.icon]}
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900 mb-3">{feature.title}</h3>
                   <p className="text-slate-600 leading-relaxed">
@@ -234,11 +198,11 @@ const Home = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {benefits.map((benefit, index) => (
-                <div key={index} className="text-center">
+              {landingData.benefits.map((benefit, index) => (
+                <div key={benefit.id || index} className="text-center">
                   <div className="inline-flex p-4 rounded-full bg-white border-2 border-slate-200 mb-4 shadow-sm">
                     <div className="text-slate-700">
-                      {benefit.icon}
+                      {iconMap[benefit.icon]}
                     </div>
                   </div>
                   <h3 className="text-lg font-semibold text-slate-900 mb-2">{benefit.title}</h3>
@@ -282,11 +246,9 @@ const Home = () => {
               Trusted by Leading Organizations
             </p>
             <div className="flex flex-wrap justify-center items-center gap-12 lg:gap-16">
-              <div className="text-2xl font-bold text-slate-300">AUTOPARTS</div>
-              <div className="text-2xl font-bold text-slate-300">MANUFACTURING</div>
-              <div className="text-2xl font-bold text-slate-300">TECHNOLOGY</div>
-              <div className="text-2xl font-bold text-slate-300">RETAIL</div>
-              <div className="text-2xl font-bold text-slate-300">HEALTHCARE</div>
+              {landingData.trustCompanies.map((company) => (
+                <div key={company} className="text-2xl font-bold text-slate-300">{company}</div>
+              ))}
             </div>
           </div>
         </section>

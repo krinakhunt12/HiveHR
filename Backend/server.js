@@ -17,6 +17,11 @@ import employeeRoutes from './src/routes/employeeRoutes.js';
 import attendanceRoutes from './src/routes/attendanceRoutes.js';
 import leaveRoutes from './src/routes/leaveRoutes.js';
 import companyRoutes from './src/routes/companyRoutes.js';
+import miscRoutes from './src/routes/miscRoutes.js';
+import hrRoutes from './src/routes/hrRoutes.js';
+import adminRoutes from './src/routes/adminRoutes.js';
+import performanceRoutes from './src/routes/performanceRoutes.js';
+import fileRoutes from './src/routes/fileRoutes.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './src/middleware/errorHandler.js';
@@ -87,6 +92,11 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/companies', companyRoutes);
+app.use('/api/misc', miscRoutes);
+app.use('/api/hr', hrRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/performance', performanceRoutes);
+app.use('/api/files', fileRoutes);
 
 // API documentation route
 app.get('/api', (req, res) => {

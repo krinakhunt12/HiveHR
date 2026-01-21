@@ -10,7 +10,7 @@ import FileListCard from "../../components/dashboard/employee/FileListCard";
 import KpiCard from "../../components/dashboard/employee/KpiCard";
 import KpiChart from "../../components/dashboard/employee/KpiChart";
 import TeamOverviewCard from "../../components/dashboard/employee/TeamOverviewCard";
-import { useEmployeeData } from "../../hooks/useEmployeeData";
+import { useRealEmployeeDashboard } from "../../hooks/useRealEmployeeDashboard";
 import { RefreshCw } from "lucide-react";
 
 const EmployeeDashboard = () => {
@@ -19,9 +19,8 @@ const EmployeeDashboard = () => {
     isLoading,
     error,
     refetch,
-    toggleAttendance,
-    markNotificationAsRead
-  } = useEmployeeData();
+    toggleAttendance
+  } = useRealEmployeeDashboard();
 
   if (isLoading) {
     return (

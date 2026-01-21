@@ -2,12 +2,10 @@ import React from 'react';
 import { Filter, Download } from 'lucide-react';
 import PerformanceTable from '../../components/performance/PerformanceTable';
 import GoalTracker from '../../components/performance/GoalTracker';
-import { usePerformance } from '../../hooks/usePerformance';
+import { useMyReviews } from '../../hooks/api/usePerformanceQueries';
 
 const MyReviews = () => {
-  const { reviews, goals, loading } = usePerformance();
-  
-  const myReviews = reviews.filter(review => review.employeeId === 'current-user');
+  const { data: reviews, isLoading } = useMyReviews();
 
   return (
     <div className="space-y-6">
@@ -29,14 +27,14 @@ const MyReviews = () => {
         </div>
       </div>
 
-      {/* Goal Tracker */}
-      <GoalTracker goals={goals} />
+      {/* Goal Tracker - Hidden or updated if goals API exists */}
+      {/* <GoalTracker goals={goals} /> */}
 
       {/* Reviews Table */}
       <div className="bg-white rounded-lg border border-gray-300">
-        <PerformanceTable 
-          reviews={myReviews}
-          loading={loading}
+        <PerformanceTable
+          reviews={reviews || []}
+          loading={isLoading}
           showActions={false}
         />
       </div>

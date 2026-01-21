@@ -1,13 +1,21 @@
 import React from 'react';
 import { Filter } from 'lucide-react';
 import LeaveTable from '../../components/leaves/LeaveTable';
-import { useLeaves } from '../../hooks/useLeaves';
+import { useMyLeaves } from '../../hooks/api/useLeaveQueries';
 
 const LeaveHistory = () => {
-  const { leaves, loading } = useLeaves();
-  
+  const { data: leavesData, isLoading: loading } = useMyLeaves();
+  const leaves = leavesData?.data?.leaves || [];
+
   // Filter leaves that are not pending
-  const historyLeaves = leaves.filter(leave => leave.status !== 'pending');
+  const historyLeaves = leaves.filter(leave => leave.status !== 'pending').map(l => ({
+    ...l,
+    startDate: l.start_date,
+    endDate: l.end_date,
+    type: l.type,
+    reason: l.reason,
+    status: l.status,
+  }));
 
   return (
     <div className="space-y-6">
@@ -25,7 +33,7 @@ const LeaveHistory = () => {
 
       {/* History Table */}
       <div className="bg-white rounded-lg border border-gray-300">
-        <LeaveTable 
+        <LeaveTable
           leaves={historyLeaves}
           loading={loading}
           showActions={false}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { BarChart3, Mail, Lock, ArrowRight, AlertCircle, User, ShieldPlus } from "lucide-react";
+import { BarChart3, Mail, Lock, ArrowRight, AlertCircle, User, ShieldPlus, Building2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
-import { useRegister } from "../../hooks/api/useAuthQueries";
+import { useRegisterCompany } from "../../hooks/api/useCompanyQueries";
 import { useToast } from "../../hooks/useToast";
 import AppLogger from "../../utils/AppLogger";
 import { Button } from "../../components/ui/button";
@@ -11,31 +11,29 @@ const AdminSignup = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [fullName, setFullName] = useState("");
-    const registerMutation = useRegister();
+    const [companyName, setCompanyName] = useState("");
+    const registerMutation = useRegisterCompany();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
     const handleSignup = async () => {
-        if (!email || !password || !fullName) {
+        if (!email || !password || !fullName || !companyName) {
             showToast("Please fill in all fields", "error");
             return;
         }
 
-        const adminId = `ADM-${Date.now().toString().slice(-6)}`;
         registerMutation.mutate({
             email,
             password,
             full_name: fullName,
-            role: 'admin',
-            employee_id: adminId
+            company_name: companyName
         }, {
             onSuccess: () => {
-                showToast("Account established. Welcome, Admin.", "success");
-                // useRegister might invalidate queries, but here we navigate
-                navigate("/admin/login"); // Or dashboard if auto-login
+                showToast("Enterprise initialized. Access granted.", "success");
+                navigate("/admin/login");
             },
             onError: (error) => {
-                AppLogger.error("Administrator registration failure", error);
+                AppLogger.error("Company registration failure", error);
             }
         });
     };
@@ -82,12 +80,23 @@ const AdminSignup = () => {
 
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase text-muted-foreground">Legal Identity Name</label>
+                            <label className="text-[10px] font-black uppercase text-muted-foreground">Enterprise Identity</label>
+                            <Input
+                                type="text"
+                                value={companyName}
+                                onChange={(e) => setCompanyName(e.target.value)}
+                                placeholder="ORGANIZATION_NAME"
+                                className="h-12 border-foreground/10 bg-muted/50 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase text-muted-foreground">Admin Identity Name</label>
                             <Input
                                 type="text"
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
-                                placeholder="FULLL_LEGAL_NAME"
+                                placeholder="FULL_LEGAL_NAME"
                                 className="h-12 border-foreground/10 bg-muted/50 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
                             />
                         </div>

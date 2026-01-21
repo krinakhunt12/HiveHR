@@ -1,10 +1,10 @@
 import React from 'react';
 import { Users, Filter, Download } from 'lucide-react';
 import PerformanceTable from '../../components/performance/PerformanceTable';
-import { usePerformance } from '../../hooks/usePerformance';
+import { useTeamReviews } from '../../hooks/api/usePerformanceQueries';
 
 const TeamReviews = () => {
-  const { reviews, loading } = usePerformance();
+  const { data: reviews, isLoading } = useTeamReviews();
 
   return (
     <div className="space-y-6">
@@ -22,7 +22,7 @@ const TeamReviews = () => {
       {/* Actions */}
       <div className="flex justify-between items-center">
         <div className="text-sm text-gray-600">
-          Showing {reviews.length} performance reviews
+          Showing {reviews?.length || 0} performance reviews
         </div>
         <div className="flex gap-3">
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
@@ -39,8 +39,8 @@ const TeamReviews = () => {
       {/* Team Reviews Table */}
       <div className="bg-white rounded-lg border border-gray-300">
         <PerformanceTable
-          reviews={reviews}
-          loading={loading}
+          reviews={reviews || []}
+          loading={isLoading}
           showActions={true}
           isManagerView={true}
         />

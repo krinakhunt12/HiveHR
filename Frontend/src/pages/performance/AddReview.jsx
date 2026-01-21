@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Plus, Users } from 'lucide-react';
 import PerformanceForm from '../../components/performance/PerformanceForm';
-import { usePerformance } from '../../hooks/usePerformance';
+import { useCreateReview } from '../../hooks/api/usePerformanceQueries';
 import { useToast } from '../../hooks/useToast';
 
 const AddReview = () => {
   const [showForm, setShowForm] = useState(false);
-  const { addReview } = usePerformance();
+  const createReviewMutation = useCreateReview();
   const { showToast } = useToast();
 
   const handleSubmitReview = async (reviewData) => {
     try {
-      await addReview(reviewData);
+      await createReviewMutation.mutateAsync(reviewData);
       setShowForm(false);
       showToast('Performance review submitted successfully!', 'success');
     } catch (error) {

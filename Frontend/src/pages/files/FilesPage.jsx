@@ -3,47 +3,52 @@ import { FileText, Upload, Shield } from 'lucide-react';
 import FileUploader from '../../components/files/FileUploader';
 import FileList from '../../components/files/FileList';
 import FileStats from '../../components/files/FileStats';
-import { useFiles } from '../../hooks/useFiles';
+import { useFiles, useUploadFile, useDeleteFile, useDownloadFile } from '../../hooks/api/useFileQueries';
+import { useCurrentUser } from '../../hooks/api/useAuthQueries';
 import { useToast } from '../../hooks/useToast';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const FilesPage = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const { files, loading, uploadFile, deleteFile, downloadFile } = useFiles();
+  const { data: files, isLoading: loading } = useFiles();
+  const { data: userData } = useCurrentUser();
+  const userRole = userData?.data?.profile?.role || 'employee';
+
+  const uploadMutation = useUploadFile();
+  const deleteMutation = useDeleteFile();
+  const downloadMutation = useDownloadFile();
   const { showToast } = useToast();
-  const userRole = localStorage.getItem('userRole') || 'employee';
 
-  const handleUploadSuccess = (fileData) => {
-    setUploadModalOpen(false);
-    showToast('File uploaded successfully!', 'success');
-  };
-
-  const handleUploadError = (error) => {
-    showToast(`Upload failed: ${error}`, 'error');
+  const handleUploadSuccess = async (fileData) => {
+    try {
+      await uploadMutation.mutateAsync(fileData);
+      setUploadModalOpen(false);
+    } catch (err) {
+      // Error handled by mutation toast
+    }
   };
 
   const handleDeleteFile = async (fileId) => {
     try {
-      await deleteFile(fileId);
-      showToast('File deleted successfully!', 'success');
-    } catch (error) {
-      showToast('Failed to delete file', 'error');
-    }
+      await deleteMutation.mutateAsync(fileId);
+    } catch (err) { }
   };
 
-  const handleDownloadFile = async (fileId, fileName) => {
+  const handleDownloadFile = async (fileId, fileName, path) => {
     try {
-      await downloadFile(fileId, fileName);
-      showToast('File download started!', 'success');
-    } catch (error) {
+      await downloadMutation.mutateAsync({ path, fileName });
+    } catch (err) {
       showToast('Failed to download file', 'error');
     }
   };
 
-  // Filter files based on user role
-  const visibleFiles = userRole === 'hr' || userRole === 'admin' 
-    ? files 
-    : files.filter(file => file.uploadedBy === 'current-user');
+  const visibleFiles = (files || []).map(f => ({
+    ...f,
+    uploadedByName: f.user?.full_name || 'System',
+    uploadedAt: f.created_at,
+    type: f.category || 'General',
+    size: f.size || 0
+  }));
 
   return (
     <DashboardLayout>
@@ -100,7 +105,10 @@ const FilesPage = () => {
               files={visibleFiles}
               loading={loading}
               onDelete={handleDeleteFile}
-              onDownload={handleDownloadFile}
+              onDownload={(id, name) => {
+                const file = visibleFiles.find(f => f.id === id);
+                handleDownloadFile(id, name, file?.file_path);
+              }}
               showActions={true}
               isHRView={userRole === 'hr' || userRole === 'admin'}
             />
