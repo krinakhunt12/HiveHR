@@ -1,36 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Shield, Key, Bell, Globe, Camera, Save, Loader2, Lock, Command } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
-import { useToast } from '../../hooks/useToast';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
-import { cn } from '../../lib/utils';
+import { useCurrentUser } from '../../hooks/api/useAuthQueries';
+import { useUpdateEmployee } from '../../hooks/api/useEmployeeQueries';
 
 const EmployeeProfile = () => {
-    const { profile, updateProfile } = useSupabaseAuth();
+    const { data: currentUserData } = useCurrentUser();
+    const updateEmployeeMutation = useUpdateEmployee();
     const { showToast } = useToast();
     const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [name, setName] = useState('');
+
+    const profile = currentUserData?.data?.profile;
 
     useEffect(() => {
         if (profile) setName(profile.full_name);
     }, [profile]);
 
-    const handleSave = async () => {
-        setLoading(true);
-        try {
-            await updateProfile({ full_name: name });
-            showToast('Personnel records updated.', 'success');
-            setIsEditing(false);
-        } catch (err) {
-            showToast(err.message, 'error');
-        } finally {
-            setLoading(false);
-        }
+    const handleSave = () => {
+        if (!profile?.id) return;
+
+        updateEmployeeMutation.mutate({
+            id: profile.id,
+            updates: { full_name: name }
+        }, {
+            onSuccess: () => {
+                showToast('Personnel records updated.', 'success');
+                setIsEditing(false);
+            },
+            onError: (error) => {
+                showToast(error.message, 'error');
+            }
+        });
     };
+
+    const loading = updateEmployeeMutation.isPending;
 
     return (
         <DashboardLayout>

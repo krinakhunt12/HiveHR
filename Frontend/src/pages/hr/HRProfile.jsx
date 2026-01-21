@@ -1,38 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Shield, Key, Bell, Globe, Camera, Briefcase, Command, Save, Lock } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
-import { useToast } from '../../hooks/useToast';
-import AppLogger from '../../utils/AppLogger';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
-import { cn } from '../../lib/utils';
+import { useCurrentUser } from '../../hooks/api/useAuthQueries';
+import { useUpdateEmployee } from '../../hooks/api/useEmployeeQueries';
 
 const HRProfile = () => {
-    const { profile, updateProfile } = useSupabaseAuth();
+    const { data: currentUserData } = useCurrentUser();
+    const updateEmployeeMutation = useUpdateEmployee();
     const { showToast } = useToast();
     const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [name, setName] = useState('');
+
+    const profile = currentUserData?.data?.profile;
 
     useEffect(() => {
         if (profile) setName(profile.full_name);
     }, [profile]);
 
-    const handleSave = async () => {
-        setLoading(true);
-        try {
-            await updateProfile({ full_name: name });
-            showToast('Identity records updated.', 'success');
-            setIsEditing(false);
-        } catch (err) {
-            AppLogger.error('HR profile update failure', err);
-            showToast(err.message, 'error');
-        } finally {
-            setLoading(false);
-        }
+    const handleSave = () => {
+        if (!profile?.id) return;
+
+        updateEmployeeMutation.mutate({
+            id: profile.id,
+            updates: { full_name: name }
+        }, {
+            onSuccess: () => {
+                showToast('Identity records updated.', 'success');
+                setIsEditing(false);
+            },
+            onError: (error) => {
+                AppLogger.error('HR profile update failure', error);
+                // Error toast handled globally or here if customized
+            }
+        });
     };
+
+    const loading = updateEmployeeMutation.isPending;
 
     return (
         <DashboardLayout>

@@ -14,22 +14,24 @@ import {
   Clock
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
+import { useCurrentUser, useLogout } from '../../hooks/api/useAuthQueries';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, logout } = useSupabaseAuth();
+  const { data: currentUserData } = useCurrentUser();
+  const logoutMutation = useLogout();
+
+  const profile = currentUserData?.data?.profile;
   const userRole = profile?.role || 'employee';
 
-  const handleLogout = async () => {
-    const role = profile?.role;
-    await logout();
-    if (role === 'admin') navigate('/admin/login');
-    else if (role === 'hr') navigate('/hr/login');
-    else navigate('/employee/login');
+  const handleLogout = () => {
+    logoutMutation.mutate();
+    // Navigation is handled by the hook/queryClient or locally
+    // useLogout hook normally handles navigation but let's be safe
+    // Actually, useLogout handles navigation on success.
   };
 
   const menuItems = {

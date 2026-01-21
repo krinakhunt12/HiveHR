@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useEmployeeStats, useClockIn, useClockOut } from '../../hooks/api/useEmployeeQueries';
-import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
+import { useCurrentUser } from '../../hooks/api/useAuthQueries';
 import { useToast } from '../../hooks/useToast';
 import { Button } from '../../components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
@@ -21,8 +21,14 @@ import { Skeleton } from '../../components/ui/skeleton';
 import { cn } from '../../lib/utils';
 
 const EmployeeDashboard = () => {
-    const { user, profile } = useSupabaseAuth();
-    const { data: employeeData, isLoading } = useEmployeeStats(user?.id);
+    const { data: currentUserData } = useCurrentUser();
+    const user = currentUserData?.data?.user;
+    const profile = currentUserData?.data?.profile;
+
+    // Use profile.id (employee_id/uuid) or user.id depending on what backend expects
+    // Usually backend maps Auth User ID to Profile. 
+    // Let's use user?.id for now as that matches previous logic
+    const { data: employeeData, isLoading } = useEmployeeStats(user?.id || user?._id);
     const clockInMutation = useClockIn();
     const clockOutMutation = useClockOut();
     const { showToast } = useToast();

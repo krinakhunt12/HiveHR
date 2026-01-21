@@ -4,8 +4,8 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
-import { toast } from './utils/toast';
-import { APIError } from './services/apiConfig';
+import { toast } from '../utils/toast';
+import { APIError } from '../services/apiConfig';
 
 /**
  * Default query options

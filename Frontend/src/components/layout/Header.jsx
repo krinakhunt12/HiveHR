@@ -1,11 +1,12 @@
 import React from 'react';
 import { Menu, Bell, User, Search, Command } from 'lucide-react';
-import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
+import { useCurrentUser } from '../../hooks/api/useAuthQueries';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 
 const Header = ({ onMenuClick }) => {
-  const { profile } = useSupabaseAuth();
+  const { data: currentUserData } = useCurrentUser();
+  const profile = currentUserData?.data?.profile;
 
   return (
     <header className="bg-background border-bottom border-muted h-20 sticky top-0 z-40">

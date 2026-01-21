@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BarChart3, Mail, Lock, ArrowRight, AlertCircle, User, ShieldPlus } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
-import { useSupabaseAuth } from "../../hooks/useSupabaseAuth";
+import { useRegister } from "../../hooks/api/useAuthQueries";
 import { useToast } from "../../hooks/useToast";
 import AppLogger from "../../utils/AppLogger";
 import { Button } from "../../components/ui/button";
@@ -11,24 +11,33 @@ const AdminSignup = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [fullName, setFullName] = useState("");
-    const { register, loading: isLoading, error: authError } = useSupabaseAuth();
+    const registerMutation = useRegister();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
     const handleSignup = async () => {
-        try {
-            const adminId = `ADM-${Date.now().toString().slice(-6)}`;
-            await register(email, password, {
-                full_name: fullName,
-                role: 'admin',
-                employee_id: adminId
-            });
-            showToast("Account established. Welcome, Admin.", "success");
-            navigate("/admin/dashboard");
-        } catch (err) {
-            AppLogger.error("Administrator registration failure", err);
-            showToast(err.message || "Registration failed", "error");
+        if (!email || !password || !fullName) {
+            showToast("Please fill in all fields", "error");
+            return;
         }
+
+        const adminId = `ADM-${Date.now().toString().slice(-6)}`;
+        registerMutation.mutate({
+            email,
+            password,
+            full_name: fullName,
+            role: 'admin',
+            employee_id: adminId
+        }, {
+            onSuccess: () => {
+                showToast("Account established. Welcome, Admin.", "success");
+                // useRegister might invalidate queries, but here we navigate
+                navigate("/admin/login"); // Or dashboard if auto-login
+            },
+            onError: (error) => {
+                AppLogger.error("Administrator registration failure", error);
+            }
+        });
     };
 
     return (
@@ -64,10 +73,10 @@ const AdminSignup = () => {
                         <p className="text-[10px] text-muted-foreground font-bold">INITIAL_ADMIN_IDENTIFICATION_REQUIRED</p>
                     </div>
 
-                    {authError && (
+                    {registerMutation.isError && (
                         <div className="p-4 bg-muted border border-foreground/10 flex items-center gap-3 text-foreground text-[10px] animate-pulse">
                             <AlertCircle className="w-4 h-4" />
-                            <p>{authError}</p>
+                            <p>{registerMutation.error?.message || "Registration failed"}</p>
                         </div>
                     )}
 
@@ -107,10 +116,10 @@ const AdminSignup = () => {
 
                         <Button
                             onClick={handleSignup}
-                            disabled={isLoading}
+                            disabled={registerMutation.isPending}
                             className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none text-xs font-black uppercase tracking-[0.3em] transition-all"
                         >
-                            {isLoading ? "AUTHORIZING..." : (
+                            {registerMutation.isPending ? "AUTHORIZING..." : (
                                 <span className="flex items-center gap-3">
                                     ESTABLISH_ACCOUNT
                                     <ShieldPlus className="w-4 h-4" />

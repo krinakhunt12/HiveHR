@@ -68,17 +68,27 @@ const Loader = () => (
     </div>
 );
 
-import { useSupabaseAuth } from "./hooks/useSupabaseAuth";
+import { useCurrentUser } from "./hooks/api/useAuthQueries";
 
 // ============================================
-// REAL AUTH HOOK (Supabase Integration)
+// REAL AUTH HOOK (TanStack Query Integration)
 // ============================================
 function useAuth() {
-    const { isAuthenticated, user, profile, loading } = useSupabaseAuth();
+    const { data: currentUser, isLoading, isError } = useCurrentUser();
+
+    // The query returns { data: { user: ..., profile: ... } } structure via apiCall
+    // currentUser itself is the response object from apiCall
+
+    // Normalize user data
+    const user = currentUser?.data?.user;
+    const profile = currentUser?.data?.profile;
+
+    // Determine authentication status
+    const isAuthenticated = !!user && !isError;
 
     // Construct user object compatible with existing code
     const authUser = user ? {
-        id: user.id,
+        id: user.id || user._id,
         email: user.email,
         roles: [profile?.role || 'employee']
     } : null;
@@ -86,7 +96,7 @@ function useAuth() {
     return {
         isAuthenticated,
         user: authUser,
-        loading,
+        loading: isLoading,
         profile
     };
 }
