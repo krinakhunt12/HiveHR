@@ -1,55 +1,133 @@
+/**
+ * Global Error Boundary
+ * Catches unexpected runtime errors and prevents app crashes
+ */
+
 import React from 'react';
-import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
-import AppLogger from '../../utils/AppLogger';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hasError: false, error: null };
+        this.state = {
+            hasError: false,
+            error: null,
+            errorInfo: null
+        };
     }
 
     static getDerivedStateFromError(error) {
-        return { hasError: true, error };
+        // Update state so the next render will show the fallback UI
+        return { hasError: true };
     }
 
     componentDidCatch(error, errorInfo) {
-        AppLogger.error('Unhandled runtime error caught by ErrorBoundary:', { error, errorInfo });
+        // Log error to console in development
+        if (import.meta.env.DEV) {
+            console.error('Error Boundary caught an error:', error, errorInfo);
+        }
+
+        // You can also log the error to an error reporting service here
+        // logErrorToService(error, errorInfo);
+
+        this.setState({
+            error,
+            errorInfo
+        });
     }
+
+    handleReload = () => {
+        window.location.reload();
+    };
+
+    handleGoHome = () => {
+        window.location.href = '/';
+    };
+
+    handleReset = () => {
+        this.setState({
+            hasError: false,
+            error: null,
+            errorInfo: null
+        });
+    };
 
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center">
-                    <div className="max-w-md w-full animate-in zoom-in-95 duration-300">
-                        <div className="w-20 h-20 bg-rose-100 text-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-rose-200/50">
-                            <AlertTriangle className="w-10 h-10" />
+                <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+                    <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+                        {/* Icon */}
+                        <div className="flex justify-center mb-6">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                                <AlertTriangle className="w-8 h-8 text-red-600" />
+                            </div>
                         </div>
-                        <h1 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Something went wrong.</h1>
-                        <p className="text-slate-500 font-medium mb-10 leading-relaxed">
-                            A critical system error occurred. We've logged the incident and our team is looking into it.
+
+                        {/* Title */}
+                        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                            Oops! Something went wrong
+                        </h1>
+
+                        {/* Description */}
+                        <p className="text-gray-600 text-center mb-6">
+                            We're sorry for the inconvenience. An unexpected error occurred.
                         </p>
-                        <div className="flex flex-col gap-3">
+
+                        {/* Error details (only in development) */}
+                        {import.meta.env.DEV && this.state.error && (
+                            <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+                                <p className="text-sm font-semibold text-gray-700 mb-2">
+                                    Error Details:
+                                </p>
+                                <p className="text-xs text-red-600 font-mono break-all">
+                                    {this.state.error.toString()}
+                                </p>
+                                {this.state.errorInfo && (
+                                    <details className="mt-2">
+                                        <summary className="text-xs text-gray-600 cursor-pointer">
+                                            Stack Trace
+                                        </summary>
+                                        <pre className="text-xs text-gray-600 mt-2 overflow-auto max-h-40">
+                                            {this.state.errorInfo.componentStack}
+                                        </pre>
+                                    </details>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Action buttons */}
+                        <div className="space-y-3">
                             <button
-                                onClick={() => window.location.reload()}
-                                className="flex items-center justify-center gap-2 w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
+                                onClick={this.handleReload}
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
                             >
-                                <RefreshCcw className="w-5 h-5" />
-                                Reload System
+                                <RefreshCw className="w-4 h-4" />
+                                Reload Page
                             </button>
+
                             <button
-                                onClick={() => window.location.href = '/'}
-                                className="flex items-center justify-center gap-2 w-full py-4 bg-white text-slate-600 rounded-2xl font-bold border border-slate-200 hover:bg-slate-50 transition-all"
+                                onClick={this.handleGoHome}
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors"
                             >
-                                <Home className="w-5 h-5" />
-                                Return Home
+                                <Home className="w-4 h-4" />
+                                Go to Homepage
                             </button>
+
+                            {import.meta.env.DEV && (
+                                <button
+                                    onClick={this.handleReset}
+                                    className="w-full px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                                >
+                                    Try to recover (Dev only)
+                                </button>
+                            )}
                         </div>
-                        <div className="mt-8 pt-8 border-t border-slate-100">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Error Identification</p>
-                            <p className="text-[10px] font-mono text-slate-400 mt-1 truncate">
-                                {this.state.error?.message || 'Unknown Reference Error'}
-                            </p>
-                        </div>
+
+                        {/* Help text */}
+                        <p className="text-xs text-gray-500 text-center mt-6">
+                            If this problem persists, please contact support.
+                        </p>
                     </div>
                 </div>
             );

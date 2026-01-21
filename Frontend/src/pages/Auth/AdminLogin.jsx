@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BarChart3, Mail, Lock, ArrowRight, AlertCircle, UserPlus, ShieldCheck } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
-import { useSupabaseAuth } from "../../hooks/useSupabaseAuth";
+import { useLogin } from "../../hooks/api/useAuthQueries";
 import { useToast } from "../../hooks/useToast";
 import AppLogger from "../../utils/AppLogger";
 import { Button } from "../../components/ui/button";
@@ -11,23 +11,24 @@ import { Card, CardContent } from "../../components/ui/Card";
 const AdminLogin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { login, loading: isLoading, error: authError } = useSupabaseAuth();
+    const loginMutation = useLogin();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        try {
-            const result = await login(email, password);
-            if (result.profile?.role !== 'admin') {
-                showToast("Access denied. Admin portal restricted.", "error");
-                return;
-            }
-            showToast("System access authorized", "success");
-            navigate("/admin/dashboard");
-        } catch (err) {
-            AppLogger.error("Login authorization failure", err);
-            showToast(err.message || "Authorization failed", "error");
+        if (!email || !password) {
+            showToast("Please enter email and password", "error");
+            return;
         }
+
+        loginMutation.mutate(
+            { email, password },
+            {
+                onError: (error) => {
+                    AppLogger.error("Login authorization failure", error);
+                }
+            }
+        );
     };
 
     const handleKeyPress = (e) => {
@@ -76,10 +77,10 @@ const AdminLogin = () => {
                         <p className="text-[10px] text-muted-foreground font-bold">CREDENTIALS_REQUIRED_FOR_SESSIONS</p>
                     </div>
 
-                    {authError && (
+                    {loginMutation.isError && (
                         <div className="p-4 bg-muted border border-foreground/10 flex items-center gap-3 text-foreground text-[10px] animate-pulse">
                             <AlertCircle className="w-4 h-4" />
-                            <p>{authError}</p>
+                            <p>{loginMutation.error?.message || "Authentication failed"}</p>
                         </div>
                     )}
 
@@ -110,10 +111,10 @@ const AdminLogin = () => {
 
                         <Button
                             onClick={handleLogin}
-                            disabled={isLoading}
+                            disabled={loginMutation.isPending}
                             className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none text-xs font-black uppercase tracking-[0.3em] transition-all"
                         >
-                            {isLoading ? "AUTHORIZING..." : (
+                            {loginMutation.isPending ? "AUTHORIZING..." : (
                                 <span className="flex items-center gap-3">
                                     INITIATE_PORTAL
                                     <ArrowRight className="w-4 h-4" />

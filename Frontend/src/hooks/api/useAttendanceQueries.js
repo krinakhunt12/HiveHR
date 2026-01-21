@@ -1,24 +1,119 @@
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '../../lib/supabaseClient'
-import AppLogger from '../../utils/AppLogger'
+/**
+ * Attendance Query Hooks
+ * TanStack Query hooks for attendance management
+ */
 
-export const useAttendanceQuery = () => {
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { attendanceAPI } from '../../services/attendanceService';
+import { queryKeys } from '../../config/queryClient';
+import { toast } from '../../utils/toast';
+
+/**
+ * Get my attendance records
+ */
+export const useMyAttendance = (params = {}, options = {}) => {
     return useQuery({
-        queryKey: ['attendance'],
-        queryFn: async () => {
-            AppLogger.info('Scanning Biometric Ledger via React Query...')
-            const { data, error } = await supabase
-                .from('attendance')
-                .select(`
-                    *,
-                    profiles:user_id (full_name, employee_id)
-                `)
-                .order('date', { ascending: false })
+        queryKey: queryKeys.attendance.my(params),
+        queryFn: () => attendanceAPI.getMyAttendance(params),
+        ...options
+    });
+};
 
-            if (error) throw error
+/**
+ * Get today's attendance status
+ */
+export const useTodayAttendance = (options = {}) => {
+    return useQuery({
+        queryKey: queryKeys.attendance.today,
+        queryFn: attendanceAPI.getTodayAttendance,
+        refetchInterval: 60000, // Refetch every minute
+        ...options
+    });
+};
 
-            return data
-        },
-        staleTime: 60000,
-    })
-}
+/**
+ * Get employee attendance (HR/Admin)
+ */
+export const useEmployeeAttendance = (userId, params = {}, options = {}) => {
+    return useQuery({
+        queryKey: queryKeys.attendance.employee(userId, params),
+        queryFn: () => attendanceAPI.getEmployeeAttendance(userId, params),
+        enabled: !!userId,
+        ...options
+    });
+};
+
+/**
+ * Get all attendance records (HR/Admin)
+ */
+export const useAllAttendance = (params = {}, options = {}) => {
+    return useQuery({
+        queryKey: queryKeys.attendance.all(params),
+        queryFn: () => attendanceAPI.getAll(params),
+        ...options
+    });
+};
+
+/**
+ * Get attendance statistics (HR/Admin)
+ */
+export const useAttendanceStats = (params = {}, options = {}) => {
+    return useQuery({
+        queryKey: queryKeys.attendance.stats(params),
+        queryFn: () => attendanceAPI.getStats(params),
+        ...options
+    });
+};
+
+/**
+ * Check in mutation
+ */
+export const useCheckIn = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (location) => attendanceAPI.checkIn(location),
+        onSuccess: () => {
+            toast.success('Checked in successfully!');
+
+            // Invalidate attendance queries
+            queryClient.invalidateQueries({ queryKey: queryKeys.attendance.today });
+            queryClient.invalidateQueries({ queryKey: ['attendance', 'my'] });
+        }
+    });
+};
+
+/**
+ * Check out mutation
+ */
+export const useCheckOut = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (location) => attendanceAPI.checkOut(location),
+        onSuccess: () => {
+            toast.success('Checked out successfully!');
+
+            // Invalidate attendance queries
+            queryClient.invalidateQueries({ queryKey: queryKeys.attendance.today });
+            queryClient.invalidateQueries({ queryKey: ['attendance', 'my'] });
+        }
+    });
+};
+
+/**
+ * Create manual attendance mutation (HR/Admin)
+ */
+export const useCreateManualAttendance = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (attendanceData) => attendanceAPI.createManual(attendanceData),
+        onSuccess: () => {
+            toast.success('Attendance record created successfully!');
+
+            // Invalidate all attendance queries
+            queryClient.invalidateQueries({ queryKey: ['attendance'] });
+        }
+    });
+};

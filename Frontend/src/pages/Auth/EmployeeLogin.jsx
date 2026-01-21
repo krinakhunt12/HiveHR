@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BarChart3, Mail, Lock, ArrowRight, AlertCircle, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useSupabaseAuth } from "../../hooks/useSupabaseAuth";
+import { useLogin } from "../../hooks/api/useAuthQueries";
 import { useToast } from "../../hooks/useToast";
 import AppLogger from "../../utils/AppLogger";
 import { Button } from "../../components/ui/button";
@@ -10,23 +10,24 @@ import { Input } from "../../components/ui/input";
 const EmployeeLogin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { login, loading: isLoading, error: authError } = useSupabaseAuth();
+    const loginMutation = useLogin();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        try {
-            const result = await login(email, password);
-            if (!result.profile) {
-                showToast("Account profile initialization pending.", "error");
-                return;
-            }
-            showToast("Employee workspace loaded.", "success");
-            navigate("/employee/dashboard");
-        } catch (err) {
-            AppLogger.error("Employee portal access failure", err);
-            showToast(err.message || "Authorization failed", "error");
+        if (!email || !password) {
+            showToast("Please enter email and password", "error");
+            return;
         }
+
+        loginMutation.mutate(
+            { email, password },
+            {
+                onError: (error) => {
+                    AppLogger.error("Employee portal access failure", error);
+                }
+            }
+        );
     };
 
     const handleKeyPress = (e) => {
@@ -75,10 +76,10 @@ const EmployeeLogin = () => {
                         <p className="text-[10px] text-muted-foreground font-bold uppercase">Authorized_Personnel_Identification</p>
                     </div>
 
-                    {authError && (
+                    {loginMutation.isError && (
                         <div className="p-4 bg-muted border border-foreground/10 flex items-center gap-3 text-foreground text-[10px] animate-fade-in">
                             <AlertCircle className="w-4 h-4" />
-                            <p>{authError}</p>
+                            <p>{loginMutation.error?.message || "Authentication failed"}</p>
                         </div>
                     )}
 
@@ -109,10 +110,10 @@ const EmployeeLogin = () => {
 
                         <Button
                             onClick={handleLogin}
-                            disabled={isLoading}
+                            disabled={loginMutation.isPending}
                             className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none text-xs font-black uppercase tracking-[0.3em] transition-all"
                         >
-                            {isLoading ? "LOADING_SESSION..." : (
+                            {loginMutation.isPending ? "LOADING_SESSION..." : (
                                 <span className="flex items-center gap-3">
                                     INITIATE_WORKSTATION
                                     <LogIn className="w-4 h-4" />

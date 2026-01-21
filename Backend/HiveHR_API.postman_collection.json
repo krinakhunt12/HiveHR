@@ -1,0 +1,472 @@
+{
+    "info": {
+        "name": "HiveHR Backend API",
+        "description": "Complete API collection for HiveHR Backend",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:5000/api",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@hivehr.com\",\n  \"password\": \"admin123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Current User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/me",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "me"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Register User (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"employee@hivehr.com\",\n  \"password\": \"employee123\",\n  \"full_name\": \"John Doe\",\n  \"employee_id\": \"EMP001\",\n  \"role\": \"employee\",\n  \"job_title\": \"Software Engineer\",\n  \"phone\": \"+91 9876543210\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Employees",
+            "item": [
+                {
+                    "name": "Get All Employees",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/employees?page=1&limit=10",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "employees"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Employee by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/employees/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "employees",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "employee_id_here"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Employee",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"newemployee@hivehr.com\",\n  \"full_name\": \"Jane Smith\",\n  \"employee_id\": \"EMP002\",\n  \"role\": \"employee\",\n  \"job_title\": \"Product Manager\",\n  \"phone\": \"+91 9876543211\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/employees",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "employees"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Attendance",
+            "item": [
+                {
+                    "name": "Check In",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"check_in_location\": {\n    \"lat\": 19.0760,\n    \"lng\": 72.8777,\n    \"address\": \"Mumbai, India\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/attendance/check-in",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "attendance",
+                                "check-in"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Check Out",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"check_out_location\": {\n    \"lat\": 19.0760,\n    \"lng\": 72.8777,\n    \"address\": \"Mumbai, India\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/attendance/check-out",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "attendance",
+                                "check-out"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Attendance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/attendance/my-attendance",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "attendance",
+                                "my-attendance"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Today's Attendance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/attendance/today",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "attendance",
+                                "today"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Leaves",
+            "item": [
+                {
+                    "name": "Create Leave Request",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"leave_type\": \"casual\",\n  \"start_date\": \"2024-02-01\",\n  \"end_date\": \"2024-02-03\",\n  \"reason\": \"Family function\",\n  \"emergency_contact\": \"+91 9876543210\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/leaves",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "leaves"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Leaves",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/leaves/my-leaves",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "leaves",
+                                "my-leaves"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Leave Balance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/leaves/balance",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "leaves",
+                                "balance"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Approve Leave (HR/Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/leaves/:id/approve",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "leaves",
+                                ":id",
+                                "approve"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "leave_id_here"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Reject Leave (HR/Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"rejected\",\n  \"rejection_reason\": \"Insufficient notice period\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/leaves/:id/reject",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "leaves",
+                                ":id",
+                                "reject"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "leave_id_here"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
