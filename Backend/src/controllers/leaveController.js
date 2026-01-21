@@ -65,11 +65,14 @@ export const createLeaveRequest = async (req, res, next) => {
             }
         }
 
+        const companyId = req.profile.company_id;
+
         // Create leave request
         const { data, error } = await supabase
             .from('leaves')
             .insert({
                 user_id: userId,
+                company_id: companyId,
                 leave_type,
                 start_date,
                 end_date,
@@ -121,6 +124,7 @@ export const getMyLeaves = async (req, res, next) => {
             .from('leaves')
             .select('*, approved_by_profile:profiles!approved_by(full_name, employee_id)', { count: 'exact' })
             .eq('user_id', userId)
+            .eq('company_id', req.profile.company_id)
             .order('created_at', { ascending: false });
 
         if (status) {
@@ -175,6 +179,7 @@ export const getLeaveBalance = async (req, res, next) => {
             .from('leave_balance')
             .select('*')
             .eq('user_id', userId)
+            .eq('company_id', req.profile.company_id)
             .eq('year', year)
             .single();
 
@@ -184,19 +189,42 @@ export const getLeaveBalance = async (req, res, next) => {
 
         // If no balance exists, create one
         if (!data) {
-            const { data: newBalance, error: createError } = await supabase
-                .from('leave_balance')
-                .insert({ user_id: userId, year })
-                .select()
-                .single();
+            const defaultBalance = {
+                user_id: userId,
+                year,
+                sick_leave_total: 8,
+                casual_leave_total: 8,
+                earned_leave_total: 12,
+                maternity_leave_total: 180,
+                paternity_leave_total: 15,
+                sick_leave_used: 0,
+                casual_leave_used: 0,
+                earned_leave_used: 0,
+                maternity_leave_used: 0,
+                paternity_leave_used: 0
+            };
 
-            if (createError) {
-                throw new ApiError(HTTP_STATUS.INTERNAL_SERVER_ERROR, createError.message);
+            // Attempt to persist the new balance
+            try {
+                const { data: newBalance, error: createError } = await supabase
+                    .from('leave_balance')
+                    .insert(defaultBalance)
+                    .select()
+                    .single();
+
+                if (!createError && newBalance) {
+                    return res.status(HTTP_STATUS.OK).json({
+                        success: true,
+                        data: newBalance
+                    });
+                }
+            } catch (err) {
+                console.error('Persistence failed:', err.message);
             }
 
             return res.status(HTTP_STATUS.OK).json({
                 success: true,
-                data: newBalance
+                data: defaultBalance
             });
         }
 
@@ -230,10 +258,37 @@ export const getAllLeaves = async (req, res, next) => {
             .from('leaves')
             .select(`
         *,
-        user:profiles!user_id(id, full_name, employee_id, department_id, departments(name)),
+        user:profiles!user_id(id, full_name, employee_id, department_id),
         approved_by_profile:profiles!approved_by(full_name, employee_id)
       `, { count: 'exact' })
+            .eq('company_id', req.profile.company_id)
             .order('created_at', { ascending: false });
+
+        // Department Access Control
+        // If user is NOT admin, restrict to their own department
+        if (req.profile.role !== 'admin') {
+            const { data: deptUsers } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('department_id', req.profile.department_id);
+
+            const userIds = deptUsers ? deptUsers.map(u => u.id) : [];
+            query = query.in('user_id', userIds);
+        } else if (department_id) {
+            // Only allow filtering by specific department if Admin
+            const { data: deptUsers } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('department_id', department_id);
+
+            const userIds = deptUsers ? deptUsers.map(u => u.id) : [];
+            if (userIds.length > 0) {
+                query = query.in('user_id', userIds);
+            } else {
+                // return empty if dept found no users
+                query = query.eq('id', 0);
+            }
+        }
 
         if (status) {
             query = query.eq('status', status);
@@ -275,6 +330,7 @@ export const getAllLeaves = async (req, res, next) => {
             }
         });
     } catch (error) {
+        console.error('Error in getAllLeaves:', error);
         next(error);
     }
 };

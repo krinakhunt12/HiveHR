@@ -58,8 +58,8 @@ export const login = async (req, res, next) => {
 
 /**
  * @route   POST /api/auth/register
- * @desc    Register new user (Admin only)
- * @access  Private/Admin
+ * @desc    Register new user (Company Admin/HR)
+ * @access  Private/CompanyAdmin/HR
  */
 export const register = async (req, res, next) => {
     try {
@@ -77,26 +77,46 @@ export const register = async (req, res, next) => {
             manager_id
         } = req.body;
 
-        // Check if employee_id already exists
+        const companyId = req.profile.company_id;
+        const planType = req.profile.company?.plan_type || PLAN_TYPES.BASIC;
+        const limit = PLAN_LIMITS[planType].employees;
+
+        // 1. Check current employee count
+        const { count, error: countError } = await supabaseAdmin
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('company_id', companyId);
+
+        if (countError) {
+            throw new ApiError(HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Failed to verify plan limits');
+        }
+
+        if (count >= limit) {
+            throw new ApiError(HTTP_STATUS.FORBIDDEN, `Plan limit reached. Your current plan allows up to ${limit} employees.`);
+        }
+
+        // Check if employee_id already exists within the company
         const { data: existingEmployee } = await supabaseAdmin
             .from('profiles')
             .select('employee_id')
             .eq('employee_id', employee_id)
+            .eq('company_id', companyId)
             .single();
 
         if (existingEmployee) {
-            throw new ApiError(HTTP_STATUS.CONFLICT, 'Employee ID already exists');
+            throw new ApiError(HTTP_STATUS.CONFLICT, 'Employee ID already exists within this company');
         }
 
         // Create auth user using admin client
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
             email,
             password,
-            email_confirm: true, // Auto-confirm email
+            email_confirm: true,
             user_metadata: {
                 full_name,
                 employee_id,
-                role
+                role,
+                company_id: companyId
             }
         });
 
@@ -113,6 +133,7 @@ export const register = async (req, res, next) => {
                 full_name,
                 employee_id,
                 role,
+                company_id: companyId,
                 department_id,
                 job_title,
                 phone,
@@ -125,7 +146,6 @@ export const register = async (req, res, next) => {
             .single();
 
         if (profileError) {
-            // Rollback: Delete auth user if profile creation fails
             await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
             throw new ApiError(HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Failed to create user profile');
         }

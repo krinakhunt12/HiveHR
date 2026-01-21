@@ -12,7 +12,7 @@ import {
     Command
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useAttendanceQuery } from '../../hooks/api/useAttendanceQueries';
+import { useAllAttendance } from '../../hooks/api/useAttendanceQueries';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
@@ -20,7 +20,7 @@ import { Skeleton } from '../../components/ui/skeleton';
 import { cn } from '../../lib/utils';
 
 const HRAttendanceManagement = () => {
-    const { data: logs, isLoading } = useAttendanceQuery();
+    const { data: logs, isLoading } = useAllAttendance();
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredLogs = logs?.filter(log =>

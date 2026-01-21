@@ -30,18 +30,24 @@ export const checkIn = async (req, res, next) => {
             throw new ApiError(HTTP_STATUS.CONFLICT, 'Already checked in for today');
         }
 
-        // Determine if late
+        // Determine if late (after 11:00 AM)
         const checkInTime = new Date();
-        const workStartTime = new Date();
-        workStartTime.setHours(9, 0, 0, 0); // 9:00 AM
+        const lateTime = new Date();
+        lateTime.setHours(11, 0, 0, 0); // 11:00 AM
 
-        const status = checkInTime > workStartTime ? 'late' : 'present';
+        // If checking in after 11:00 AM, mark as half-day immediately? 
+        // Or marked as 'late' and then 'half-day' calculated later?
+        // Requirement: "If an employee punches in after 11:00 AM, mark the day as Half Day"
+        const status = checkInTime > lateTime ? 'half-day' : 'present';
+
+        const companyId = req.profile.company_id;
 
         // Create attendance record
         const { data, error } = await supabase
             .from('attendance')
             .insert({
                 user_id: userId,
+                company_id: companyId,
                 date: today,
                 check_in_time: checkInTime.toISOString(),
                 check_in_location,
@@ -91,12 +97,27 @@ export const checkOut = async (req, res, next) => {
             throw new ApiError(HTTP_STATUS.CONFLICT, 'Already checked out for today');
         }
 
+        const checkOutTime = new Date();
+        const checkInTime = new Date(attendance.check_in_time);
+        const durationMs = checkOutTime - checkInTime;
+        const totalHours = Number((durationMs / (1000 * 60 * 60)).toFixed(2));
+
+        // Determine Final Status
+        // Rule: >= 9 hours = Full Day
+        // Rule: < 9 hours = Half Day (enforced strict 9h rule for full day)
+        // If they were already 'half-day' due to late entry, and worked < 9h, it remains half-day.
+        // If they worked >= 9h, we upgrade to full-day (assuming flexible timing allows makeup).
+        // Otherwise, if strictly < 9h, it is half-day.
+        let status = totalHours >= 9 ? 'full-day' : 'half-day';
+
         // Update attendance record
         const { data, error } = await supabase
             .from('attendance')
             .update({
-                check_out_time: new Date().toISOString(),
-                check_out_location
+                check_out_time: checkOutTime.toISOString(),
+                check_out_location,
+                total_hours: totalHours,
+                status
             })
             .eq('id', attendance.id)
             .select()
@@ -130,6 +151,7 @@ export const getMyAttendance = async (req, res, next) => {
             .from('attendance')
             .select('*', { count: 'exact' })
             .eq('user_id', userId)
+            .eq('company_id', req.profile.company_id)
             .order('date', { ascending: false });
 
         if (start_date) {
@@ -182,6 +204,7 @@ export const getTodayAttendance = async (req, res, next) => {
             .from('attendance')
             .select('*')
             .eq('user_id', userId)
+            .eq('company_id', req.profile.company_id)
             .eq('date', today)
             .single();
 
@@ -212,6 +235,7 @@ export const getEmployeeAttendance = async (req, res, next) => {
             .from('attendance')
             .select('*', { count: 'exact' })
             .eq('user_id', userId)
+            .eq('company_id', req.profile.company_id)
             .order('date', { ascending: false });
 
         if (start_date) {
@@ -274,10 +298,20 @@ export const getAllAttendance = async (req, res, next) => {
           full_name,
           employee_id,
           department_id,
-          departments(name)
+          departments!department_id(name)
         )
       `, { count: 'exact' })
+            .eq('company_id', req.profile.company_id)
             .order('date', { ascending: false });
+
+        // Department Access Control
+        // If user is NOT admin, restrict to their own department
+        if (req.profile.role !== 'admin') {
+            query = query.eq('profiles.department_id', req.profile.department_id);
+        } else if (department_id) {
+            // Only allow filtering by specific department if Admin
+            query = query.eq('profiles.department_id', department_id);
+        }
 
         if (date) {
             query = query.eq('date', date);
@@ -285,10 +319,6 @@ export const getAllAttendance = async (req, res, next) => {
 
         if (status) {
             query = query.eq('status', status);
-        }
-
-        if (department_id) {
-            query = query.eq('profiles.department_id', department_id);
         }
 
         // Pagination
@@ -414,6 +444,36 @@ export const getAttendanceStats = async (req, res, next) => {
     }
 };
 
+/**
+ * @route   GET /api/attendance/config
+ * @desc    Get attendance configuration rules
+ * @access  Private
+ */
+export const getAttendanceConfig = async (req, res, next) => {
+    try {
+        // These can be moved to a 'settings' table in the DB for full configurability
+        const config = {
+            office_hours: {
+                start: '10:00',
+                end: '19:00',
+                full_day_hours: 9
+            },
+            status_rules: {
+                late_entry_threshold: '11:00',
+                half_day_hours_threshold: 4.5,
+                full_day_hours_threshold: 9
+            }
+        };
+
+        res.status(HTTP_STATUS.OK).json({
+            success: true,
+            data: config
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export default {
     checkIn,
     checkOut,
@@ -422,5 +482,6 @@ export default {
     getEmployeeAttendance,
     getAllAttendance,
     createManualAttendance,
-    getAttendanceStats
+    getAttendanceStats,
+    getAttendanceConfig
 };

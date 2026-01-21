@@ -35,12 +35,17 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   const menuItems = {
-    admin: [
-      { name: 'Dashboard Overview', href: '/admin/dashboard', icon: LayoutDashboard },
-      { name: 'Manage HR Managers', href: '/admin/hr-management', icon: ShieldCheck },
-      { name: 'Manage Employees', href: '/admin/employee-management', icon: Users },
-      { name: 'User Roles & Access', href: '/admin/roles', icon: ShieldAlert },
-      { name: 'Global Settings', href: '/admin/profile', icon: Settings },
+    super_admin: [
+      { name: 'Platform Stats', href: '/admin/dashboard', icon: LayoutDashboard },
+      { name: 'Manage Companies', href: '/admin/companies', icon: ShieldCheck },
+      { name: 'System Logs', href: '/admin/logs', icon: ShieldAlert },
+    ],
+    company_admin: [
+      { name: 'Company Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+      { name: 'Manage Departments', href: '/admin/departments', icon: ShieldCheck },
+      { name: 'Personnel Files', href: '/admin/employee-management', icon: Users },
+      { name: 'Roles & Access', href: '/admin/roles', icon: ShieldAlert },
+      { name: 'Workspace Settings', href: '/admin/profile', icon: Settings },
     ],
     hr: [
       { name: 'Dashboard Overview', href: '/hr/dashboard', icon: LayoutDashboard },
@@ -79,8 +84,10 @@ const Sidebar = ({ isOpen, onClose }) => {
               <BarChart3 className="w-4 h-4 text-black" />
             </div>
             <div>
-              <h1 className="text-lg font-black tracking-tighter uppercase">HiveHR</h1>
-              <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold">{userRole} Engine</p>
+              <h1 className="text-lg font-black tracking-tighter uppercase truncate max-w-[150px]">
+                {profile?.company?.name || 'HiveHR'}
+              </h1>
+              <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold">{userRole.replace('_', ' ')} Engine</p>
             </div>
           </div>
         </div>

@@ -3,25 +3,51 @@ import { Plus } from 'lucide-react';
 import LeaveForm from '../../components/leaves/LeaveForm';
 import LeaveTable from '../../components/leaves/LeaveTable';
 import LeaveBalanceCard from '../../components/leaves/LeaveBalanceCard';
-import { useLeaves } from '../../hooks/useLeaves';
+import { useMyLeaves, useLeaveBalance, useCreateLeave } from '../../hooks/api/useLeaveQueries';
 import { useToast } from '../../hooks/useToast';
 
 const MyLeaves = () => {
   const [showForm, setShowForm] = useState(false);
-  const { leaves, loading, applyForLeave } = useLeaves();
   const { showToast } = useToast();
+
+  // Fetch API Data
+  const { data: leavesData, isLoading: leavesLoading } = useMyLeaves();
+  const leaves = leavesData?.data?.leaves || [];
+
+  const currentYear = new Date().getFullYear();
+  const { data: balanceData, isLoading: balanceLoading } = useLeaveBalance(currentYear);
+  const balances = balanceData?.data; // Structure depends on API, usually data.balance or just data if it's the row
+
+  const createLeaveMutation = useCreateLeave();
 
   const handleSubmitLeave = async (leaveData) => {
     try {
-      await applyForLeave(leaveData);
+      await createLeaveMutation.mutateAsync({
+        start_date: leaveData.startDate,
+        end_date: leaveData.endDate,
+        type: leaveData.type,
+        reason: leaveData.reason
+      });
       setShowForm(false);
       showToast('Leave application submitted successfully!', 'success');
     } catch (error) {
-      showToast('Failed to submit leave application', 'error');
+      showToast(error.message || 'Failed to submit leave application', 'error');
     }
   };
 
-  const myLeaves = leaves.filter(leave => leave.employeeId === 'current-user');
+  // Map API data to UI format
+  const mappedLeaves = leaves.map(leave => ({
+    id: leave.id,
+    startDate: leave.start_date,
+    endDate: leave.end_date,
+    type: leave.type,
+    reason: leave.reason,
+    status: leave.status,
+    employeeName: leave.user?.full_name || 'Me', // Optional for MyLeaves
+    // duration: calculate... (LeaveTable calculates it)
+  }));
+
+  const isLoading = leavesLoading || balanceLoading;
 
   return (
     <div className="space-y-6">
@@ -33,7 +59,8 @@ const MyLeaves = () => {
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+          disabled={isLoading}
+          className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors disabled:opacity-50"
         >
           <Plus className="w-4 h-4" />
           Apply for Leave
@@ -41,14 +68,14 @@ const MyLeaves = () => {
       </div>
 
       {/* Leave Balance */}
-      <LeaveBalanceCard />
+      <LeaveBalanceCard balances={balances} />
 
       {/* Leave Applications Table */}
       <div className="bg-white rounded-lg border border-gray-300">
-        <LeaveTable 
-          leaves={myLeaves} 
-          loading={loading}
-          showActions={true}
+        <LeaveTable
+          leaves={mappedLeaves}
+          loading={isLoading}
+          showActions={false}
         />
       </div>
 
@@ -57,6 +84,7 @@ const MyLeaves = () => {
         <LeaveForm
           onSubmit={handleSubmitLeave}
           onCancel={() => setShowForm(false)}
+          balances={balances}
         />
       )}
     </div>

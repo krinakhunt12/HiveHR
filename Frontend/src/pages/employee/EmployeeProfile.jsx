@@ -3,6 +3,7 @@ import { User, Mail, Shield, Key, Bell, Globe, Camera, Save, Loader2, Lock, Comm
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useCurrentUser } from '../../hooks/api/useAuthQueries';
 import { useUpdateEmployee } from '../../hooks/api/useEmployeeQueries';
+import { useToast } from '../../hooks/useToast';
 
 const EmployeeProfile = () => {
     const { data: currentUserData } = useCurrentUser();

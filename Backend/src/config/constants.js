@@ -3,9 +3,23 @@
  */
 
 export const ROLES = {
-    ADMIN: 'admin',
+    SUPER_ADMIN: 'super_admin', // Multi-tenant platform owner
+    COMPANY_ADMIN: 'company_admin', // Company owner
     HR: 'hr',
+    MANAGER: 'manager',
     EMPLOYEE: 'employee'
+};
+
+export const PLAN_TYPES = {
+    BASIC: 'basic',
+    PROFESSIONAL: 'professional',
+    ENTERPRISE: 'enterprise'
+};
+
+export const PLAN_LIMITS = {
+    [PLAN_TYPES.BASIC]: { employees: 50, departments: 3 },
+    [PLAN_TYPES.PROFESSIONAL]: { employees: 500, departments: 20 },
+    [PLAN_TYPES.ENTERPRISE]: { employees: 1000000, departments: 1000 }
 };
 
 export const LEAVE_TYPES = {

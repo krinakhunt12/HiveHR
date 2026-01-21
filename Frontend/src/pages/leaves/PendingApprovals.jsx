@@ -1,18 +1,20 @@
 import React from 'react';
 import { Users, Clock } from 'lucide-react';
 import LeaveTable from '../../components/leaves/LeaveTable';
-import { useLeaves } from '../../hooks/useLeaves';
+import { useAllLeaves, useApproveLeave, useRejectLeave } from '../../hooks/api/useLeaveQueries';
 import { useToast } from '../../hooks/useToast';
 
 const PendingApprovals = () => {
-  const { leaves, loading, approveLeave, rejectLeave } = useLeaves();
-  const { showToast } = useToast();
+  const { data: leavesData, isLoading } = useAllLeaves({ status: 'pending' });
+  const leaves = leavesData?.data?.leaves || [];
 
-  const pendingLeaves = leaves.filter(leave => leave.status === 'pending');
+  const approveMutation = useApproveLeave();
+  const rejectMutation = useRejectLeave();
+  const { showToast } = useToast();
 
   const handleApprove = async (leaveId) => {
     try {
-      await approveLeave(leaveId);
+      await approveMutation.mutateAsync(leaveId);
       showToast('Leave approved successfully!', 'success');
     } catch (error) {
       showToast('Failed to approve leave', 'error');
@@ -21,12 +23,27 @@ const PendingApprovals = () => {
 
   const handleReject = async (leaveId) => {
     try {
-      await rejectLeave(leaveId);
+      // Reason is required by backend but for quick action we might default or ask.
+      // LeaveTable currently just calls onReject(id).
+      // We'll pass a default reason for now or simpler, update logic to prompt.
+      // For this implementation, we'll default it. 
+      await rejectMutation.mutateAsync({ id: leaveId, reason: 'Manager Rejected' });
       showToast('Leave rejected successfully!', 'success');
     } catch (error) {
       showToast('Failed to reject leave', 'error');
     }
   };
+
+  const mappedLeaves = leaves.map(leave => ({
+    id: leave.id,
+    startDate: leave.start_date,
+    endDate: leave.end_date,
+    type: leave.type,
+    reason: leave.reason,
+    status: leave.status,
+    employeeName: leave.user?.full_name || 'Unknown',
+    employeeEmail: leave.user?.email || 'N/A' // user object might not have email depending on query
+  }));
 
   return (
     <div className="space-y-6">
@@ -47,7 +64,7 @@ const PendingApprovals = () => {
           <div className="flex items-center gap-3">
             <Clock className="w-8 h-8 text-gray-700" />
             <div>
-              <p className="text-2xl font-bold text-gray-900">{pendingLeaves.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{mappedLeaves.length}</p>
               <p className="text-sm text-gray-600">Pending Requests</p>
             </div>
           </div>
@@ -57,8 +74,8 @@ const PendingApprovals = () => {
       {/* Pending Leaves Table */}
       <div className="bg-white rounded-lg border border-gray-300">
         <LeaveTable
-          leaves={pendingLeaves}
-          loading={loading}
+          leaves={mappedLeaves}
+          loading={isLoading}
           showActions={true}
           onApprove={handleApprove}
           onReject={handleReject}

@@ -12,13 +12,14 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
 // Import routes
-import authRoutes from './routes/authRoutes.js';
-import employeeRoutes from './routes/employeeRoutes.js';
-import attendanceRoutes from './routes/attendanceRoutes.js';
-import leaveRoutes from './routes/leaveRoutes.js';
+import authRoutes from './src/routes/authRoutes.js';
+import employeeRoutes from './src/routes/employeeRoutes.js';
+import attendanceRoutes from './src/routes/attendanceRoutes.js';
+import leaveRoutes from './src/routes/leaveRoutes.js';
+import companyRoutes from './src/routes/companyRoutes.js';
 
 // Import middleware
-import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { errorHandler, notFoundHandler } from './src/middleware/errorHandler.js';
 
 // Load environment variables
 dotenv.config();
@@ -36,7 +37,7 @@ app.use(helmet());
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'],
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
     optionsSuccessStatus: 200
 };
@@ -85,6 +86,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leaves', leaveRoutes);
+app.use('/api/companies', companyRoutes);
 
 // API documentation route
 app.get('/api', (req, res) => {

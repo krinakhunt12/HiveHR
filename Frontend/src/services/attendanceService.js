@@ -46,6 +46,13 @@ export const attendanceAPI = {
     },
 
     /**
+     * Get attendance configuration rules
+     */
+    getAttendanceConfig: async () => {
+        return await apiCall('/attendance/config');
+    },
+
+    /**
      * Get employee attendance (HR/Admin)
      */
     getEmployeeAttendance: async (userId, params = {}) => {

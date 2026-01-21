@@ -35,10 +35,13 @@ export const authenticate = async (req, res, next) => {
             });
         }
 
-        // Fetch user profile with role information
+        // Fetch user profile with role information and company context
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('*')
+            .select(`
+                *,
+                company:companies(*)
+            `)
             .eq('id', user.id)
             .single();
 
@@ -104,14 +107,19 @@ export const authorize = (...allowedRoles) => {
 };
 
 /**
- * Check if user is admin
+ * Check if user is platform admin
  */
-export const isAdmin = authorize(ROLES.ADMIN);
+export const isSuperAdmin = authorize(ROLES.SUPER_ADMIN);
 
 /**
- * Check if user is HR or Admin
+ * Check if user is HR or Company Admin or Super Admin
  */
-export const isHROrAdmin = authorize(ROLES.HR, ROLES.ADMIN);
+export const isHROrAdmin = authorize(ROLES.HR, ROLES.COMPANY_ADMIN, ROLES.SUPER_ADMIN);
+
+/**
+ * Check if user is Manager, HR, Company Admin or Super Admin
+ */
+export const isManagerOrHROrAdmin = authorize(ROLES.MANAGER, ROLES.HR, ROLES.COMPANY_ADMIN, ROLES.SUPER_ADMIN);
 
 /**
  * Check if user is accessing their own resource
@@ -132,4 +140,4 @@ export const isSelfOrAdmin = (req, res, next) => {
     });
 };
 
-export default { authenticate, authorize, isAdmin, isHROrAdmin, isSelfOrAdmin };
+export default { authenticate, authorize, isSuperAdmin, isHROrAdmin, isManagerOrHROrAdmin, isSelfOrAdmin };

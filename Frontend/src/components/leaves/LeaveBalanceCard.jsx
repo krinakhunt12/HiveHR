@@ -1,12 +1,40 @@
 import React from 'react';
 import { TrendingUp, AlertTriangle } from 'lucide-react';
 
-const LeaveBalanceCard = () => {
+const LeaveBalanceCard = ({ balances }) => {
+  if (!balances) return null;
+
   const leaveBalances = [
-    { type: 'Casual Leave', total: 12, used: 3, remaining: 9 },
-    { type: 'Sick Leave', total: 6, used: 1, remaining: 5 },
-    { type: 'Earned Leave', total: 15, used: 0, remaining: 15 },
-    { type: 'Maternity Leave', total: 84, used: 0, remaining: 84 },
+    {
+      type: 'Casual Leave',
+      total: balances.casual_leave_total || 0,
+      used: balances.casual_leave_used || 0,
+      remaining: (balances.casual_leave_total || 0) - (balances.casual_leave_used || 0)
+    },
+    {
+      type: 'Sick Leave',
+      total: balances.sick_leave_total || 0,
+      used: balances.sick_leave_used || 0,
+      remaining: (balances.sick_leave_total || 0) - (balances.sick_leave_used || 0)
+    },
+    {
+      type: 'Earned Leave',
+      total: balances.earned_leave_total || 0,
+      used: balances.earned_leave_used || 0,
+      remaining: (balances.earned_leave_total || 0) - (balances.earned_leave_used || 0)
+    },
+    {
+      type: 'Maternity Leave',
+      total: balances.maternity_leave_total || 0,
+      used: balances.maternity_leave_used || 0,
+      remaining: (balances.maternity_leave_total || 0) - (balances.maternity_leave_used || 0)
+    },
+    {
+      type: 'Paternity Leave',
+      total: balances.paternity_leave_total || 0,
+      used: balances.paternity_leave_used || 0,
+      remaining: (balances.paternity_leave_total || 0) - (balances.paternity_leave_used || 0)
+    },
   ];
 
   return (
@@ -26,9 +54,9 @@ const LeaveBalanceCard = () => {
               <span className="text-sm text-gray-500">/ {balance.total}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-gray-800 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(balance.used / balance.total) * 100}%` }}
+                style={{ width: `${balance.total > 0 ? (balance.used / balance.total) * 100 : 0}%` }}
               ></div>
             </div>
             <div className="flex justify-between text-xs text-gray-500 mt-1">

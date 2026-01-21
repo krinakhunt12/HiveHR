@@ -5,16 +5,18 @@ import PendingApprovals from './PendingApprovals';
 import LeaveHistory from './LeaveHistory';
 import LeaveStats from '../../components/leaves/LeaveStats';
 import { useToast } from '../../hooks/useToast';
+import { useCurrentUser } from '../../hooks/api/useAuthQueries';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const LeavesPage = () => {
   const [activeTab, setActiveTab] = useState('my-leaves');
   const { showToast } = useToast();
-  const userRole = localStorage.getItem('userRole') || 'employee';
+  const { data: currentUser } = useCurrentUser();
+  const userRole = currentUser?.data?.profile?.role || 'employee';
 
   const tabs = [
     { id: 'my-leaves', label: 'My Leaves', icon: Calendar },
-    ...(userRole === 'manager' || userRole === 'admin' 
+    ...(userRole === 'manager' || userRole === 'admin'
       ? [{ id: 'approvals', label: 'Pending Approvals', icon: FileCheck }]
       : []),
     { id: 'history', label: 'History', icon: History }
@@ -43,11 +45,10 @@ const LeavesPage = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeTab === tab.id
+                      className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                           ? 'border-gray-900 text-gray-900'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-400'
-                      }`}
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       {tab.label}

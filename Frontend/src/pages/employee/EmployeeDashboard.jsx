@@ -12,7 +12,8 @@ import {
     Command
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useEmployeeStats, useClockIn, useClockOut } from '../../hooks/api/useEmployeeQueries';
+import { useEmployeeStats } from '../../hooks/api/useEmployeeQueries';
+import { useCheckIn, useCheckOut } from '../../hooks/api/useAttendanceQueries';
 import { useCurrentUser } from '../../hooks/api/useAuthQueries';
 import { useToast } from '../../hooks/useToast';
 import { Button } from '../../components/ui/button';
@@ -29,20 +30,17 @@ const EmployeeDashboard = () => {
     // Usually backend maps Auth User ID to Profile. 
     // Let's use user?.id for now as that matches previous logic
     const { data: employeeData, isLoading } = useEmployeeStats(user?.id || user?._id);
-    const clockInMutation = useClockIn();
-    const clockOutMutation = useClockOut();
+    const clockInMutation = useCheckIn();
+    const clockOutMutation = useCheckOut();
     const { showToast } = useToast();
 
     const handleClockAction = async () => {
         try {
             if (!employeeData?.attendanceToday) {
-                await clockInMutation.mutateAsync(user.id);
+                await clockInMutation.mutateAsync();
                 showToast('Clock-In protocol established.', 'success');
             } else if (!employeeData.attendanceToday.check_out_time) {
-                await clockOutMutation.mutateAsync({
-                    attendanceId: employeeData.attendanceToday.id,
-                    userId: user.id
-                });
+                await clockOutMutation.mutateAsync();
                 showToast('Clock-Out protocol finalized.', 'success');
             }
         } catch (err) {
@@ -53,9 +51,15 @@ const EmployeeDashboard = () => {
     const stats_cards = [
         {
             label: 'Attendance_Rate',
-            value: '98%',
+            value: employeeData?.attendanceToday?.status?.toUpperCase().replace('-', '_') || 'ABSENT',
             icon: CheckCircle2,
-            meta: 'OPTIMAL'
+            meta: `LOG:${employeeData?.attendanceToday?.date || 'N/A'}`
+        },
+        {
+            label: 'Total_Work_Hours',
+            value: employeeData?.attendanceToday?.total_hours ? `${employeeData.attendanceToday.total_hours} HRS` : '0.0 HRS',
+            icon: Clock,
+            meta: 'DAILY_ACCUMULATION'
         },
         {
             label: 'Leaves_Consumed',
@@ -99,16 +103,22 @@ const EmployeeDashboard = () => {
                             <p className="text-sm font-bold tracking-tight">
                                 {isLoading ? 'SYNCING...' : employeeData?.attendanceToday ? (employeeData.attendanceToday.check_out_time ? 'CYCLE_FINALIZED' : 'ACTIVE_STATION') : 'INACTIVE_NODE'}
                             </p>
+                            {employeeData?.attendanceToday?.check_in_time && (
+                                <p className="text-[9px] font-bold opacity-50 mt-1">
+                                    IN: {new Date(employeeData.attendanceToday.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {employeeData.attendanceToday.check_out_time && ` | OUT: ${new Date(employeeData.attendanceToday.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                                </p>
+                            )}
                         </div>
                         <Button
                             onClick={handleClockAction}
-                            disabled={isLoading || clockInMutation.isLoading || clockOutMutation.isLoading || (employeeData?.attendanceToday?.check_out_time)}
+                            disabled={isLoading || clockInMutation.isPending || clockOutMutation.isPending || (employeeData?.attendanceToday?.check_out_time)}
                             className={cn(
                                 "h-14 px-8 rounded-none text-[10px] font-black uppercase tracking-[0.2em] transition-all",
                                 employeeData?.attendanceToday ? (employeeData.attendanceToday.check_out_time ? 'bg-secondary text-muted-foreground opacity-50' : 'bg-foreground text-background hover:bg-neutral-800') : 'bg-foreground text-background hover:bg-neutral-800'
                             )}
                         >
-                            {isLoading ? '...' : (employeeData?.attendanceToday ? (employeeData.attendanceToday.check_out_time ? 'FINALIZED' : 'CLOCK_OUT') : 'CLOCK_IN')}
+                            {isLoading || clockInMutation.isPending || clockOutMutation.isPending ? 'SYNCING...' : (employeeData?.attendanceToday ? (employeeData.attendanceToday.check_out_time ? 'FINALIZED' : 'CLOCK_OUT') : 'CLOCK_IN')}
                         </Button>
                     </Card>
                 </div>

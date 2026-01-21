@@ -3,7 +3,7 @@ import { X, Calendar, Clock } from 'lucide-react';
 import Modal from '../shared/Modal';
 import { LEAVE_TYPES } from '../../constants/leaveConstants';
 
-const LeaveForm = ({ onSubmit, onCancel }) => {
+const LeaveForm = ({ onSubmit, onCancel, balances }) => {
   const [formData, setFormData] = useState({
     type: 'casual',
     startDate: '',
@@ -12,8 +12,16 @@ const LeaveForm = ({ onSubmit, onCancel }) => {
     emergencyContact: ''
   });
 
+  const [error, setError] = useState('');
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const validationError = validateLeave();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    setError('');
     onSubmit(formData);
   };
 
@@ -32,6 +40,27 @@ const LeaveForm = ({ onSubmit, onCancel }) => {
     return 0;
   };
 
+  const getRemainingBalance = (type) => {
+    if (!balances) return 0;
+    const totalKey = `${type}_leave_total`;
+    const usedKey = `${type}_leave_used`;
+    return (balances[totalKey] || 0) - (balances[usedKey] || 0);
+  };
+
+  const validateLeave = () => {
+    const days = calculateDays();
+    if (days <= 0) return "Invalid date range";
+
+    const balance = getRemainingBalance(formData.type);
+    // Skip check for 'other' or 'bereavement' if not tracked, but assume standard types are tracked
+    if (['sick', 'casual', 'earned', 'maternity', 'paternity'].includes(formData.type)) {
+      if (days > balance) {
+        return `Insufficient leave balance. You have ${balance} days remaining for ${formData.type} leave.`;
+      }
+    }
+    return null;
+  };
+
   return (
     <Modal onClose={onCancel}>
       <div className="bg-white rounded-xl max-w-md w-full mx-auto p-6">
@@ -45,6 +74,12 @@ const LeaveForm = ({ onSubmit, onCancel }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Leave Type */}

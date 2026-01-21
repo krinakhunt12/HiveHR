@@ -32,6 +32,18 @@ export const useTodayAttendance = (options = {}) => {
 };
 
 /**
+ * Get attendance configuration
+ */
+export const useAttendanceConfig = (options = {}) => {
+    return useQuery({
+        queryKey: ['attendance', 'config'],
+        queryFn: attendanceAPI.getAttendanceConfig,
+        staleTime: Infinity, // Config rarely changes
+        ...options
+    });
+};
+
+/**
  * Get employee attendance (HR/Admin)
  */
 export const useEmployeeAttendance = (userId, params = {}, options = {}) => {

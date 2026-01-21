@@ -10,7 +10,7 @@ import { ApiError } from '../middleware/errorHandler.js';
 /**
  * @route   GET /api/employees
  * @desc    Get all employees (with filters)
- * @access  Private/HR/Admin
+ * @access  Private/HR/CompanyAdmin
  */
 export const getAllEmployees = async (req, res, next) => {
     try {
@@ -25,9 +25,12 @@ export const getAllEmployees = async (req, res, next) => {
             sort_order = 'desc'
         } = req.query;
 
+        const companyId = req.profile.company_id;
+
         let query = supabase
             .from('profiles')
-            .select('*, departments(name)', { count: 'exact' });
+            .select('*, departments!department_id(name)', { count: 'exact' })
+            .eq('company_id', companyId);
 
         // Apply filters
         if (department_id) {
@@ -90,10 +93,11 @@ export const getEmployeeById = async (req, res, next) => {
             .from('profiles')
             .select(`
         *,
-        departments(id, name, description),
+        departments!department_id(id, name, description),
         manager:profiles!manager_id(id, full_name, email, employee_id)
       `)
             .eq('id', id)
+            .eq('company_id', req.profile.company_id)
             .single();
 
         if (error || !data) {
@@ -197,11 +201,12 @@ export const updateEmployee = async (req, res, next) => {
         const { id } = req.params;
         const updates = req.body;
 
-        // Check if employee exists
+        // Check if employee exists within the company
         const { data: existingEmployee } = await supabase
             .from('profiles')
             .select('id')
             .eq('id', id)
+            .eq('company_id', req.profile.company_id)
             .single();
 
         if (!existingEmployee) {
@@ -213,6 +218,7 @@ export const updateEmployee = async (req, res, next) => {
             .from('profiles')
             .update(updates)
             .eq('id', id)
+            .eq('company_id', req.profile.company_id)
             .select()
             .single();
 
@@ -239,11 +245,12 @@ export const deleteEmployee = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        // Check if employee exists
+        // Check if employee exists within the company
         const { data: existingEmployee } = await supabase
             .from('profiles')
             .select('id')
             .eq('id', id)
+            .eq('company_id', req.profile.company_id)
             .single();
 
         if (!existingEmployee) {
@@ -275,12 +282,22 @@ export const getEmployeeStats = async (req, res, next) => {
     try {
         const { id } = req.params;
 
+        const today = new Date().toISOString().split('T')[0];
+
         // Get attendance stats
         const { data: attendanceData } = await supabase
             .from('attendance')
             .select('status')
             .eq('user_id', id)
             .gte('date', new Date(new Date().getFullYear(), 0, 1).toISOString());
+
+        // Get today's attendance
+        const { data: attendanceToday } = await supabase
+            .from('attendance')
+            .select('*')
+            .eq('user_id', id)
+            .eq('date', today)
+            .single();
 
         // Get leave stats
         const { data: leaveData } = await supabase
@@ -305,6 +322,7 @@ export const getEmployeeStats = async (req, res, next) => {
                 absent: attendanceData?.filter(a => a.status === 'absent').length || 0,
                 work_from_home: attendanceData?.filter(a => a.status === 'work-from-home').length || 0
             },
+            attendanceToday: attendanceToday || null,
             leaves: {
                 balance: leaveData || {},
                 pending_requests: pendingLeaves?.length || 0

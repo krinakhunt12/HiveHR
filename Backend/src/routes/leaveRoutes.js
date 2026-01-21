@@ -12,7 +12,7 @@ import {
     rejectLeave,
     cancelLeave
 } from '../controllers/leaveController.js';
-import { authenticate, isHROrAdmin } from '../middleware/auth.js';
+import { authenticate, isHROrAdmin, isManagerOrHROrAdmin } from '../middleware/auth.js';
 import { validate, leaveSchemas } from '../middleware/validator.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
@@ -28,8 +28,8 @@ router.get('/balance', asyncHandler(getLeaveBalance));
 router.delete('/:id', asyncHandler(cancelLeave));
 
 // HR/Admin routes
-router.get('/all', isHROrAdmin, asyncHandler(getAllLeaves));
-router.put('/:id/approve', isHROrAdmin, asyncHandler(approveLeave));
-router.put('/:id/reject', isHROrAdmin, validate(leaveSchemas.update), asyncHandler(rejectLeave));
+router.get('/all', isManagerOrHROrAdmin, asyncHandler(getAllLeaves));
+router.put('/:id/approve', isManagerOrHROrAdmin, asyncHandler(approveLeave));
+router.put('/:id/reject', isManagerOrHROrAdmin, validate(leaveSchemas.update), asyncHandler(rejectLeave));
 
 export default router;

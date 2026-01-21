@@ -11,7 +11,7 @@ import {
     refreshToken,
     changePassword
 } from '../controllers/authController.js';
-import { authenticate, isAdmin } from '../middleware/auth.js';
+import { authenticate, isHROrAdmin } from '../middleware/auth.js';
 import { validate, authSchemas } from '../middleware/validator.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
@@ -26,7 +26,7 @@ router.post('/logout', authenticate, asyncHandler(logout));
 router.get('/me', authenticate, asyncHandler(getCurrentUser));
 router.post('/change-password', authenticate, asyncHandler(changePassword));
 
-// Admin only routes
-router.post('/register', authenticate, isAdmin, validate(authSchemas.register), asyncHandler(register));
+// Company Admin / HR only routes
+router.post('/register', authenticate, isHROrAdmin, validate(authSchemas.register), asyncHandler(register));
 
 export default router;

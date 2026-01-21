@@ -11,7 +11,7 @@ import {
     deleteEmployee,
     getEmployeeStats
 } from '../controllers/employeeController.js';
-import { authenticate, isAdmin, isHROrAdmin, isSelfOrAdmin } from '../middleware/auth.js';
+import { authenticate, isHROrAdmin, isSelfOrAdmin } from '../middleware/auth.js';
 import { validate, employeeSchemas } from '../middleware/validator.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
@@ -23,8 +23,8 @@ router.use(authenticate);
 // Get all employees (HR/Admin only)
 router.get('/', isHROrAdmin, asyncHandler(getAllEmployees));
 
-// Create employee (Admin only)
-router.post('/', isAdmin, validate(employeeSchemas.create), asyncHandler(createEmployee));
+// Create employee (HR/Admin only)
+router.post('/', isHROrAdmin, validate(employeeSchemas.create), asyncHandler(createEmployee));
 
 // Get employee by ID (Self or HR/Admin)
 router.get('/:id', asyncHandler(getEmployeeById));
@@ -32,8 +32,8 @@ router.get('/:id', asyncHandler(getEmployeeById));
 // Update employee (HR/Admin only)
 router.put('/:id', isHROrAdmin, validate(employeeSchemas.update), asyncHandler(updateEmployee));
 
-// Delete employee (Admin only)
-router.delete('/:id', isAdmin, asyncHandler(deleteEmployee));
+// Delete employee (HR/Admin only)
+router.delete('/:id', isHROrAdmin, asyncHandler(deleteEmployee));
 
 // Get employee stats (Self or HR/Admin)
 router.get('/:id/stats', asyncHandler(getEmployeeStats));

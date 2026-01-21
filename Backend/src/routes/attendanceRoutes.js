@@ -11,9 +11,10 @@ import {
     getEmployeeAttendance,
     getAllAttendance,
     createManualAttendance,
-    getAttendanceStats
+    getAttendanceStats,
+    getAttendanceConfig
 } from '../controllers/attendanceController.js';
-import { authenticate, isHROrAdmin } from '../middleware/auth.js';
+import { authenticate, isHROrAdmin, isManagerOrHROrAdmin } from '../middleware/auth.js';
 import { validate, attendanceSchemas } from '../middleware/validator.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 
@@ -28,10 +29,12 @@ router.post('/check-out', validate(attendanceSchemas.checkOut), asyncHandler(che
 router.get('/my-attendance', asyncHandler(getMyAttendance));
 router.get('/today', asyncHandler(getTodayAttendance));
 
-// HR/Admin routes
-router.get('/all', isHROrAdmin, asyncHandler(getAllAttendance));
-router.get('/stats', isHROrAdmin, asyncHandler(getAttendanceStats));
-router.get('/employee/:userId', isHROrAdmin, asyncHandler(getEmployeeAttendance));
+router.get('/config', asyncHandler(getAttendanceConfig));
+
+// HR/Manager/Admin routes
+router.get('/all', isManagerOrHROrAdmin, asyncHandler(getAllAttendance));
+router.get('/stats', isManagerOrHROrAdmin, asyncHandler(getAttendanceStats));
+router.get('/employee/:userId', isManagerOrHROrAdmin, asyncHandler(getEmployeeAttendance));
 router.post('/manual', isHROrAdmin, validate(attendanceSchemas.create), asyncHandler(createManualAttendance));
 
 export default router;
