@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Users } from 'lucide-react';
+import { Mail, Lock, Users, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 
@@ -13,65 +13,67 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <Link to="/" className="flex items-center gap-2 mb-10 group">
-        <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100 group-hover:scale-105 transition-transform">
-          <Users className="text-white w-6 h-6" />
+    <div className="min-h-screen bg-[var(--color-background-gray)] flex flex-col items-center justify-center p-6">
+      <Link to="/" className="flex items-center gap-2.5 mb-10 group">
+        <div className="w-9 h-9 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shadow-sm shadow-indigo-100 group-hover:bg-[var(--color-primary-hover)] transition-colors">
+          <Users className="text-white w-5 h-5" />
         </div>
-        <span className="text-2xl font-black text-slate-900 tracking-tight">HiveHr</span>
+        <span className="text-xl font-semibold text-[var(--color-text-main)] tracking-tight">HiveHr</span>
       </Link>
 
-      <Card className="w-full max-w-md border-slate-100 shadow-xl shadow-slate-200/50">
-        <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-black text-slate-900 tracking-tight">Welcome back</CardTitle>
-            <p className="text-sm font-medium text-slate-500">Log in to manage your workplace</p>
+      <Card className="w-full max-w-[400px] border-slate-100 shadow-sm rounded-xl overflow-hidden bg-white">
+        <CardHeader className="text-center pt-10 pb-2 space-y-2">
+            <CardTitle className="text-2xl font-semibold text-[var(--color-text-main)] tracking-tight">Welcome back</CardTitle>
+            <p className="text-sm font-medium text-slate-400">Enter your credentials to access your portal</p>
         </CardHeader>
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
+        <CardContent className="pt-8 px-8 pb-10">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Work Email</label>
                 <div className="relative group">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-indigo-600 transition-colors" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5 group-focus-within:text-[var(--color-primary)] transition-colors" />
                     <input 
                         type="email" 
                         required 
-                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all font-medium" 
-                        placeholder="john@company.com"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" 
+                        placeholder="name@company.com"
                     />
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <div className="flex justify-between items-center ">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Password</label>
-                    <Link to="#" className="text-[10px] font-black text-indigo-600 uppercase tracking-wider hover:text-indigo-700 transition-colors">Forgot?</Link>
+            <div className="space-y-1.5">
+                <div className="flex justify-between items-center ml-0.5">
+                    <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Password</label>
+                    <Link to="#" className="text-[10px] font-semibold text-[var(--color-primary)] uppercase tracking-wider hover:opacity-70 transition-opacity">Forgot?</Link>
                 </div>
                 <div className="relative group">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-indigo-600 transition-colors" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5 group-focus-within:text-[var(--color-primary)] transition-colors" />
                     <input 
                         type="password" 
                         required 
-                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all font-medium" 
-                        placeholder="••••••••"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" 
+                        placeholder="••••••••••••"
                     />
                 </div>
             </div>
 
-            <Button type="submit" className="w-full py-6 font-black uppercase tracking-widest text-xs">
-                Log In
+            <Button type="submit" className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
+                Sign in <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm font-medium text-slate-500">
-                Don't have an account? <Link to="/signup" className="text-indigo-600 font-black">Sign up</Link>
+          <div className="mt-8 text-center pt-6 border-t border-slate-50">
+            <p className="text-sm font-medium text-slate-400">
+                New to the platform? <Link to="/signup" className="text-[var(--color-primary)] font-semibold hover:text-[var(--color-primary-hover)] transition-colors">Apply for access</Link>
             </p>
           </div>
         </CardContent>
       </Card>
       
-      <div className="mt-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">
-        © 2026 HiveHr. Enterprise grade HR management.
+      <div className="mt-10 text-[10px] font-medium text-slate-300 uppercase tracking-widest text-center flex items-center gap-3">
+        <span>© 2026 HIVEHR</span>
+        <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+        <span>Secure Infrastructure</span>
       </div>
     </div>
   );
