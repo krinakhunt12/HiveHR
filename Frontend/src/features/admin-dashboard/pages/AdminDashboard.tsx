@@ -9,19 +9,43 @@ import {
   ShieldAlert,
   Globe,
   Database,
-  Unplug
+    Unplug,
+    AlertCircle
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
+import { hrApi } from '@/shared/api/hrApi';
 
 const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [health, setHealth] = useState<{ ok: boolean; service: string; timestamp: string } | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
+        let isMounted = true;
+
+        const loadData = async () => {
+            try {
+                const res = await hrApi.getHealth();
+                if (!isMounted) return;
+                setHealth(res);
+            } catch (err) {
+                if (!isMounted) return;
+                setError(err instanceof Error ? err.message : 'Failed to fetch backend health.');
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        loadData();
+
+        return () => {
+            isMounted = false;
+        };
   }, []);
 
   const navItems = [
@@ -62,8 +86,21 @@ const AdminDashboard = () => {
                 <AdminStat title="Active Tenants" value="2,104" icon={<Building2 className="text-[var(--color-primary)]/70" />} />
                 <AdminStat title="Global Traffic" value="84.2M" icon={<Users className="text-emerald-500/70" />} />
                 <AdminStat title="System MRR" value="$420.5k" icon={<CreditCard className="text-amber-500/70" />} />
-                <AdminStat title="Uptime" value="99.99%" icon={<Activity className="text-purple-500/70" />} />
+                                <AdminStat title="API Health" value={health?.ok ? 'Healthy' : 'Unknown'} icon={<Activity className="text-purple-500/70" />} />
             </div>
+
+                        {(error || health) && (
+                            <Card className={cn(error ? 'border-rose-200 bg-rose-50' : 'border-emerald-200 bg-emerald-50')}>
+                                <CardContent className={cn('p-4 flex items-center gap-3', error ? 'text-rose-700' : 'text-emerald-700')}>
+                                    <AlertCircle size={18} />
+                                    <p className="text-sm font-medium">
+                                        {error
+                                            ? `API health check failed: ${error}`
+                                            : `Connected to ${health?.service} at ${new Date(health?.timestamp ?? '').toLocaleString()}`}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="lg:col-span-2">

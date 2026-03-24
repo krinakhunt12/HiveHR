@@ -6,6 +6,8 @@ import EmployeeDashboard from "@/features/employee-dashboard/pages/EmployeeDashb
 import CompanyDashboard from "@/features/company-dashboard/pages/CompanyDashboard";
 import AdminDashboard from "@/features/admin-dashboard/pages/AdminDashboard";
 import { marketingRoutes } from "@/features/marketing/routes";
+import RequireRole from "@/app/guards/RequireRole";
+import { dashboardPathForRole, getCurrentRole } from "@/shared/auth/roles";
 
 export const router = createBrowserRouter([
   {
@@ -25,16 +27,32 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     children: [
       {
-        path: "employee",
-        element: <EmployeeDashboard />,
-      },
-      {
-        path: "company",
-        element: <CompanyDashboard />,
+        index: true,
+        element: <Navigate to={dashboardPathForRole(getCurrentRole())} replace />,
       },
       {
         path: "admin",
-        element: <AdminDashboard />,
+        element: (
+          <RequireRole requiredRole="admin">
+            <AdminDashboard />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "company",
+        element: (
+          <RequireRole requiredRole="company_admin">
+            <CompanyDashboard />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "employee",
+        element: (
+          <RequireRole requiredRole="employee">
+            <EmployeeDashboard />
+          </RequireRole>
+        ),
       },
     ],
   },

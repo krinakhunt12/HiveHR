@@ -7,20 +7,100 @@ import {
   ArrowUpRight, 
   MessageSquare,
   TrendingUp,
-  Award
+    Award,
+    AlertCircle
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
+import { hrApi, type AttendanceLog, type CompanyPolicy } from '@/shared/api/hrApi';
 
 const EmployeeDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [attendanceToday, setAttendanceToday] = useState<AttendanceLog | null>(null);
+    const [policies, setPolicies] = useState<CompanyPolicy[]>([]);
+    const [isSavingAttendance, setIsSavingAttendance] = useState(false);
+
+    const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
+    const employeeId = (import.meta.env.VITE_HR_EMPLOYEE_ID as string | undefined)?.trim();
+    const today = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
+        let isMounted = true;
+
+        const loadData = async () => {
+            if (!companyId || !employeeId) {
+                setError('Set VITE_HR_COMPANY_ID and VITE_HR_EMPLOYEE_ID in frontend env to use attendance actions.');
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                const [attendanceRes, policyRes] = await Promise.all([
+                    hrApi.listAttendance({ employee_id: employeeId, attendance_date: today }),
+                    hrApi.listPolicies(companyId),
+                ]);
+
+                if (!isMounted) return;
+                setAttendanceToday(attendanceRes.data[0] ?? null);
+                setPolicies(policyRes.data);
+            } catch (err) {
+                if (!isMounted) return;
+                setError(err instanceof Error ? err.message : 'Failed to load employee dashboard data.');
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        loadData();
+
+        return () => {
+            isMounted = false;
+        };
   }, []);
+
+    const onCheckIn = async () => {
+        if (!companyId || !employeeId) return;
+
+        setIsSavingAttendance(true);
+        setError(null);
+        try {
+            const res = await hrApi.checkIn({
+                company_id: companyId,
+                employee_id: employeeId,
+            });
+            setAttendanceToday(res.data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to check in.');
+        } finally {
+            setIsSavingAttendance(false);
+        }
+    };
+
+    const onCheckOut = async () => {
+        if (!employeeId) return;
+
+        setIsSavingAttendance(true);
+        setError(null);
+        try {
+            const res = await hrApi.checkOut({
+                employee_id: employeeId,
+            });
+            setAttendanceToday(res.data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to check out.');
+        } finally {
+            setIsSavingAttendance(false);
+        }
+    };
+
+    const canCheckIn = !attendanceToday?.check_in_at;
+    const canCheckOut = !!attendanceToday?.check_in_at && !attendanceToday?.check_out_at;
+    const todaysMinutes = attendanceToday?.work_minutes ?? 0;
 
   const navItems = [
     { icon: <Clock size={18} />, label: 'Dashboard', path: '/dashboard/employee' },
@@ -52,15 +132,31 @@ const EmployeeDashboard = () => {
           </div>
           <div className="flex gap-2">
              <Button variant="outline" size="sm" className="font-medium text-xs h-9">Request Time Off</Button>
-             <Button size="sm" className="font-medium text-xs h-9">Punch In</Button>
+                         <Button
+                             size="sm"
+                             className="font-medium text-xs h-9"
+                             onClick={canCheckIn ? onCheckIn : onCheckOut}
+                             disabled={isSavingAttendance || (!canCheckIn && !canCheckOut)}
+                         >
+                             {isSavingAttendance ? 'Saving...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Completed'}
+                         </Button>
           </div>
         </div>
+
+                {error && (
+                    <Card className="border-rose-200 bg-rose-50">
+                        <CardContent className="p-4 flex items-center gap-3 text-rose-700">
+                            <AlertCircle size={18} />
+                            <p className="text-sm font-medium">{error}</p>
+                        </CardContent>
+                    </Card>
+                )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard title="Total Attendance" value="98.4%" trend="+1.2%" icon={<Clock className="text-[var(--color-primary)]/80" />} />
             <StatCard title="Leave Balance" value="14 Days" icon={<Calendar className="text-[var(--color-success-green)]/80" />} />
-            <StatCard title="Active Tasks" value="08" icon={<CheckSquare className="text-[var(--color-warning-orange)]/80" />} />
-            <StatCard title="Points" value="1,240" icon={<Award className="text-indigo-400" />} />
+                        <StatCard title="Active Tasks" value="08" icon={<CheckSquare className="text-[var(--color-warning-orange)]/80" />} />
+                        <StatCard title="Today Minutes" value={String(todaysMinutes)} icon={<Award className="text-indigo-400" />} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -78,28 +174,18 @@ const EmployeeDashboard = () => {
 
             <Card className="h-fit">
                 <CardHeader className="py-5 border-b border-slate-50">
-                    <CardTitle className="text-base font-semibold">Weekly Progress</CardTitle>
+                    <CardTitle className="text-base font-semibold">Policy Highlights</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-8">
-                    <div className="relative w-32 h-32 mx-auto mb-6">
-                        <svg className="w-full h-full transform -rotate-90">
-                            <circle cx="64" cy="64" r="58" fill="transparent" stroke="#F1F5F9" strokeWidth="8" />
-                            <circle cx="64" cy="64" r="58" fill="transparent" stroke="#4F46E5" strokeWidth="8" strokeDasharray="364.4" strokeDashoffset="36.4" strokeLinecap="round" className="opacity-80" />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-xl font-semibold text-[var(--color-text-main)]">36h</span>
-                            <span className="text-[10px] text-slate-400 font-medium">of 40h</span>
-                        </div>
-                    </div>
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center text-xs font-medium">
-                            <span className="text-slate-500">Weekly Target</span>
-                            <span className="text-[var(--color-success-green)]">90% Met</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-[var(--color-primary)]/80 rounded-full" style={{ width: '90%' }}></div>
-                        </div>
-                    </div>
+                <CardContent className="pt-6 space-y-3">
+                    {policies.slice(0, 3).map((policy) => (
+                      <div key={policy.id} className="p-3 rounded-lg border border-slate-100 bg-slate-50/30 text-left">
+                        <p className="text-xs font-semibold text-[var(--color-text-main)]">{policy.title}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 mt-1">{policy.policy_type}</p>
+                      </div>
+                    ))}
+                    {policies.length === 0 && (
+                      <p className="text-xs text-slate-400">No policies available.</p>
+                    )}
                 </CardContent>
             </Card>
         </div>

@@ -1,10 +1,60 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Building2, Users, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Building2, Users, ShieldCheck, ArrowRight, AlertCircle, Lock, Briefcase } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { authApi } from '@/shared/api/authApi';
+import { setCurrentRole, type AppRole } from '@/shared/auth/roles';
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [role, setRole] = React.useState<AppRole>('employee');
+  const [companyName, setCompanyName] = React.useState('');
+  const [companyId, setCompanyId] = React.useState('');
+  const [employeeCode, setEmployeeCode] = React.useState('');
+  const [designation, setDesignation] = React.useState('');
+  const [error, setError] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    try {
+      const payload: Parameters<typeof authApi.signup>[0] = {
+        email,
+        password,
+        full_name: fullName,
+        role,
+      };
+
+      if (role === 'company_admin') {
+        payload.company_name = companyName;
+      }
+
+      if (role === 'employee') {
+        payload.company_id = companyId;
+        payload.employee_code = employeeCode;
+        payload.designation = designation;
+      }
+
+      const res = await authApi.signup(payload);
+      setCurrentRole(res.role);
+      navigate('/login');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signup failed');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[var(--color-background-gray)] flex flex-col items-center justify-center p-6">
       <Link to="/" className="flex items-center gap-2.5 mb-10 group">
@@ -20,15 +70,15 @@ const Signup = () => {
             <p className="text-sm font-medium text-slate-400">Join the next generation of global HR teams</p>
         </CardHeader>
         <CardContent className="pt-8 px-8 pb-10">
-          <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">First name</label>
-                    <input type="text" className="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Jane" />
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Jane" />
                 </div>
                 <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Last name</label>
-                    <input type="text" className="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Doe" />
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Doe" />
                 </div>
             </div>
 
@@ -36,17 +86,69 @@ const Signup = () => {
                 <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Corporate email</label>
                 <div className="relative group">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5 group-focus-within:text-[var(--color-primary)] transition-colors" />
-                    <input type="email" className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="jane@company.io" />
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="jane@company.io" />
                 </div>
             </div>
 
             <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Company name</label>
+                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Password</label>
                 <div className="relative group">
-                    <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5 group-focus-within:text-[var(--color-primary)] transition-colors" />
-                    <input type="text" className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Acme Corporation" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Minimum 8 characters" />
                 </div>
             </div>
+
+            <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Role</label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as AppRole)}
+                  className="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium"
+                >
+                  <option value="admin">Main Admin</option>
+                  <option value="company_admin">Company Admin</option>
+                  <option value="employee">Employee</option>
+                </select>
+            </div>
+
+            {role === 'company_admin' && (
+              <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Company name</label>
+                  <div className="relative group">
+                      <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                      <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Acme Corporation" />
+                  </div>
+              </div>
+            )}
+
+            {role === 'employee' && (
+              <>
+                <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Company ID</label>
+                    <input type="text" value={companyId} onChange={(e) => setCompanyId(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="UUID of company" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Employee Code</label>
+                      <input type="text" value={employeeCode} onChange={(e) => setEmployeeCode(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="EMP001" />
+                  </div>
+                  <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider ml-0.5">Designation</label>
+                      <div className="relative group">
+                        <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                        <input type="text" value={designation} onChange={(e) => setDesignation(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-lg text-sm outline-none focus:ring-4 focus:ring-[var(--color-primary)]/5 focus:border-[var(--color-primary)]/40 transition-all font-medium placeholder:text-slate-300" placeholder="Software Engineer" />
+                      </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {error && (
+              <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-100 text-rose-700 text-xs font-medium flex items-center gap-2">
+                <AlertCircle size={14} />
+                {error}
+              </div>
+            )}
 
             <div className="py-4 px-5 bg-slate-50/80 rounded-xl border border-slate-100 flex gap-4 items-start">
                 <ShieldCheck className="text-[var(--color-primary)]/60 w-4 h-4 shrink-0 mt-0.5" />
@@ -55,8 +157,8 @@ const Signup = () => {
                 </p>
             </div>
 
-            <Button type="button" className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
-                Create Account <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
+            <Button type="submit" disabled={isSubmitting} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
+              {isSubmitting ? 'Creating...' : 'Create Account'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </form>
 
