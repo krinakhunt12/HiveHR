@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { roleLabels, setCurrentRole, type AppRole } from '@/shared/auth/roles';
 import { setAuthSession } from '@/shared/auth/session';
 import { authApi } from '@/shared/api/authApi';
+import { useMutation } from '@tanstack/react-query';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,16 +14,15 @@ const Login = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-        const res = await authApi.login({ email, password });
-        console.log('authApi.login -> response', res);
+  const mutation = useMutation((payload: { email: string; password: string }) => authApi.login(payload), {
+    onMutate: () => {
+      setError(null);
+    },
+    onError: (err: unknown) => {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    },
+    onSuccess: (res) => {
       setCurrentRole(res.user.role);
       setAuthSession({
         access_token: res.session.access_token,
@@ -38,14 +38,14 @@ const Login = () => {
           employee_id: (res.user as any).employee_id ?? null,
         },
       });
-        console.log('after setAuthSession -> localStorage key:', localStorage.getItem('hivehr_auth_session'));
 
       navigate(res.redirect_to);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate({ email, password });
   };
 
   return (
@@ -117,8 +117,8 @@ const Login = () => {
               </div>
             )}
 
-            <Button type="submit" disabled={isSubmitting} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
-                {isSubmitting ? 'Signing in...' : 'Sign in'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
+            <Button type="submit" disabled={mutation.isLoading} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
+              {mutation.isLoading ? 'Signing in...' : 'Sign in'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </form>
 
