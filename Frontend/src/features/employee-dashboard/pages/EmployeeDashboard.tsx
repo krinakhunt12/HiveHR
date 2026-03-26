@@ -13,6 +13,7 @@ import {
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
+import LeaveSummary from '@/shared/components/LeaveSummary';
 import { cn } from '@/shared/utils/cn';
 import { hrApi, type AttendanceLog, type CompanyPolicy } from '@/shared/api/hrApi';
 
@@ -154,9 +155,9 @@ const EmployeeDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard title="Total Attendance" value="98.4%" trend="+1.2%" icon={<Clock className="text-[var(--color-primary)]/80" />} />
-            <StatCard title="Leave Balance" value="14 Days" icon={<Calendar className="text-[var(--color-success-green)]/80" />} />
-                        <StatCard title="Active Tasks" value="08" icon={<CheckSquare className="text-[var(--color-warning-orange)]/80" />} />
-                        <StatCard title="Today Minutes" value={String(todaysMinutes)} icon={<Award className="text-indigo-400" />} />
+            <LeaveSummary paid={14} sick={6} />
+            <StatCard title="Active Tasks" value="08" icon={<CheckSquare className="text-[var(--color-warning-orange)]/80" />} />
+            <StatCard title="Today Minutes" value={String(todaysMinutes)} icon={<Award className="text-indigo-400" />} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
