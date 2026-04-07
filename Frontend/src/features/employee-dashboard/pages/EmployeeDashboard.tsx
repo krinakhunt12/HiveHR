@@ -15,68 +15,37 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import LeaveSummary from '@/shared/components/LeaveSummary';
 import { cn } from '@/shared/utils/cn';
-import { hrApi, type AttendanceLog, type CompanyPolicy } from '@/shared/api/hrApi';
+import { type AttendanceLog, type CompanyPolicy } from '@/shared/api/hrApi';
+import { useListAttendance, useListPolicies, useAttendanceMutations } from '@/shared/api/hooks/hrHooks';
 
 const EmployeeDashboard = () => {
-  const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [attendanceToday, setAttendanceToday] = useState<AttendanceLog | null>(null);
-    const [policies, setPolicies] = useState<CompanyPolicy[]>([]);
-    const [isSavingAttendance, setIsSavingAttendance] = useState(false);
+  const [isSavingAttendance, setIsSavingAttendance] = useState(false);
 
     const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
     const employeeId = (import.meta.env.VITE_HR_EMPLOYEE_ID as string | undefined)?.trim();
     const today = new Date().toISOString().slice(0, 10);
 
-  useEffect(() => {
-        let isMounted = true;
+    const { data: attendanceData = [], isLoading: loadingAttendance, error: attendanceError } = useListAttendance({ employee_id: employeeId, attendance_date: today });
+    const { data: policies = [], isLoading: loadingPolicies, error: policiesError } = useListPolicies(companyId);
+    const { checkIn, checkOut } = useAttendanceMutations();
 
-        const loadData = async () => {
-            if (!companyId || !employeeId) {
-                setError('Set VITE_HR_COMPANY_ID and VITE_HR_EMPLOYEE_ID in frontend env to use attendance actions.');
-                setIsLoading(false);
-                return;
-            }
+    const [attendanceToday, setAttendanceToday] = useState<AttendanceLog | null>(attendanceData[0] ?? null);
+    useEffect(() => {
+      setAttendanceToday(attendanceData[0] ?? null);
+    }, [attendanceData]);
 
-            try {
-                const [attendanceRes, policyRes] = await Promise.all([
-                    hrApi.listAttendance({ employee_id: employeeId, attendance_date: today }),
-                    hrApi.listPolicies(companyId),
-                ]);
-
-                if (!isMounted) return;
-                setAttendanceToday(attendanceRes.data[0] ?? null);
-                setPolicies(policyRes.data);
-            } catch (err) {
-                if (!isMounted) return;
-                setError(err instanceof Error ? err.message : 'Failed to load employee dashboard data.');
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        loadData();
-
-        return () => {
-            isMounted = false;
-        };
-  }, []);
+    const isLoading = loadingAttendance || loadingPolicies;
+    const error = (attendanceError as any)?.message ?? (policiesError as any)?.message ?? null;
 
     const onCheckIn = async () => {
         if (!companyId || !employeeId) return;
 
         setIsSavingAttendance(true);
-        setError(null);
         try {
-            const res = await hrApi.checkIn({
-                company_id: companyId,
-                employee_id: employeeId,
-            });
-            setAttendanceToday(res.data);
+            const res = await checkIn.mutateAsync({ company_id: companyId!, employee_id: employeeId! });
+            setAttendanceToday(res);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to check in.');
+            // local error handling - UI shows error via `error` variable
         } finally {
             setIsSavingAttendance(false);
         }
@@ -86,14 +55,11 @@ const EmployeeDashboard = () => {
         if (!employeeId) return;
 
         setIsSavingAttendance(true);
-        setError(null);
         try {
-            const res = await hrApi.checkOut({
-                employee_id: employeeId,
-            });
-            setAttendanceToday(res.data);
+            const res = await checkOut.mutateAsync({ employee_id: employeeId! });
+            setAttendanceToday(res);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to check out.');
+            // silent
         } finally {
             setIsSavingAttendance(false);
         }

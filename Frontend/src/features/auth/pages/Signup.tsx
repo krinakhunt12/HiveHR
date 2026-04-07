@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Building2, Users, ShieldCheck, ArrowRight, AlertCircle, Lock, Briefcase } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { authApi } from '@/shared/api/authApi';
+import { useSignup } from '@/shared/api/hooks/authHooks';
 import { setCurrentRole, type AppRole } from '@/shared/auth/roles';
 
 const Signup = () => {
@@ -20,6 +20,8 @@ const Signup = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+  const signup = useSignup();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -28,24 +30,24 @@ const Signup = () => {
     const fullName = `${firstName} ${lastName}`.trim();
 
     try {
-      const payload: Parameters<typeof authApi.signup>[0] = {
+      const payload: Parameters<typeof signup.mutate>[0] = {
         email,
         password,
         full_name: fullName,
         role,
-      };
+      } as any;
 
       if (role === 'company_admin') {
-        payload.company_name = companyName;
+        (payload as any).company_name = companyName;
       }
 
       if (role === 'employee') {
-        payload.company_id = companyId;
-        payload.employee_code = employeeCode;
-        payload.designation = designation;
+        (payload as any).company_id = companyId;
+        (payload as any).employee_code = employeeCode;
+        (payload as any).designation = designation;
       }
 
-      const res = await authApi.signup(payload);
+      const res = await signup.mutateAsync(payload as any);
       setCurrentRole(res.role);
       navigate('/login');
     } catch (err) {

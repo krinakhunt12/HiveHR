@@ -5,8 +5,7 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { roleLabels, setCurrentRole, type AppRole } from '@/shared/auth/roles';
 import { setAuthSession } from '@/shared/auth/session';
-import { authApi } from '@/shared/api/authApi';
-import { useMutation } from '@tanstack/react-query';
+import { useLogin } from '@/shared/api/hooks/authHooks';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,37 +14,36 @@ const Login = () => {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
 
-  const mutation = useMutation((payload: { email: string; password: string }) => authApi.login(payload), {
-    onMutate: () => {
-      setError(null);
-    },
-    onError: (err: unknown) => {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    },
-    onSuccess: (res) => {
-      setCurrentRole(res.user.role);
-      setAuthSession({
-        access_token: res.session.access_token,
-        refresh_token: res.session.refresh_token,
-        expires_at: res.session.expires_at,
-        user: {
-          id: res.user.id,
-          email: res.user.email,
-          full_name: res.user.full_name,
-          role: res.user.role,
-          company_id: (res.user as any).company_id ?? (res.session as any).user?.company_id ?? null,
-          company_name: (res.user as any).company_name ?? (res.session as any).user?.company_name ?? null,
-          employee_id: (res.user as any).employee_id ?? null,
-        },
-      });
-
-      navigate(res.redirect_to);
-    },
-  });
+  const login = useLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({ email, password });
+    login.mutate(
+      { email, password },
+      {
+        onMutate: () => setError(null),
+        onError: (err: unknown) => setError(err instanceof Error ? err.message : 'Login failed'),
+        onSuccess: (res) => {
+          setCurrentRole(res.user.role);
+          setAuthSession({
+            access_token: res.session.access_token,
+            refresh_token: res.session.refresh_token,
+            expires_at: res.session.expires_at,
+            user: {
+              id: res.user.id,
+              email: res.user.email,
+              full_name: res.user.full_name,
+              role: res.user.role,
+              company_id: (res.user as any).company_id ?? (res.session as any).user?.company_id ?? null,
+              company_name: (res.user as any).company_name ?? (res.session as any).user?.company_name ?? null,
+              employee_id: (res.user as any).employee_id ?? null,
+            },
+          });
+
+          navigate(res.redirect_to);
+        },
+      },
+    );
   };
 
   return (
@@ -117,8 +115,8 @@ const Login = () => {
               </div>
             )}
 
-            <Button type="submit" disabled={mutation.isLoading} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
-              {mutation.isLoading ? 'Signing in...' : 'Sign in'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
+            <Button type="submit" disabled={login.isLoading} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
+              {login.isLoading ? 'Signing in...' : 'Sign in'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </form>
 

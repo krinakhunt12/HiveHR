@@ -14,6 +14,26 @@
   --color-border-soft: #E5E7EB;
   --color-success-green: #22C55E;
   --color-warning-orange: #F59E0B;
+  --color-white: #FFFFFF;
+
+  /* Slate (tailwind-like) */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-700: #334155;
+  --color-slate-900: #0f172a;
+
+  /* Rose / error */
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-700: #be123c;
+
+  /* Semantic tokens */
+  --color-muted-text: var(--color-slate-400);
+  --color-placeholder: #9ca3af; /* approx tailwind slate-400 */
   
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;

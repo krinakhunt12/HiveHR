@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import { 
   Building2, 
@@ -16,37 +16,10 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
-import { hrApi } from '@/shared/api/hrApi';
+import { useHealth } from '@/shared/api/hooks/hrHooks';
 
 const AdminDashboard = () => {
-  const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [health, setHealth] = useState<{ ok: boolean; service: string; timestamp: string } | null>(null);
-
-  useEffect(() => {
-        let isMounted = true;
-
-        const loadData = async () => {
-            try {
-                const res = await hrApi.getHealth();
-                if (!isMounted) return;
-                setHealth(res);
-            } catch (err) {
-                if (!isMounted) return;
-                setError(err instanceof Error ? err.message : 'Failed to fetch backend health.');
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        loadData();
-
-        return () => {
-            isMounted = false;
-        };
-  }, []);
+  const { data: health, isLoading, error } = useHealth()
 
   const navItems = [
     { icon: <Activity size={18} />, label: 'Pulse', path: '/dashboard/admin' },

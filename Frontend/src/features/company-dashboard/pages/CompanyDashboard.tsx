@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import { 
   Users, 
@@ -16,57 +16,21 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
-import { hrApi, type CompanyPolicy, type Employee } from '@/shared/api/hrApi';
+import { type CompanyPolicy, type Employee } from '@/shared/api/hrApi';
+import { useListEmployees, useListPolicies } from '@/shared/api/hooks/hrHooks';
 import { getAuthSession } from '@/shared/auth/session';
 
 const CompanyDashboard = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [query, setQuery] = useState('');
-    const [employees, setEmployees] = useState<Employee[]>([]);
-    const [policies, setPolicies] = useState<CompanyPolicy[]>([]);
+    const [query, setQuery] = React.useState('');
     const session = getAuthSession();
     const companyNameFromSession = session?.user?.company_name ?? undefined;
+    const companyId = session?.user?.company_id ?? undefined;
 
-  useEffect(() => {
-        let isMounted = true;
+    const { data: employees = [], isLoading: loadingEmployees, error: employeesError } = useListEmployees(companyId);
+    const { data: policies = [], isLoading: loadingPolicies, error: policiesError } = useListPolicies(companyId);
 
-        const loadData = async () => {
-            try {
-                // Use company_id and company_name from the stored login session (do not call /me)
-                const session = getAuthSession();
-                const companyId = session?.user?.company_id ?? undefined;
-
-                if (!companyId) {
-                    setError('No company is mapped to your account.');
-                    setIsLoading(false);
-                    return;
-                }
-
-                const [employeeRes, policyRes] = await Promise.all([
-                    hrApi.listEmployees(companyId),
-                    hrApi.listPolicies(companyId),
-                ]);
-
-                if (!isMounted) return;
-                setEmployees(employeeRes.data);
-                setPolicies(policyRes.data);
-            } catch (err) {
-                if (!isMounted) return;
-                setError(err instanceof Error ? err.message : 'Failed to load company dashboard data.');
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        loadData();
-
-        return () => {
-            isMounted = false;
-        };
-  }, []);
+    const isLoading = loadingEmployees || loadingPolicies;
+    const error = (employeesError as any)?.message ?? (policiesError as any)?.message ?? null;
 
     const filteredEmployees = useMemo(() => {
         const normalized = query.trim().toLowerCase();
