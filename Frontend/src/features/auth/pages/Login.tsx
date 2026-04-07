@@ -1,49 +1,21 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, Lock, Users, ArrowRight, AlertCircle } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { roleLabels, setCurrentRole, type AppRole } from '@/shared/auth/roles';
-import { setAuthSession } from '@/shared/auth/session';
+import { roleLabels, type AppRole } from '@/shared/auth/roles';
 import { useLogin } from '@/shared/api/hooks/authHooks';
 
 const Login = () => {
-  const navigate = useNavigate();
   const [role, setRole] = React.useState<AppRole>('employee');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState<string | null>(null);
 
   const login = useLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login.mutate(
-      { email, password },
-      {
-        onMutate: () => setError(null),
-        onError: (err: unknown) => setError(err instanceof Error ? err.message : 'Login failed'),
-        onSuccess: (res) => {
-          setCurrentRole(res.user.role);
-          setAuthSession({
-            access_token: res.session.access_token,
-            refresh_token: res.session.refresh_token,
-            expires_at: res.session.expires_at,
-            user: {
-              id: res.user.id,
-              email: res.user.email,
-              full_name: res.user.full_name,
-              role: res.user.role,
-              company_id: (res.user as any).company_id ?? (res.session as any).user?.company_id ?? null,
-              company_name: (res.user as any).company_name ?? (res.session as any).user?.company_name ?? null,
-              employee_id: (res.user as any).employee_id ?? null,
-            },
-          });
-
-          navigate(res.redirect_to);
-        },
-      },
-    );
+    login.mutate({ email, password });
   };
 
   return (
@@ -108,15 +80,15 @@ const Login = () => {
                 </select>
             </div>
 
-            {error && (
+            {login.error && (
               <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-100 text-rose-700 text-xs font-medium flex items-center gap-2">
                 <AlertCircle size={14} />
-                {error}
+                {String((login.error as any)?.message ?? 'Login failed')}
               </div>
             )}
 
-            <Button type="submit" disabled={login.isLoading} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
-              {login.isLoading ? 'Signing in...' : 'Sign in'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
+            <Button type="submit" disabled={login.isPending} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2" {...{variant: 'primary'} as any}>
+              {login.isPending ? 'Signing in...' : 'Sign in'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </form>
 

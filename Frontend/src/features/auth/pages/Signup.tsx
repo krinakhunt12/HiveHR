@@ -1,13 +1,12 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, Building2, Users, ShieldCheck, ArrowRight, AlertCircle, Lock, Briefcase } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { useSignup } from '@/shared/api/hooks/authHooks';
-import { setCurrentRole, type AppRole } from '@/shared/auth/roles';
+import { type AppRole } from '@/shared/auth/roles';
 
 const Signup = () => {
-  const navigate = useNavigate();
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [email, setEmail] = React.useState('');
@@ -17,44 +16,31 @@ const Signup = () => {
   const [companyId, setCompanyId] = React.useState('');
   const [employeeCode, setEmployeeCode] = React.useState('');
   const [designation, setDesignation] = React.useState('');
-  const [error, setError] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const signup = useSignup();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-
     const fullName = `${firstName} ${lastName}`.trim();
 
-    try {
-      const payload: Parameters<typeof signup.mutate>[0] = {
-        email,
-        password,
-        full_name: fullName,
-        role,
-      } as any;
+    const payload: any = {
+      email,
+      password,
+      full_name: fullName,
+      role,
+    };
 
-      if (role === 'company_admin') {
-        (payload as any).company_name = companyName;
-      }
-
-      if (role === 'employee') {
-        (payload as any).company_id = companyId;
-        (payload as any).employee_code = employeeCode;
-        (payload as any).designation = designation;
-      }
-
-      const res = await signup.mutateAsync(payload as any);
-      setCurrentRole(res.role);
-      navigate('/login');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup failed');
-    } finally {
-      setIsSubmitting(false);
+    if (role === 'company_admin') {
+      payload.company_name = companyName;
     }
+
+    if (role === 'employee') {
+      payload.company_id = companyId;
+      payload.employee_code = employeeCode;
+      payload.designation = designation;
+    }
+
+    signup.mutate(payload);
   };
 
   return (
@@ -145,10 +131,10 @@ const Signup = () => {
               </>
             )}
 
-            {error && (
+            {signup.error && (
               <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-100 text-rose-700 text-xs font-medium flex items-center gap-2">
                 <AlertCircle size={14} />
-                {error}
+                {String((signup.error as any)?.message ?? 'Signup failed')}
               </div>
             )}
 
@@ -159,8 +145,8 @@ const Signup = () => {
                 </p>
             </div>
 
-            <Button type="submit" disabled={isSubmitting} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2">
-              {isSubmitting ? 'Creating...' : 'Create Account'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
+            <Button type="submit" disabled={signup.isPending} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2" {...{variant: 'primary'} as any}>
+              {signup.isPending ? 'Creating...' : 'Create Account'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </form>
 

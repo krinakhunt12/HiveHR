@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { getUserContext } from "../_shared/auth.ts";
 
 type JsonMap = Record<string, unknown>;
 
@@ -88,9 +89,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    const userContext = await getUserContext(supabase);
+    if (!userContext) {
+      return jsonResponse(401, { error: "User context not found" });
+    }
+
     if (req.method === "GET" && normalizedPath === "/attendance") {
-      const companyId = url.searchParams.get("company_id");
-      const employeeId = url.searchParams.get("employee_id");
+      const companyIdParam = url.searchParams.get("company_id");
+      const employeeIdParam = url.searchParams.get("employee_id");
       const attendanceDate = url.searchParams.get("attendance_date");
 
       let query = supabase
@@ -99,12 +105,21 @@ Deno.serve(async (req) => {
         .order("attendance_date", { ascending: false })
         .order("check_in_at", { ascending: false });
 
-      if (companyId) {
-        query = query.eq("company_id", companyId);
-      }
-
-      if (employeeId) {
-        query = query.eq("employee_id", employeeId);
+      if (userContext.role === "admin") {
+        if (companyIdParam) query = query.eq("company_id", companyIdParam);
+        if (employeeIdParam) query = query.eq("employee_id", employeeIdParam);
+      } else if (userContext.role === "hr") {
+        if (!userContext.companyId) {
+          return jsonResponse(403, { error: "User is not associated with a company" });
+        }
+        query = query.eq("company_id", userContext.companyId);
+        if (employeeIdParam) query = query.eq("employee_id", employeeIdParam);
+      } else {
+        // Employee
+        if (!userContext.employeeId) {
+          return jsonResponse(403, { error: "Employee record not found for user" });
+        }
+        query = query.eq("employee_id", userContext.employeeId);
       }
 
       if (attendanceDate) {
@@ -130,6 +145,29 @@ Deno.serve(async (req) => {
         return jsonResponse(400, {
           error: "Missing required fields: employee_id, company_id",
         });
+      }
+
+      // Role-based validation
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId) {
+           return jsonResponse(403, { error: "User is not associated with a company" });
+        }
+        
+        if (userContext.role === "hr") {
+            if (companyId !== userContext.companyId) {
+                return jsonResponse(403, { error: "You can only log attendance for your own company" });
+            }
+            // Verify employee belongs to your company
+            const { data: emp, error: empErr } = await supabase.from("employees").select("company_id").eq("id", employeeId).single();
+            if (empErr || emp?.company_id !== userContext.companyId) {
+                return jsonResponse(403, { error: "Employee does not belong to your company" });
+            }
+        } else {
+            // Employee role
+            if (employeeId !== userContext.employeeId) {
+                return jsonResponse(403, { error: "You can only log attendance for yourself" });
+            }
+        }
       }
 
       const { data: existing, error: existingError } = await supabase
@@ -189,6 +227,20 @@ Deno.serve(async (req) => {
         return jsonResponse(400, {
           error: "Missing required field: employee_id",
         });
+      }
+
+      // Role-based validation
+      if (userContext.role !== "admin") {
+         if (userContext.role === "hr") {
+            const { data: emp, error: empErr } = await supabase.from("employees").select("company_id").eq("id", employeeId).single();
+            if (empErr || emp?.company_id !== userContext.companyId) {
+                return jsonResponse(403, { error: "Employee does not belong to your company" });
+            }
+         } else {
+            if (employeeId !== userContext.employeeId) {
+                 return jsonResponse(403, { error: "You can only log attendance for yourself" });
+            }
+         }
       }
 
       const { data: existing, error: existingError } = await supabase

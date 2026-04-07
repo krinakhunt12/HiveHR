@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { getUserContext } from "../_shared/auth.ts";
 
 type JsonMap = Record<string, unknown>;
 
@@ -87,16 +88,36 @@ Deno.serve(async (req) => {
       });
     }
 
+    const userContext = await getUserContext(supabase);
+    if (!userContext) {
+      return jsonResponse(401, { error: "User context not found" });
+    }
+
     if (req.method === "GET" && normalizedPath === "/policies") {
-      const companyId = url.searchParams.get("company_id");
-      if (!companyId) {
+      const companyIdParam = url.searchParams.get("company_id");
+      
+      let targetCompanyId = companyIdParam;
+
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId) {
+          return jsonResponse(403, { error: "User is not associated with a company" });
+        }
+        // If they provided a company_id but it's not theirs, reject or override?
+        // Let's override to be safe, or reject if mismatch.
+        if (companyIdParam && companyIdParam !== userContext.companyId) {
+           return jsonResponse(403, { error: "You cannot access policies of another company" });
+        }
+        targetCompanyId = userContext.companyId;
+      }
+
+      if (!targetCompanyId) {
         return jsonResponse(400, { error: "Missing query parameter: company_id" });
       }
 
       const { data, error } = await supabase
         .from("company_policies")
         .select("*")
-        .eq("company_id", companyId)
+        .eq("company_id", targetCompanyId)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -116,6 +137,16 @@ Deno.serve(async (req) => {
         return jsonResponse(400, {
           error: "Missing required fields: company_id, title, content",
         });
+      }
+
+      // Role-based validation
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId || userContext.role !== "hr") {
+          return jsonResponse(403, { error: "Insufficient permissions" });
+        }
+        if (companyId !== userContext.companyId) {
+          return jsonResponse(403, { error: "You can only create policies for your own company" });
+        }
       }
 
       const { data, error } = await supabase
@@ -142,6 +173,24 @@ Deno.serve(async (req) => {
       const policyId = segments[1];
       const payload = (await req.json()) as JsonMap;
 
+      // Role-based validation
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId || userContext.role !== "hr") {
+          return jsonResponse(403, { error: "Insufficient permissions" });
+        }
+
+        // Verify policy belongs to your company
+        const { data: existing, error: checkError } = await supabase
+          .from("company_policies")
+          .select("company_id")
+          .eq("id", policyId)
+          .single();
+
+        if (checkError || existing?.company_id !== userContext.companyId) {
+          return jsonResponse(403, { error: "You can only update policies for your own company" });
+        }
+      }
+
       const { data, error } = await supabase
         .from("company_policies")
         .update({
@@ -164,6 +213,24 @@ Deno.serve(async (req) => {
 
     if (req.method === "DELETE" && segments[0] === "policies" && segments.length === 2) {
       const policyId = segments[1];
+
+      // Role-based validation
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId || userContext.role !== "hr") {
+          return jsonResponse(403, { error: "Insufficient permissions" });
+        }
+
+        // Verify policy belongs to your company
+        const { data: existing, error: checkError } = await supabase
+          .from("company_policies")
+          .select("company_id")
+          .eq("id", policyId)
+          .single();
+
+        if (checkError || existing?.company_id !== userContext.companyId) {
+          return jsonResponse(403, { error: "You can only delete policies for your own company" });
+        }
+      }
 
       const { error } = await supabase
         .from("company_policies")

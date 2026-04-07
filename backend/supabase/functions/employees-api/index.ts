@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { getUserContext } from "../_shared/auth.ts";
 
 type JsonMap = Record<string, unknown>;
 
@@ -77,16 +78,31 @@ Deno.serve(async (req) => {
       });
     }
 
+    const userContext = await getUserContext(supabase);
+    if (!userContext) {
+      return jsonResponse(401, { error: "User context not found" });
+    }
+
     if (req.method === "GET" && normalizedPath === "/employees") {
-      const companyId = url.searchParams.get("company_id");
+      const companyIdParam = url.searchParams.get("company_id");
 
       let query = supabase
         .from("employees")
         .select("id, employee_code, full_name, designation, joined_on, status, company_id, department_id")
         .order("created_at", { ascending: false });
 
-      if (companyId) {
-        query = query.eq("company_id", companyId);
+      // Role-based filtering
+      if (userContext.role === "admin") {
+        // Admin can see all or filter by param
+        if (companyIdParam) {
+          query = query.eq("company_id", companyIdParam);
+        }
+      } else {
+        // HR and Employee can ONLY see their own company
+        if (!userContext.companyId) {
+          return jsonResponse(403, { error: "User is not associated with a company" });
+        }
+        query = query.eq("company_id", userContext.companyId);
       }
 
       const { data, error } = await query;
@@ -101,11 +117,20 @@ Deno.serve(async (req) => {
     if (req.method === "GET" && segments[0] === "employees" && segments.length === 2) {
       const employeeId = segments[1];
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("employees")
         .select("*")
-        .eq("id", employeeId)
-        .single();
+        .eq("id", employeeId);
+
+      // Role-based filtering for single employee access
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId) {
+          return jsonResponse(403, { error: "User is not associated with a company" });
+        }
+        query = query.eq("company_id", userContext.companyId);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) {
         return jsonResponse(404, { error: error.message });
@@ -124,6 +149,16 @@ Deno.serve(async (req) => {
         return jsonResponse(400, {
           error: `Missing required fields: ${missing.join(", ")}`,
         });
+      }
+
+      // Role-based validation
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId || userContext.role !== "hr") {
+          return jsonResponse(403, { error: "Insufficient permissions" });
+        }
+        if (payload.company_id !== userContext.companyId) {
+          return jsonResponse(403, { error: "You can only create employees for your own company" });
+        }
       }
 
       const { data, error } = await supabase
@@ -154,6 +189,24 @@ Deno.serve(async (req) => {
       const employeeId = segments[1];
       const payload = (await req.json()) as JsonMap;
 
+      // Role-based validation
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId || userContext.role !== "hr") {
+          return jsonResponse(403, { error: "Insufficient permissions" });
+        }
+        
+        // Verify employee belongs to your company
+        const { data: existing, error: checkError } = await supabase
+          .from("employees")
+          .select("company_id")
+          .eq("id", employeeId)
+          .single();
+        
+        if (checkError || existing?.company_id !== userContext.companyId) {
+          return jsonResponse(403, { error: "You can only update employees from your own company" });
+        }
+      }
+
       const updateData = {
         company_id: payload.company_id ?? undefined,
         department_id: payload.department_id ?? undefined,
@@ -183,6 +236,24 @@ Deno.serve(async (req) => {
 
     if (req.method === "DELETE" && segments[0] === "employees" && segments.length === 2) {
       const employeeId = segments[1];
+
+      // Role-based validation
+      if (userContext.role !== "admin") {
+        if (!userContext.companyId || userContext.role !== "hr") {
+          return jsonResponse(403, { error: "Insufficient permissions" });
+        }
+        
+        // Verify employee belongs to your company
+        const { data: existing, error: checkError } = await supabase
+          .from("employees")
+          .select("company_id")
+          .eq("id", employeeId)
+          .single();
+        
+        if (checkError || existing?.company_id !== userContext.companyId) {
+          return jsonResponse(403, { error: "You can only delete employees from your own company" });
+        }
+      }
 
       const { error } = await supabase
         .from("employees")
