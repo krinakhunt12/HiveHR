@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { 
   Users, 
-  Menu, 
   Bell, 
   Search,
   ChevronDown,
-  Settings,
-  LogOut
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../utils/cn';

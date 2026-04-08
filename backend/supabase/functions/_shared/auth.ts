@@ -2,7 +2,7 @@ import { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 export interface UserContext {
   userId: string;
-  role: "admin" | "hr" | "employee" | null;
+  role: "admin" | "company_admin" | "hr" | "employee" | null;
   companyId: string | null;
   employeeId: string | null;
 }

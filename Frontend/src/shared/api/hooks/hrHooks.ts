@@ -1,223 +1,77 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { 
-  hrApi, 
-  type Employee, 
-  type AttendanceLog, 
-  type CompanyPolicy, 
-  type EmployeeCreateInput, 
-  type EmployeeUpdateInput, 
-  type PolicyCreateInput, 
-  type PolicyUpdateInput, 
-  type AttendanceFilter, 
-  type MeProfile 
-} from '@/shared/api/hrApi'
-import { useToast } from '@/shared/ui/toast'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 /**
- * --- PROFILE HOOKS ---
+ * --- IN-LINED TYPES ---
  */
-
-export function useGetMe() {
-  return useQuery<MeProfile, Error>({ 
-    queryKey: ['me'], 
-    queryFn: () => hrApi.getMe().then((r) => r.data)
-  })
+export interface Employee {
+  id: string;
+  employee_code: string;
+  full_name: string;
+  designation: string;
+  joined_on: string;
+  status: 'active' | 'inactive';
 }
 
-export function useHealth() {
-  return useQuery({ 
-    queryKey: ['health'], 
-    queryFn: () => hrApi.getHealth() 
-  })
+export interface CompanyPolicy {
+  id: string;
+  title: string;
+  content: string;
+  is_active: boolean;
+}
+
+export interface MeProfile {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  role: 'admin' | 'company_admin' | 'employee' | null;
 }
 
 /**
- * --- EMPLOYEE HOOKS ---
+ * --- STATIC MOCK DATA ---
  */
-
-export function useListEmployees(companyId?: string) {
-  const toast = useToast()
-
-  return useQuery<Employee[], Error>({
-    queryKey: ['employees', companyId ?? 'all'],
-    queryFn: async () => {
-      try {
-        const res = await hrApi.listEmployees(companyId)
-        return res.data
-      } catch (err: any) {
-        toast({ 
-          title: 'Failed to load employees', 
-          description: err?.message ?? 'Server error', 
-          type: 'error' 
-        })
-        throw err
-      }
-    }
-  })
+const MOCK_ME: MeProfile = {
+  id: 'me-123',
+  email: 'krina@hivehr.com',
+  full_name: 'Krina Khunt',
+  role: 'company_admin'
 }
 
-export function useGetEmployee(employeeId?: string) {
-  return useQuery<Employee | null, Error>({
-    queryKey: ['employee', employeeId],
-    queryFn: () => (employeeId ? hrApi.getEmployee(employeeId).then((r) => r.data) : Promise.resolve(null)),
-    enabled: !!employeeId,
-  })
-}
+const MOCK_EMPLOYEES: Employee[] = [
+  { id: '1', employee_code: 'EMP001', full_name: 'Alex Johnson', designation: 'Developer', joined_on: '2023-01', status: 'active' },
+  { id: '2', employee_code: 'EMP002', full_name: 'Sarah Smith', designation: 'Designer', joined_on: '2023-02', status: 'active' },
+  { id: '3', employee_code: 'EMP003', full_name: 'Ryan White', designation: 'Project Manager', joined_on: '2023-03', status: 'active' },
+]
 
-export function useEmployeeMutations() {
-  const qc = useQueryClient()
-  const toast = useToast()
-
-  const create = useMutation({
-    mutationFn: (input: EmployeeCreateInput) => hrApi.createEmployee(input).then((r) => r.data),
-    onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['employees'] })
-      toast({ title: 'Employee created', description: data?.full_name ?? 'Success', type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Create failed', description: err?.message ?? 'Could not create employee', type: 'error' }),
-  })
-
-  const update = useMutation({
-    mutationFn: ({ id, input }: { id: string; input: EmployeeUpdateInput }) =>
-      hrApi.updateEmployee(id, input).then((r) => r.data),
-    onSuccess: (data, vars) => {
-      qc.invalidateQueries({ queryKey: ['employees'] })
-      qc.invalidateQueries({ queryKey: ['employee', vars.id] })
-      toast({ title: 'Employee updated', description: data?.full_name ?? 'Success', type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Update failed', description: err?.message ?? 'Could not update employee', type: 'error' }),
-  })
-
-  const remove = useMutation({
-    mutationFn: (id: string) => hrApi.deleteEmployee(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['employees'] })
-      toast({ title: 'Employee deleted', type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Delete failed', description: err?.message ?? 'Could not delete employee', type: 'error' }),
-  })
-
-  return { create, update, remove }
-}
+const MOCK_POLICIES: CompanyPolicy[] = [
+  { id: 'p1', title: 'Work from Home', content: 'Guidelines for remote work...', is_active: true },
+  { id: 'p2', title: 'Annual Leave', content: 'Holiday entitlement rules...', is_active: true }
+]
 
 /**
- * --- ATTENDANCE HOOKS ---
+ * --- STATIC HOOKS ---
  */
+export const useGetMe = () => useQuery({ queryKey: ['me'], queryFn: async () => MOCK_ME })
+export const useListEmployees = () => useQuery({ queryKey: ['employees'], queryFn: async () => MOCK_EMPLOYEES })
+export const useListPolicies = () => useQuery({ queryKey: ['policies'], queryFn: async () => MOCK_POLICIES })
+export const useListAttendance = () => useQuery({ queryKey: ['attendance'], queryFn: async () => [] })
 
-export function useListAttendance(filter: AttendanceFilter = {}) {
-  const toast = useToast()
+export const useEmployeeMutations = () => ({
+  create: { mutateAsync: async () => {}, isPending: false },
+  update: { mutateAsync: async () => {}, isPending: false },
+  remove: { mutateAsync: async () => {}, isPending: false }
+})
 
-  return useQuery<AttendanceLog[], Error>({
-    queryKey: ['attendance', filter],
-    queryFn: async () => {
-      try {
-        const res = await hrApi.listAttendance(filter)
-        return res.data
-      } catch (err: any) {
-        toast({ 
-          title: 'Failed to load attendance', 
-          description: err?.message ?? 'Server error', 
-          type: 'error' 
-        })
-        throw err
-      }
-    }
-  })
-}
-
-export function useAttendanceMutations() {
-  const qc = useQueryClient()
-  const toast = useToast()
-
-  const checkIn = useMutation({
-    mutationFn: (input: { employee_id: string; company_id: string; attendance_date?: string }) =>
-      hrApi.checkIn(input).then((r) => r.data),
-    onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['attendance'] })
-      toast({ title: 'Checked in', description: `Checked in at ${data.check_in_at ?? ''}`, type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Check-in failed', description: err?.message ?? 'Unable to check in', type: 'error' }),
-  })
-
-  const checkOut = useMutation({
-    mutationFn: (input: { employee_id: string; attendance_date?: string }) =>
-      hrApi.checkOut(input).then((r) => r.data),
-    onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['attendance'] })
-      toast({ title: 'Checked out', description: `Checked out at ${data.check_out_at ?? ''}`, type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Check-out failed', description: err?.message ?? 'Unable to check out', type: 'error' }),
-  })
-
-  return { checkIn, checkOut }
-}
-
-/**
- * --- POLICY HOOKS ---
- */
-
-export function useListPolicies(companyId?: string) {
-  const toast = useToast()
-
-  return useQuery<CompanyPolicy[], Error>({
-    queryKey: ['policies', companyId],
-    queryFn: async () => {
-       if (!companyId) return []
-       try {
-         const res = await hrApi.listPolicies(companyId)
-         return res.data
-       } catch (err: any) {
-         toast({ title: 'Failed to load policies', description: err?.message ?? 'Server error', type: 'error' })
-         throw err
-       }
-    },
-    enabled: !!companyId,
-  })
-}
-
-export function usePolicyMutations() {
-  const qc = useQueryClient()
-  const toast = useToast()
-
-  const create = useMutation({
-    mutationFn: (input: PolicyCreateInput) => hrApi.createPolicy(input).then((r) => r.data),
-    onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ['policies'] })
-      toast({ title: 'Policy created', description: data?.title ?? 'Success', type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Create failed', description: err?.message ?? 'Could not create policy', type: 'error' }),
-  })
-
-  const update = useMutation({
-    mutationFn: ({ id, input }: { id: string; input: PolicyUpdateInput }) =>
-      hrApi.updatePolicy(id, input).then((r) => r.data),
-    onSuccess: (data, vars) => {
-      qc.invalidateQueries({ queryKey: ['policies'] })
-      qc.invalidateQueries({ queryKey: ['policy', vars.id] })
-      toast({ title: 'Policy updated', description: data?.title ?? 'Success', type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Update failed', description: err?.message ?? 'Could not update policy', type: 'error' }),
-  })
-
-  const remove = useMutation({
-    mutationFn: (id: string) => hrApi.deletePolicy(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['policies'] })
-      toast({ title: 'Policy deleted', type: 'success' })
-    },
-    onError: (err: any) => toast({ title: 'Delete failed', description: err?.message ?? 'Could not delete policy', type: 'error' }),
-  })
-
-  return { create, update, remove }
-}
+export const usePolicyMutations = () => ({
+  create: { mutateAsync: async () => {}, isPending: false },
+  update: { mutateAsync: async () => {}, isPending: false },
+  remove: { mutateAsync: async () => {}, isPending: false }
+})
 
 export default {
   useGetMe,
   useListEmployees,
-  useGetEmployee,
-  useListAttendance,
   useListPolicies,
+  useListAttendance,
   useEmployeeMutations,
-  useAttendanceMutations,
-  usePolicyMutations,
+  usePolicyMutations
 }

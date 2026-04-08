@@ -94,7 +94,7 @@ export function setAuthRole(role: AppRole): void {
 
 export function isSessionExpired(): boolean {
   const session = getAuthSession();
-  if (!session || !session.expires_at) return true;
+if (!session || session.expires_at == null) return true;
 
   const nowInSeconds = Math.floor(Date.now() / 1000);
   const expired = session.expires_at < nowInSeconds;
@@ -113,4 +113,4 @@ export function getAccessToken(): string | null {
   const token = getAuthSession()?.access_token ?? null;
   try { if (token) console.log("getAccessToken -> token present:", true); } catch {}
   return token;
-}
+}

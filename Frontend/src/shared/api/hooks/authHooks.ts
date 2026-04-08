@@ -1,57 +1,117 @@
 import { useMutation } from '@tanstack/react-query'
-import { authApi, type LoginResponse, type SignupResponse } from '@/shared/api/authApi'
-import { useToast } from '@/shared/ui/toast'
-import { setAuthSession } from '@/shared/auth/session'
-import { setCurrentRole } from '@/shared/auth/roles'
 import { useNavigate } from 'react-router-dom'
+import { 
+  setAuthSession, 
+  clearAuthSession 
+} from '@/shared/auth/session'
+import { useAuthStore } from '@/shared/auth/store'
+import { useToast } from '@/shared/ui/toast/useToast'
+
+/**
+ * --- IN-LINED TYPES ---
+ */
+export interface LoginResponse {
+  message: string;
+  user: {
+    id: string;
+    email: string;
+    full_name: string;
+    role: 'admin' | 'company_admin' | 'employee';
+    company_id: string | null;
+    company_name: string | null;
+    employee_id: string | null;
+  };
+  session: {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+  };
+  redirect_to: string;
+}
+
+export interface SignupResponse {
+  message: string;
+  user_id: string;
+  role: 'admin' | 'company_admin' | 'employee';
+  company_id: string | null;
+  redirect_to: string;
+}
+
+/**
+ * --- STATIC AUTH HOOKS ---
+ */
 
 export function useLogin() {
-  const toast = useToast()
   const navigate = useNavigate()
+  const { setCurrentRole } = useAuthStore()
+  const { toast } = useToast()
 
-  return useMutation({
-    mutationFn: (payload: { email: string; password: string }) => authApi.login(payload),
-    onError: (err: unknown) => {
-      const message = err instanceof Error ? err.message : String(err)
-      toast({ title: 'Login failed', description: message ?? 'Unable to sign in', type: 'error' })
-    },
-    onSuccess: (res: LoginResponse) => {
-      setCurrentRole(res.user.role)
-      setAuthSession({
-        access_token: res.session.access_token,
-        refresh_token: res.session.refresh_token,
-        expires_at: res.session.expires_at,
+  return useMutation<LoginResponse, Error, any>({
+    mutationFn: async (payload) => {
+      // Fake a loading delay
+      await new Promise(res => setTimeout(res, 300))
+      
+      const role = payload.email.includes('admin') ? 'company_admin' : 'employee'
+      
+      return {
+        message: 'Direct success (Offline Mode)',
         user: {
-          id: res.user.id,
-          email: res.user.email,
-          full_name: res.user.full_name,
-          role: res.user.role,
-          company_id: (res.user as any).company_id ?? (res.session as any).user?.company_id ?? null,
-          company_name: (res.user as any).company_name ?? (res.session as any).user?.company_name ?? null,
-          employee_id: (res.user as any).employee_id ?? null,
+          id: 'mock-id-123',
+          email: payload.email,
+          full_name: 'Krina Khunt',
+          role: role as any,
+          company_id: 'c-123',
+          company_name: 'HiveHR Cloud Solutions',
+          employee_id: null
         },
-      })
-      toast({ title: 'Signed in', description: `Welcome ${res.user.full_name ?? res.user.email}`, type: 'success' })
-      navigate(res.redirect_to)
+        session: {
+          access_token: 'local-static-token',
+          refresh_token: 'local-refresh-token',
+          expires_at: Math.floor(Date.now() / 1000) + 86400
+        },
+        redirect_to: role === 'company_admin' ? '/dashboard/company' : '/dashboard/employee'
+      }
     },
+    onSuccess: (res) => {
+      setAuthSession(res)
+      setCurrentRole(res.user.role)
+      toast({ title: 'Logged in (Static UI)', description: 'Experience the UI without interruptions.', type: 'success' })
+      navigate(res.redirect_to)
+    }
   })
 }
 
 export function useSignup() {
-  const toast = useToast()
   const navigate = useNavigate()
+  const { toast } = useToast()
 
-  return useMutation({
-    mutationFn: (payload: Parameters<typeof authApi.signup>[0]) => authApi.signup(payload),
-    onError: (err: unknown) => {
-      const message = err instanceof Error ? err.message : String(err)
-      toast({ title: 'Signup failed', description: message ?? 'Unable to create account', type: 'error' })
+  return useMutation<SignupResponse, Error, any>({
+    mutationFn: async (payload) => {
+      await new Promise(res => setTimeout(res, 300))
+      return {
+        message: 'Success (Static UI)',
+        user_id: 'new-mock-id',
+        role: payload.role as any,
+        company_id: 'new-c-id',
+        redirect_to: '/login'
+      }
     },
-    onSuccess: (res: SignupResponse) => {
-      toast({ title: 'Account created', description: `Account created for ${res.user_id}`, type: 'success' })
-      navigate('/login')
-    },
+    onSuccess: (res) => {
+      toast({ title: 'Welcome!', description: 'Your account is ready in static mode.', type: 'success' })
+      navigate(res.redirect_to)
+    }
   })
 }
 
-export default { useLogin, useSignup }
+export function useLogout() {
+  const navigate = useNavigate()
+  const { setCurrentRole } = useAuthStore()
+
+  return {
+    mutate: () => {
+      clearAuthSession()
+      setCurrentRole(null)
+      navigate('/login')
+    }
+  }
+}
