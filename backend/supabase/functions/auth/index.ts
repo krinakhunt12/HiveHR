@@ -35,28 +35,25 @@ Deno.serve(async (req) => {
   try {
     const payload = await req.json().catch(() => ({}));
 
-    // --- SIGNUP (Updated to enrich JWT) ---
+    // --- SIGNUP ---
     if (req.method === "POST" && path === "/signup") {
       const { email, password, full_name, role, company_name, company_id } = payload;
       let finalCompanyId = company_id;
 
-      // 1. Create Company first (for owners)
       if (role === 'company_admin' && !finalCompanyId && company_name) {
            const { data: comp, error: compErr } = await adminClient.from("companies").insert({ name: company_name }).select().single();
            if (compErr) throw compErr;
            finalCompanyId = comp.id;
       }
 
-      // 2. Create the Auth User with enriched metadata
       const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
-        user_metadata: { full_name, role, company_id: finalCompanyId } // ENRICH JWT
+        user_metadata: { full_name, role, company_id: finalCompanyId }
       });
       if (authError || !authData.user) throw authError;
 
-      // 3. Create Profile
       await adminClient.from("profiles").insert({
         id: authData.user.id,
         full_name,
@@ -68,7 +65,7 @@ Deno.serve(async (req) => {
       return jsonResponse(201, { message: "Signup Successful", user_id: authData.user.id, redirect_to: "/login" });
     }
 
-    // --- LOGIN (Updated to enrich existing JWTs) ---
+    // --- LOGIN (Now fetches company_name) ---
     if (req.method === "POST" && path === "/login") {
       const { email, password } = payload;
       const { data: loginData, error: loginError } = await publicClient.auth.signInWithPassword({ email, password });
@@ -76,19 +73,27 @@ Deno.serve(async (req) => {
 
       const userId = loginData.user.id;
       
-      // Fetch data from DB to ensure JWT is in sync
-      const { data: profile } = await adminClient.from("profiles").select("*").eq("id", userId).single();
+      // Fetch Profile AND Company Name in one go!
+      const { data: profile, error: profErr } = await adminClient
+          .from("profiles")
+          .select(`
+            *,
+            companies (name)
+          `)
+          .eq("id", userId)
+          .single();
       
-      // Sync metadata so the JWT contains company_id
-      if (profile && (!loginData.user.user_metadata?.company_id || !loginData.user.user_metadata?.role)) {
-           await adminClient.auth.admin.updateUserById(userId, {
-              user_metadata: { 
-                  ...loginData.user.user_metadata,
-                  role: profile.role,
-                  company_id: profile.company_id
-              }
-           });
-      }
+      const companyName = (profile as any)?.companies?.name || null;
+      
+      // Update metadata to persist role/company in JWT
+      await adminClient.auth.admin.updateUserById(userId, {
+        user_metadata: { 
+            ...loginData.user.user_metadata,
+            role: profile.role,
+            company_id: profile.company_id,
+            company_name: companyName
+        }
+      });
 
       return jsonResponse(200, {
         message: "Login successful",
@@ -97,7 +102,8 @@ Deno.serve(async (req) => {
           email, 
           full_name: profile?.full_name || "User", 
           role: profile?.role || "employee",
-          company_id: profile?.company_id || null
+          company_id: profile?.company_id || null,
+          company_name: companyName
         },
         session: { 
           access_token: loginData.session.access_token, 
