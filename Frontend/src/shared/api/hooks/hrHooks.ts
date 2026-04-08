@@ -1,13 +1,18 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '../supabase'
+import { useAuthStore } from '@/shared/auth/store'
+
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 /**
- * --- IN-LINED TYPES ---
+ * --- UNIFIED DATA MODELS ---
  */
 export interface Employee {
   id: string;
   employee_code: string;
   full_name: string;
   designation: string;
+  department_id: string | null;
   joined_on: string;
   status: 'active' | 'inactive';
 }
@@ -16,7 +21,20 @@ export interface CompanyPolicy {
   id: string;
   title: string;
   content: string;
+  policy_type: string;
+  effective_from: string | null;
   is_active: boolean;
+}
+
+export interface AttendanceLog {
+  id: string;
+  company_id: string;
+  employee_id: string;
+  attendance_date: string;
+  check_in_at: string | null;
+  check_out_at: string | null;
+  status: string;
+  work_minutes: number;
 }
 
 export interface MeProfile {
@@ -27,51 +45,135 @@ export interface MeProfile {
 }
 
 /**
- * --- STATIC MOCK DATA ---
+ * --- AUTHENTICATED DATA ---
+ * FIXED: Properly prioritizing metadata role over default Supabase 'authenticated' role
  */
-const MOCK_ME: MeProfile = {
-  id: 'me-123',
-  email: 'krina@hivehr.com',
-  full_name: 'Krina Khunt',
-  role: 'company_admin'
+export const useGetMe = () => {
+  const { session } = useAuthStore();
+  
+  return useQuery({ 
+    queryKey: ['me', session?.user?.id], 
+    queryFn: async () => {
+      if (!session) throw new Error('Not logged in')
+      
+      const user = session.user as any;
+      // ALWAYS prioritize user_metadata.role for professional display
+      const specializedRole = user.user_metadata?.role || user.app_metadata?.role || (user.role !== 'authenticated' ? user.role : 'employee');
+
+      return {
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || user.full_name,
+        role: specializedRole
+      } as MeProfile
+    },
+    enabled: !!session,
+    retry: false
+  })
 }
 
-const MOCK_EMPLOYEES: Employee[] = [
-  { id: '1', employee_code: 'EMP001', full_name: 'Alex Johnson', designation: 'Developer', joined_on: '2023-01', status: 'active' },
-  { id: '2', employee_code: 'EMP002', full_name: 'Sarah Smith', designation: 'Designer', joined_on: '2023-02', status: 'active' },
-  { id: '3', employee_code: 'EMP003', full_name: 'Ryan White', designation: 'Project Manager', joined_on: '2023-03', status: 'active' },
-]
+/**
+ * --- EMPLOYEE DATA (SECURE EDGE ACCESS) ---
+ */
+export const useListEmployees = (companyId?: string) => {
+  const { session } = useAuthStore();
 
-const MOCK_POLICIES: CompanyPolicy[] = [
-  { id: 'p1', title: 'Work from Home', content: 'Guidelines for remote work...', is_active: true },
-  { id: 'p2', title: 'Annual Leave', content: 'Holiday entitlement rules...', is_active: true }
-]
+  return useQuery({ 
+    queryKey: ['employees', companyId], 
+    queryFn: async () => {
+      if (!companyId || !session?.access_token) return []
+      
+      const { data, error } = await supabase.functions.invoke(`employee?company_id=${companyId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': supabaseAnonKey
+        }
+      })
+      
+      if (error) throw error
+      return data as Employee[]
+    },
+    enabled: !!companyId && !!session?.access_token,
+    retry: false
+  })
+}
 
 /**
- * --- STATIC HOOKS ---
+ * --- CORE MANAGEMENT MUTATIONS (Edge Function Powered) ---
  */
-export const useGetMe = () => useQuery({ queryKey: ['me'], queryFn: async () => MOCK_ME })
-export const useListEmployees = () => useQuery({ queryKey: ['employees'], queryFn: async () => MOCK_EMPLOYEES })
-export const useListPolicies = () => useQuery({ queryKey: ['policies'], queryFn: async () => MOCK_POLICIES })
-export const useListAttendance = () => useQuery({ queryKey: ['attendance'], queryFn: async () => [] })
+export const useEmployeeMutations = () => {
+  const queryClient = useQueryClient()
+  const { session } = useAuthStore();
 
-export const useEmployeeMutations = () => ({
-  create: { mutateAsync: async () => {}, isPending: false },
-  update: { mutateAsync: async () => {}, isPending: false },
-  remove: { mutateAsync: async () => {}, isPending: false }
+  const create = useMutation({
+    mutationFn: async (payload: any) => {
+      if (!session?.access_token) throw new Error('Unauthorized')
+      const { data, error } = await supabase.functions.invoke('employee', {
+        method: 'POST',
+        body: payload,
+        headers: { 
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': supabaseAnonKey
+        }
+      })
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['employees'] }),
+    retry: false
+  })
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      if (!session?.access_token) throw new Error('Unauthorized')
+      const { data, error } = await supabase.functions.invoke('employee', {
+        method: 'DELETE',
+        body: { id },
+        headers: { 
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': supabaseAnonKey
+        }
+      })
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['employees'] }),
+    retry: false
+  })
+
+  return { create, remove }
+}
+
+/**
+ * --- POLICIES AND ATTENDANCE (Mocks) ---
+ */
+export const useListPolicies = (_companyId?: string) => useQuery({ 
+  queryKey: ['policies'], 
+  queryFn: async () => [
+    { id: '1', title: 'Work From Home Policy', content: 'Detailed remote work guidelines', policy_type: 'Compliance', effective_from: '2026-01-01', is_active: true }
+  ] as CompanyPolicy[],
+  retry: false
+})
+
+export const useListAttendance = (_params?: any) => useQuery({ 
+  queryKey: ['attendance'], 
+  queryFn: async () => [] as AttendanceLog[],
+  retry: false
 })
 
 export const usePolicyMutations = () => ({
-  create: { mutateAsync: async () => {}, isPending: false },
-  update: { mutateAsync: async () => {}, isPending: false },
-  remove: { mutateAsync: async () => {}, isPending: false }
+  create: { mutateAsync: async (_p: any) => {}, isPending: false },
+  remove: { mutateAsync: async (_id: string) => {}, isPending: false }
 })
 
-export default {
-  useGetMe,
-  useListEmployees,
-  useListPolicies,
-  useListAttendance,
-  useEmployeeMutations,
-  usePolicyMutations
-}
+export const useAttendanceMutations = () => ({
+  checkIn: { mutateAsync: async (_p: any) => {}, isPending: false },
+  checkOut: { mutateAsync: async (_id: string) => {}, isPending: false }
+})
+
+export const useHealth = () => useQuery({
+  queryKey: ['health'],
+  queryFn: async () => ({ status: 'healthy', project: 'HiveHR-Real-Roles' }),
+  retry: false
+})

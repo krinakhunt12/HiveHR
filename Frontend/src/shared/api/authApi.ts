@@ -1,8 +1,8 @@
 import { supabase } from "./supabase";
-import type { AppRole } from "@/shared/auth/roles";
-import { setAuthSession, clearAuthSession } from "@/shared/auth/session";
 
-interface LoginResponse {
+export type AppRole = 'admin' | 'company_admin' | 'employee';
+
+export interface LoginResponse {
   message: string;
   user: {
     id: string;
@@ -10,7 +10,7 @@ interface LoginResponse {
     full_name: string;
     role: AppRole;
     company_id: string | null;
-    employee_id: string | null;
+    company_name: string | null;
   };
   session: {
     access_token: string;
@@ -20,7 +20,7 @@ interface LoginResponse {
   redirect_to: string;
 }
 
-interface SignupResponse {
+export interface SignupResponse {
   message: string;
   user_id: string;
   role: AppRole;
@@ -29,9 +29,11 @@ interface SignupResponse {
 }
 
 export const authApi = {
+  /**
+   * Proper Login using your custom auth Edge Function
+   */
   login: async ({ email, password }: { email: string; password: string }): Promise<LoginResponse> => {
-    // We call the auth-api/login Edge Function
-    const { data, error } = await supabase.functions.invoke("auth-api/login", {
+    const { data, error } = await supabase.functions.invoke("auth/login", {
       body: { email, password },
       method: "POST"
     });
@@ -40,31 +42,20 @@ export const authApi = {
       throw new Error(error?.message || data?.error || "Login failed");
     }
 
-    // CRITICAL: Tell the Supabase client to use this new session
+    // Sync session with the Supabase client
     await supabase.auth.setSession({
       access_token: data.session.access_token,
       refresh_token: data.session.refresh_token,
     });
 
-    // Update our custom session storage for the legacy parts of the app
-    setAuthSession(data);
-    
     return data as LoginResponse;
   },
 
-  signup: async (payload: {
-    email: string;
-    password: string;
-    full_name: string;
-    role: AppRole;
-    company_name?: string;
-    company_id?: string;
-    employee_code?: string;
-    designation?: string;
-    joined_on?: string;
-  }): Promise<SignupResponse> => {
-    // We call the auth-api/signup Edge Function
-    const { data, error } = await supabase.functions.invoke("auth-api/signup", {
+  /**
+   * Proper Signup using your custom auth Edge Function
+   */
+  signup: async (payload: any): Promise<SignupResponse> => {
+    const { data, error } = await supabase.functions.invoke("auth/signup", {
       body: payload,
       method: "POST"
     });
@@ -74,12 +65,5 @@ export const authApi = {
     }
 
     return data as SignupResponse;
-  },
-
-  logout: async () => {
-    await supabase.auth.signOut();
-    clearAuthSession();
   }
 };
-
-export type { LoginResponse, SignupResponse };

@@ -7,19 +7,20 @@ import {
   ArrowUpRight, 
   MessageSquare,
   TrendingUp,
-    Award,
-    AlertCircle
+  Award,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import LeaveSummary from '@/shared/components/LeaveSummary';
 import { cn } from '@/shared/utils/cn';
-import { type AttendanceLog, type CompanyPolicy } from '@/shared/api/hrApi';
-import { useListAttendance, useListPolicies, useAttendanceMutations } from '@/shared/api/hooks/hrHooks';
+import { useListAttendance, useListPolicies, useAttendanceMutations, useGetMe, type AttendanceLog } from '@/shared/api/hooks/hrHooks';
 
 const EmployeeDashboard = () => {
     const [isSavingAttendance, setIsSavingAttendance] = useState(false);
+    const { data: user } = useGetMe();
+    const userName = user?.full_name?.split(' ')[0] || 'User';
 
     const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
     const employeeId = (import.meta.env.VITE_HR_EMPLOYEE_ID as string | undefined)?.trim();
@@ -29,9 +30,12 @@ const EmployeeDashboard = () => {
     const { data: policies = [], isLoading: loadingPolicies, error: policiesError } = useListPolicies(companyId);
     const { checkIn, checkOut } = useAttendanceMutations();
 
-    const [attendanceToday, setAttendanceToday] = useState<AttendanceLog | null>(attendanceData[0] ?? null);
+    const [attendanceToday, setAttendanceToday] = useState<AttendanceLog | null>(null);
+    
     useEffect(() => {
-      setAttendanceToday(attendanceData[0] ?? null);
+      if (attendanceData.length > 0) {
+        setAttendanceToday(attendanceData[0]);
+      }
     }, [attendanceData]);
 
     const isLoading = loadingAttendance || loadingPolicies;
@@ -39,10 +43,9 @@ const EmployeeDashboard = () => {
 
     const onCheckIn = async () => {
         if (!companyId || !employeeId) return;
-
         setIsSavingAttendance(true);
         try {
-            const res = await checkIn.mutateAsync({ company_id: companyId!, employee_id: employeeId! });
+            const res = await checkIn.mutateAsync({ company_id: companyId, employee_id: employeeId });
             setAttendanceToday(res);
         } catch (err) {
             // Error handled via toast or dashboard error state
@@ -53,10 +56,9 @@ const EmployeeDashboard = () => {
 
     const onCheckOut = async () => {
         if (!employeeId) return;
-
         setIsSavingAttendance(true);
         try {
-            const res = await checkOut.mutateAsync({ employee_id: employeeId! });
+            const res = await checkOut.mutateAsync({ employee_id: employeeId });
             setAttendanceToday(res);
         } catch (err) {
             // silent
@@ -79,7 +81,7 @@ const EmployeeDashboard = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout navItems={navItems} userRole="Staff" userName="John Doe" userInitials="JD">
+      <DashboardLayout navItems={navItems}>
         <div className="space-y-10">
             <div className="flex justify-between items-center text-left">
                 <div className="space-y-2">
@@ -107,12 +109,12 @@ const EmployeeDashboard = () => {
   }
 
   return (
-    <DashboardLayout navItems={navItems} userRole="Sr. Product Designer" userName="Johnathan Doe" userInitials="JD">
+    <DashboardLayout navItems={navItems}>
       <div className="space-y-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
           <div>
-            <h1 className="text-2xl font-semibold text-main tracking-tight">Welcome back, Johnathan</h1>
-            <p className="text-sm font-medium text-muted mt-0.5">Monday, 15 March 2026</p>
+            <h1 className="text-2xl font-semibold text-main tracking-tight">Welcome back, {userName}</h1>
+            <p className="text-sm font-medium text-muted mt-0.5">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
           <div className="flex gap-2">
              <Button variant="outline" size="sm" className="font-medium text-xs h-9 border-border">Request Time Off</Button>

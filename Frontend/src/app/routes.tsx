@@ -7,33 +7,60 @@ import CompanyDashboard from "@/features/company-dashboard/pages/CompanyDashboar
 import AdminDashboard from "@/features/admin-dashboard/pages/AdminDashboard";
 import { marketingRoutes } from "@/features/marketing/routes";
 import RequireRole from "@/app/guards/RequireRole";
-import { dashboardPathForRole, getCurrentRole } from "@/shared/auth/roles";
+import { useAuthStore } from "@/shared/auth/store";
+
+/**
+ * --- SMART REDIRECT COMPONENT ---
+ * Protects public pages (Login/Signup/Landing) by sending authenticated users 
+ * straight to their respective dashboards.
+ */
+const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { session } = useAuthStore();
+  if (session) {
+    const role = (session.user.role || '').toLowerCase();
+    const target = (role === 'company_admin' || role === 'admin') ? '/dashboard/company' : '/dashboard/employee';
+    return <Navigate to={target} replace />;
+  }
+  return <>{children}</>;
+};
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <PublicOnly>
+        <LandingPage />
+      </PublicOnly>
+    ),
   },
   ...marketingRoutes,
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <PublicOnly>
+        <Login />
+      </PublicOnly>
+    ),
   },
   {
     path: "/signup",
-    element: <Signup />,
+    element: (
+      <PublicOnly>
+        <Signup />
+      </PublicOnly>
+    ),
   },
   {
     path: "/dashboard",
     children: [
       {
         index: true,
-        element: <Navigate to={dashboardPathForRole(getCurrentRole())} replace />,
+        element: <Navigate to="/login" replace />,
       },
       {
         path: "admin",
         element: (
-          <RequireRole requiredRole="admin">
+          <RequireRole allowedRoles={['admin']}>
             <AdminDashboard />
           </RequireRole>
         ),
@@ -41,7 +68,7 @@ export const router = createBrowserRouter([
       {
         path: "company",
         element: (
-          <RequireRole requiredRole="company_admin">
+          <RequireRole allowedRoles={['company_admin', 'admin']}>
             <CompanyDashboard />
           </RequireRole>
         ),
@@ -49,7 +76,7 @@ export const router = createBrowserRouter([
       {
         path: "employee",
         element: (
-          <RequireRole requiredRole="employee">
+          <RequireRole allowedRoles={['employee']}>
             <EmployeeDashboard />
           </RequireRole>
         ),

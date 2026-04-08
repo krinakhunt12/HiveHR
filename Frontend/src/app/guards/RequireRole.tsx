@@ -1,26 +1,32 @@
-import { Navigate } from "react-router-dom";
-import type { ReactNode } from "react";
-import { canAccess, dashboardPathForRole, getCurrentRole, type AppRole } from "@/shared/auth/roles";
-import { getAccessToken, isSessionExpired } from "@/shared/auth/session";
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuthStore, type AppRole } from '@/shared/auth/store';
 
 interface RequireRoleProps {
-  requiredRole: AppRole;
-  children: ReactNode;
+  children: React.ReactNode;
+  allowedRoles: AppRole[];
 }
 
-const RequireRole = ({ requiredRole, children }: RequireRoleProps) => {
-  const accessToken = getAccessToken();
-  const isExpired = isSessionExpired();
+/**
+ * --- ROLE GUARD ---
+ * Protects routes based on the current session stored in the Unified Auth Store.
+ */
+export const RequireRole: React.FC<RequireRoleProps> = ({ children, allowedRoles }) => {
+  const { session } = useAuthStore();
+  const location = useLocation();
 
-  if (!accessToken || isExpired || accessToken.split(".").length !== 3) {
-    return <Navigate to="/login" replace />;
+  if (!session) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  const role = (session.user?.role || '').toLowerCase() as AppRole;
+  const safeAllowedRoles = Array.isArray(allowedRoles) ? allowedRoles : [];
 
-  const role = getCurrentRole();
-
-  if (!canAccess(role, requiredRole)) {
-    return <Navigate to={dashboardPathForRole(role)} replace />;
+  if (!safeAllowedRoles.includes(role)) {
+    // Redirect to correct dashboard
+    const defaultDash = (role === 'company_admin' || role === 'admin') 
+      ? '/dashboard/company' 
+      : '/dashboard/employee';
+    return <Navigate to={defaultDash} replace />; 
   }
 
   return <>{children}</>;
