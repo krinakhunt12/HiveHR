@@ -16,10 +16,15 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
 import { useHealth, useListEmployees } from '@/shared/api/hooks/hrHooks';
 
+import { AddEmployeeModal } from '../../company-dashboard/components/AddEmployeeModal';
+
 const AdminDashboard = () => {
     const [query, setQuery] = React.useState('');
+    const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
     const { data: health, isLoading: loadingHealth, error: healthError } = useHealth();
-    const { data: employees = [], isLoading: loadingEmployees, error: employeesError } = useListEmployees();
+    const { data: employeesResponse, isLoading: loadingEmployees, error: employeesError } = useListEmployees();
+
+    const employees = employeesResponse?.data || [];
 
     const isLoading = loadingHealth || loadingEmployees;
     const error = (healthError as any)?.message ?? (employeesError as any)?.message ?? null;
@@ -116,6 +121,9 @@ const AdminDashboard = () => {
                     <CardHeader className="flex flex-row items-center justify-between py-5 border-b border-soft">
                         <CardTitle className="text-base font-semibold text-main">Global Directory</CardTitle>
                         <div className="flex gap-2">
+                            <Button onClick={() => setIsAddModalOpen(true)} className="h-7 px-3 text-[10px] font-bold uppercase tracking-wider">
+                                <Users size={12} className="mr-1.5" /> Invite Global
+                            </Button>
                             <div className="relative">
                                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-dim w-3 h-3" />
                                 <input
@@ -211,6 +219,7 @@ const AdminDashboard = () => {
                 </div>
             </div>
         </div>
+        <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
     </DashboardLayout>
   );
 };

@@ -9,6 +9,10 @@ import { marketingRoutes } from "@/features/marketing/routes";
 import RequireRole from "@/app/guards/RequireRole";
 import { useAuthStore } from "@/shared/auth/store";
 
+import { detectRole } from "@/shared/utils/authUtils";
+
+import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
+
 /**
  * --- SMART REDIRECT COMPONENT ---
  * Protects public pages (Login/Signup/Landing) by sending authenticated users 
@@ -17,8 +21,11 @@ import { useAuthStore } from "@/shared/auth/store";
 const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session } = useAuthStore();
   if (session) {
-    const role = (session.user.role || '').toLowerCase();
-    const target = (role === 'company_admin' || role === 'admin') ? '/dashboard/company' : '/dashboard/employee';
+    // If user needs to reset password, don't redirect them to dashboard
+    if (session.user.force_password_reset) return <>{children}</>;
+    
+    const role = detectRole(session.user);
+    const target = (role === 'admin') ? '/dashboard/admin' : (role === 'company_admin' ? '/dashboard/company' : '/dashboard/employee');
     return <Navigate to={target} replace />;
   }
   return <>{children}</>;
@@ -49,6 +56,10 @@ export const router = createBrowserRouter([
         <Signup />
       </PublicOnly>
     ),
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
   },
   {
     path: "/dashboard",

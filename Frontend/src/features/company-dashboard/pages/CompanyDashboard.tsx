@@ -22,19 +22,26 @@ import { cn } from '@/shared/utils/cn';
 import { useListEmployees, useListPolicies, useEmployeeMutations, type Employee, type CompanyPolicy } from '@/shared/api/hooks/hrHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
+import { AddEmployeeModal } from '../components/AddEmployeeModal';
+import { EditEmployeeModal } from '../components/EditEmployeeModal';
 
 type View = 'overview' | 'directory' | 'jobs' | 'time' | 'policies';
 
 const CompanyDashboard = () => {
     const [currentView, setCurrentView] = useState<View>('overview');
     const [query, setQuery] = useState('');
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
     const { session } = useAuthStore();
     const { toast } = useToast();
     const companyId = session?.user?.company_id ?? undefined;
 
-    const { data: employees = [], isLoading: loadingEmployees, error: employeesError } = useListEmployees(companyId);
-    const { data: policies = [], isLoading: loadingPolicies, error: policiesError } = useListPolicies(companyId);
+    const { data: employeesResponse, isLoading: loadingEmployees, error: employeesError } = useListEmployees({ company_id: companyId });
+    const { data: policiesResponse, isLoading: loadingPolicies, error: policiesError } = useListPolicies({ company_id: companyId });
     const { remove: removeEmployee } = useEmployeeMutations();
+
+    const employees = employeesResponse?.data || [];
+    const policies = policiesResponse?.data || [];
 
     const isLoading = loadingEmployees || loadingPolicies;
     const error = (employeesError as any)?.message ?? (policiesError as any)?.message ?? null;
@@ -88,7 +95,7 @@ const CompanyDashboard = () => {
                     <h1 className="text-2xl font-semibold text-main tracking-tight">Organization Overview</h1>
                     <p className="text-sm font-medium text-muted mt-0.5">Summary for {session?.user.company_name}.</p>
                 </div>
-                <Button onClick={() => setCurrentView('directory')} className="gap-2"><UserPlus size={16} /> Manage Members</Button>
+                <Button onClick={() => setIsAddModalOpen(true)} className="gap-2"><UserPlus size={16} /> Add Member</Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -196,7 +203,7 @@ const CompanyDashboard = () => {
                                         </td>
                                         <td className="px-8 py-5 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-indigo-50 hover:text-indigo-600 border-soft"><Edit3 size={14} /></Button>
+                                                <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-indigo-50 hover:text-indigo-600 border-soft" onClick={() => setEditingEmployee(emp)}><Edit3 size={14} /></Button>
                                                 <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-rose-50 hover:text-rose-600 border-soft" onClick={() => handleDeleteEmployee(emp.id, emp.full_name)}><Trash2 size={14} /></Button>
                                             </div>
                                         </td>
@@ -273,6 +280,12 @@ const CompanyDashboard = () => {
                 {currentView === 'jobs' && renderPlaceholder('Recruitment')}
                 {currentView === 'time' && renderPlaceholder('Time & Attendance')}
             </main>
+            <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+            <EditEmployeeModal 
+                isOpen={!!editingEmployee} 
+                onClose={() => setEditingEmployee(null)} 
+                employee={editingEmployee} 
+            />
         </DashboardLayout>
     );
 };

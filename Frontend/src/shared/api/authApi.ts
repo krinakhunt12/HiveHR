@@ -65,5 +65,18 @@ export const authApi = {
     }
 
     return data as SignupResponse;
+  },
+
+  updatePassword: async (newPassword: string): Promise<{ message: string }> => {
+    const { data, error } = await supabase.functions.invoke("auth/update-password", {
+      body: { new_password: newPassword },
+      method: "POST"
+    });
+
+    if (error || !data || data.error) {
+      throw new Error(error?.message || data?.error || "Password update failed");
+    }
+
+    return data;
   }
 };

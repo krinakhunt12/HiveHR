@@ -6,6 +6,8 @@ interface RequireRoleProps {
   allowedRoles: AppRole[];
 }
 
+import { detectRole } from '@/shared/utils/authUtils';
+
 /**
  * --- ROLE GUARD ---
  * Protects routes based on the current session stored in the Unified Auth Store.
@@ -18,7 +20,7 @@ export const RequireRole: React.FC<RequireRoleProps> = ({ children, allowedRoles
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  const role = (session.user?.role || '').toLowerCase() as AppRole;
+  const role = detectRole(session.user);
   const safeAllowedRoles = Array.isArray(allowedRoles) ? allowedRoles : [];
 
   if (!safeAllowedRoles.includes(role)) {

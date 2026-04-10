@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import { 
   Clock, 
@@ -15,7 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import LeaveSummary from '@/shared/components/LeaveSummary';
 import { cn } from '@/shared/utils/cn';
-import { useListAttendance, useListPolicies, useAttendanceMutations, useGetMe, type AttendanceLog } from '@/shared/api/hooks/hrHooks';
+import { useTodayAttendance, useListPolicies, useAttendanceMutations, useGetMe, type AttendanceLog } from '@/shared/api/hooks/hrHooks';
 
 const EmployeeDashboard = () => {
     const [isSavingAttendance, setIsSavingAttendance] = useState(false);
@@ -26,27 +26,19 @@ const EmployeeDashboard = () => {
     const employeeId = (import.meta.env.VITE_HR_EMPLOYEE_ID as string | undefined)?.trim();
     const today = new Date().toISOString().slice(0, 10);
 
-    const { data: attendanceData = [], isLoading: loadingAttendance, error: attendanceError } = useListAttendance({ employee_id: employeeId, attendance_date: today });
-    const { data: policies = [], isLoading: loadingPolicies, error: policiesError } = useListPolicies(companyId);
+    const { data: attendanceToday, isLoading: loadingAttendance, error: attendanceError } = useTodayAttendance();
+    const { data: policiesResponse, isLoading: loadingPolicies, error: policiesError } = useListPolicies({ company_id: companyId });
     const { checkIn, checkOut } = useAttendanceMutations();
 
-    const [attendanceToday, setAttendanceToday] = useState<AttendanceLog | null>(null);
-    
-    useEffect(() => {
-      if (attendanceData.length > 0) {
-        setAttendanceToday(attendanceData[0]);
-      }
-    }, [attendanceData]);
+    const policies = policiesResponse?.data || [];
 
     const isLoading = loadingAttendance || loadingPolicies;
     const error = (attendanceError as any)?.message ?? (policiesError as any)?.message ?? null;
 
     const onCheckIn = async () => {
-        if (!companyId || !employeeId) return;
         setIsSavingAttendance(true);
         try {
-            const res = await checkIn.mutateAsync({ company_id: companyId, employee_id: employeeId });
-            setAttendanceToday(res);
+            await checkIn.mutateAsync();
         } catch (err) {
             // Error handled via toast or dashboard error state
         } finally {
@@ -55,11 +47,9 @@ const EmployeeDashboard = () => {
     };
 
     const onCheckOut = async () => {
-        if (!employeeId) return;
         setIsSavingAttendance(true);
         try {
-            const res = await checkOut.mutateAsync({ employee_id: employeeId });
-            setAttendanceToday(res);
+            await checkOut.mutateAsync();
         } catch (err) {
             // silent
         } finally {
@@ -67,9 +57,10 @@ const EmployeeDashboard = () => {
         }
     };
 
-    const canCheckIn = !attendanceToday?.check_in_at;
-    const canCheckOut = !!attendanceToday?.check_in_at && !attendanceToday?.check_out_at;
-    const todaysMinutes = attendanceToday?.work_minutes ?? 0;
+    const hasAttendance = attendanceToday && 'id' in attendanceToday;
+    const canCheckIn = !hasAttendance;
+    const canCheckOut = hasAttendance && !attendanceToday.check_out_at;
+    const todaysMinutes = (hasAttendance ? attendanceToday.work_minutes : 0) ?? 0;
 
   const navItems = [
     { icon: <Clock size={18} />, label: 'Dashboard', path: '/dashboard/employee' },

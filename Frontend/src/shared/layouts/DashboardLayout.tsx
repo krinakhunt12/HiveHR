@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import { 
   Users, 
   Bell, 
-  Search,
   ChevronRight,
   LogOut,
   Menu,
   X,
-  Settings,
-  HelpCircle
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../utils/cn';
 import { useLogout } from '../api/hooks/authHooks';
 import { useGetMe } from '../api/hooks/hrHooks';
+
+import { detectRole } from '../utils/authUtils';
 
 interface NavItem {
   icon: React.ReactNode;
@@ -40,7 +39,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   // FIXED: Explicitly display company_admin or employee role instead of 'authenticated'
   const userName = user?.full_name || 'User';
-  const rawRole = user?.role || 'employee';
+  const rawRole = detectRole(user);
   const userRoleDisplay = rawRole === 'company_admin' ? 'Company Admin' : rawRole === 'admin' ? 'System Admin' : 'Staff Member';
   
   const userInitials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();

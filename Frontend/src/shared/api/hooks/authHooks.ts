@@ -28,10 +28,18 @@ export function useLogin() {
       })
 
       toast({ title: 'Signed in', description: `Welcome back, ${res.user.full_name}!`, type: 'success' })
+      
+      // 3. Forced Password Reset Check
+      if (res.user.force_password_reset) {
+        navigate('/reset-password');
+        return;
+      }
 
-      // 3. Simple, Case-Insensitive redirection
+      // 4. Role-based redirection
       const role = (res.user.role || '').toLowerCase()
-      if (role === 'company_admin' || role === 'admin') {
+      if (role === 'admin') {
+        navigate('/dashboard/admin')
+      } else if (role === 'company_admin') {
         navigate('/dashboard/company')
       } else {
         navigate('/dashboard/employee')
