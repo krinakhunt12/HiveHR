@@ -6,9 +6,12 @@ import {
   CheckSquare, 
   ArrowUpRight, 
   MessageSquare,
-  TrendingUp,
   Award,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  LayoutDashboard,
+  Wind,
+  Target
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
@@ -16,14 +19,18 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import LeaveSummary from '@/shared/components/LeaveSummary';
 import { cn } from '@/shared/utils/cn';
 import { useTodayAttendance, useListPolicies, useAttendanceMutations, useGetMe, type AttendanceLog } from '@/shared/api/hooks/hrHooks';
+import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
+import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
+
+type View = 'dashboard' | 'leaves' | 'tasks' | 'messages' | 'performance';
 
 const EmployeeDashboard = () => {
+    const [currentView, setCurrentView] = useState<View>('dashboard');
     const [isSavingAttendance, setIsSavingAttendance] = useState(false);
     const { data: user } = useGetMe();
     const userName = user?.full_name?.split(' ')[0] || 'User';
 
     const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
-    const employeeId = (import.meta.env.VITE_HR_EMPLOYEE_ID as string | undefined)?.trim();
     const today = new Date().toISOString().slice(0, 10);
 
     const { data: attendanceToday, isLoading: loadingAttendance, error: attendanceError } = useTodayAttendance();
@@ -39,9 +46,7 @@ const EmployeeDashboard = () => {
         setIsSavingAttendance(true);
         try {
             await checkIn.mutateAsync();
-        } catch (err) {
-            // Error handled via toast or dashboard error state
-        } finally {
+        } catch (err: any) {} finally {
             setIsSavingAttendance(false);
         }
     };
@@ -50,9 +55,7 @@ const EmployeeDashboard = () => {
         setIsSavingAttendance(true);
         try {
             await checkOut.mutateAsync();
-        } catch (err) {
-            // silent
-        } finally {
+        } catch (err: any) {} finally {
             setIsSavingAttendance(false);
         }
     };
@@ -63,152 +66,192 @@ const EmployeeDashboard = () => {
     const todaysMinutes = (hasAttendance ? attendanceToday.work_minutes : 0) ?? 0;
 
   const navItems = [
-    { icon: <Clock size={18} />, label: 'Dashboard', path: '/dashboard/employee' },
-    { icon: <Calendar size={18} />, label: 'Time Off', path: '#' },
-    { icon: <CheckSquare size={18} />, label: 'Tasks', path: '#' },
-    { icon: <MessageSquare size={18} />, label: 'Messages', path: '#' },
-    { icon: <Award size={18} />, label: 'Performance', path: '#' },
+    { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: 'dashboard' },
+    { icon: <Target size={18} />, label: 'Directives', path: 'tasks' },
+    { icon: <Wind size={18} />, label: 'Lifecycle', path: 'leaves' },
+    { icon: <CheckSquare size={18} />, label: 'Tasks', path: 'tasks' },
+    { icon: <MessageSquare size={18} />, label: 'Messages', path: 'messages' },
+    { icon: <Award size={18} />, label: 'Excellence', path: 'performance' },
   ];
+
+  const customNavItems = navItems.map(item => ({
+    ...item,
+    onClick: () => setCurrentView(item.path as View)
+  }));
+
+  const renderDashboard = () => (
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
+          <div>
+            <h1 className="text-3xl font-bold text-[var(--text-main)] tracking-tight font-sans">Growth Cycle, {userName}</h1>
+            <p className="text-sm font-medium text-slate-400 mt-1">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          </div>
+          <div className="flex gap-4">
+             <button 
+                onClick={() => setCurrentView('leaves')}
+                className="px-6 py-3 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all border border-slate-200 hover:border-emerald-200"
+             >
+                Request Maintenance
+             </button>
+             <button
+                 className={cn(
+                    "btn-primary py-3 px-8",
+                    !canCheckIn && canCheckOut ? "bg-amber-600 shadow-amber-600/20 hover:bg-amber-700" : ""
+                 )}
+                 onClick={canCheckIn ? onCheckIn : onCheckOut}
+                 disabled={isSavingAttendance || (!canCheckIn && !canCheckOut)}
+             >
+                 {isSavingAttendance ? 'Syncing...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Cycle Completed'}
+             </button>
+          </div>
+        </div>
+
+        {error && (
+            <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-700 animate-pulse">
+                <AlertCircle size={18} />
+                <p className="text-xs font-bold uppercase tracking-widest">{error}</p>
+            </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <StatCard title="Ecosystem Contribution" value="98.4%" trend="+1.2%" icon={<Clock />} theme="emerald" />
+            <div className="card-premium p-6 border-none shadow-premium flex flex-col justify-center bg-white">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Maintenance Quota</p>
+                <div className="flex items-center gap-4">
+                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-500 w-[60%] rounded-full"></div>
+                    </div>
+                    <span className="text-xs font-bold text-slate-700">14/24 <span className="text-[10px] text-slate-300">Days</span></span>
+                </div>
+            </div>
+            <StatCard title="Active Directives" value="08" icon={<CheckSquare />} theme="amber" />
+            <StatCard title="Operational Minutes" value={String(todaysMinutes)} icon={<Award />} theme="emerald" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 card-premium p-0 border-none shadow-premium overflow-hidden bg-white">
+                <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-gradient-to-r from-emerald-50/30 to-transparent">
+                    <h3 className="text-lg font-bold font-sans">Priority Directives</h3>
+                    <button 
+                        onClick={() => setCurrentView('tasks')}
+                        className="text-xs font-bold text-emerald-600 hover:text-emerald-700 uppercase tracking-widest"
+                    >
+                        Full Hub
+                    </button>
+                </div>
+                <div className="p-0">
+                    <TaskItem title="Harvest Capacity Audit" category="Operations" due="Today" priority="high" />
+                    <TaskItem title="Protocol Update Review" category="Compliance" due="Tomorrow" priority="medium" />
+                    <TaskItem title="System Calibration Feedback" category="Maintenance" due="Mar 20" priority="low" />
+                </div>
+            </div>
+
+            <div className="card-premium p-8 border-none shadow-premium h-fit bg-white text-left">
+                <h4 className="text-sm font-bold mb-6 font-sans">Organizational Protocols</h4>
+                <div className="space-y-4">
+                    {policies.slice(0, 3).map((policy) => (
+                      <div key={policy.id} className="p-4 rounded-2xl border border-slate-50 bg-slate-50/50 hover:border-emerald-200 transition-all group cursor-pointer text-left">
+                        <p className="text-xs font-bold text-slate-700 group-hover:text-emerald-700 transition-colors">{policy.title}</p>
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold mt-2">{policy.policy_type}</p>
+                      </div>
+                    ))}
+                    {policies.length === 0 && (
+                      <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">No protocols found.</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    </div>
+  );
 
   if (isLoading) {
     return (
-      <DashboardLayout navItems={navItems}>
-        <div className="space-y-10">
-            <div className="flex justify-between items-center text-left">
-                <div className="space-y-2">
-                    <Skeleton className="h-8 w-64" />
-                    <Skeleton className="h-4 w-48" />
-                </div>
-                <div className="flex gap-2">
-                    <Skeleton className="h-9 w-24 rounded-lg" />
-                    <Skeleton className="h-9 w-24 rounded-lg" />
-                </div>
+      <DashboardLayout navItems={customNavItems as any}>
+        <div className="space-y-12">
+            <Skeleton className="h-12 w-64 rounded-2xl" />
+            <div className="grid grid-cols-4 gap-8">
+                <Skeleton className="h-32 rounded-3xl" />
+                <Skeleton className="h-32 rounded-3xl" />
+                <Skeleton className="h-32 rounded-3xl" />
+                <Skeleton className="h-32 rounded-3xl" />
             </div>
-            <div className="grid grid-cols-4 gap-6">
-                <Skeleton className="h-28 rounded-xl" />
-                <Skeleton className="h-28 rounded-xl" />
-                <Skeleton className="h-28 rounded-xl" />
-                <Skeleton className="h-28 rounded-xl" />
-            </div>
-            <div className="grid grid-cols-3 gap-6">
-                <Skeleton className="col-span-2 h-[450px] rounded-xl" />
-                <Skeleton className="h-[450px] rounded-xl" />
-            </div>
+            <Skeleton className="h-96 rounded-3xl" />
         </div>
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout navItems={navItems}>
-      <div className="space-y-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
-          <div>
-            <h1 className="text-2xl font-semibold text-main tracking-tight">Welcome back, {userName}</h1>
-            <p className="text-sm font-medium text-muted mt-0.5">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
-          </div>
-          <div className="flex gap-2">
-             <Button variant="outline" size="sm" className="font-medium text-xs h-9 border-border">Request Time Off</Button>
-             <Button
-                 variant="default"
-                 size="sm"
-                 className="font-medium text-xs h-9 shadow-sm shadow-indigo-500/10"
-                 onClick={canCheckIn ? onCheckIn : onCheckOut}
-                 disabled={isSavingAttendance || (!canCheckIn && !canCheckOut)}
-             >
-                 {isSavingAttendance ? 'Saving...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Completed'}
-             </Button>
-          </div>
-        </div>
-
-                {error && (
-                    <Card className="border-error/20 bg-error-bg">
-                        <CardContent className="p-4 flex items-center gap-3 text-error">
-                            <AlertCircle size={18} />
-                            <p className="text-sm font-medium">{error}</p>
-                        </CardContent>
-                    </Card>
-                )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard title="Total Attendance" value="98.4%" trend="+1.2%" icon={<Clock className="text-primary/80" />} />
-            <LeaveSummary paid={14} sick={6} />
-            <StatCard title="Active Tasks" value="08" icon={<CheckSquare className="text-warning/80" />} />
-            <StatCard title="Today Minutes" value={String(todaysMinutes)} icon={<Award className="text-indigo-400" />} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 border-soft">
-                <CardHeader className="flex flex-row items-center justify-between py-5 border-b border-soft text-left">
-                    <CardTitle className="text-base font-semibold text-main">Priority Tasks</CardTitle>
-                    <Button variant="ghost" size="sm" className="text-xs font-semibold text-primary">Manage all</Button>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <TaskItem title="Q2 Product Roadmap Review" category="Product" due="Today" priority="high" />
-                    <TaskItem title="Customer Feedback Analysis" category="Research" due="Tomorrow" priority="medium" />
-                    <TaskItem title="Updated Design System Guidelines" category="Design" due="Mar 20" priority="low" />
-                </CardContent>
-            </Card>
-
-            <Card className="h-fit border-soft text-left">
-                <CardHeader className="py-5 border-b border-soft">
-                    <CardTitle className="text-base font-semibold text-main">Policy Highlights</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6 space-y-3">
-                    {policies.slice(0, 3).map((policy) => (
-                      <div key={policy.id} className="p-3 rounded-lg border border-soft bg-bg/30 text-left">
-                        <p className="text-xs font-semibold text-main">{policy.title}</p>
-                        <p className="text-[10px] uppercase tracking-wider text-muted mt-1">{policy.policy_type}</p>
-                      </div>
-                    ))}
-                    {policies.length === 0 && (
-                      <p className="text-xs text-muted">No policies available.</p>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
-      </div>
+    <DashboardLayout navItems={customNavItems as any}>
+        <main className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {currentView === 'dashboard' && renderDashboard()}
+            {currentView === 'tasks' && <TaskManagementView isAdmin={false} />}
+            {currentView === 'leaves' && <LeaveManagementView isAdmin={false} />}
+            {currentView === 'messages' && <PlaceholderBox title="Comms Node" />}
+            {currentView === 'performance' && <PlaceholderBox title="Excellence Metrics" />}
+        </main>
     </DashboardLayout>
   );
 };
 
-const StatCard = ({ title, value, icon, trend }: any) => (
-    <Card className="hover:border-primary/10 transition-all border-soft text-left">
-        <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-5">
-                <div className="p-2 bg-bg rounded-lg">
-                    {React.cloneElement(icon, { size: 18 })}
-                </div>
-                {trend && (
-                    <div className="flex items-center gap-1 text-[10px] font-semibold text-success bg-success-bg px-2 py-0.5 rounded-full">
-                        <TrendingUp size={10} />
-                        <span>{trend}</span>
-                    </div>
-                )}
-            </div>
-            <p className="text-xs font-medium text-muted mb-1">{title}</p>
-            <p className="text-xl font-semibold text-main tracking-tight leading-none">{value}</p>
-        </CardContent>
-    </Card>
-);
-
-const TaskItem = ({ title, category, due, priority }: any) => (
-    <div className="flex items-center justify-between px-6 py-5 border-b border-soft last:border-0 hover:bg-bg transition-colors group cursor-pointer text-left">
-        <div className="flex items-center gap-4 text-left">
+const StatCard = ({ title, value, icon, trend, theme }: any) => {
+    const isEmerald = theme === 'emerald';
+    return (
+        <div className="card-premium p-8 group border-none shadow-premium relative overflow-hidden bg-white text-left">
             <div className={cn(
-                "w-1 h-6 rounded-full",
-                priority === 'high' ? 'bg-error/60' : priority === 'medium' ? 'bg-warning/60' : 'bg-border'
-            )}></div>
-            <div>
-                <p className="text-sm font-medium text-main group-hover:text-primary transition-colors tracking-tight">{title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[10px] text-muted font-medium uppercase tracking-wider">{category}</span>
-                    <span className="w-1 h-1 bg-border rounded-full"></span>
-                    <span className="text-[10px] text-muted font-medium">{due}</span>
+                "absolute top-0 right-0 p-6 opacity-5 transition-all group-hover:scale-125 duration-500",
+                isEmerald ? "text-emerald-900" : "text-amber-900"
+            )}>
+                {React.cloneElement(icon, { size: 80 })}
+            </div>
+            <div className="flex flex-col gap-6 relative z-10">
+                <div className={cn(
+                    "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300",
+                    isEmerald ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                )}>
+                    {React.cloneElement(icon, { size: 20 })}
+                </div>
+                <div>
+                    <div className="flex items-center justify-between mb-1">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">{title}</p>
+                        {trend && <span className="text-[10px] font-bold text-emerald-600">{trend}</span>}
+                    </div>
+                    <p className="text-2xl font-bold text-[var(--text-main)] tracking-tight">{value}</p>
                 </div>
             </div>
         </div>
-        <ArrowUpRight size={14} className="text-dim group-hover:text-primary transition-all" />
+    );
+};
+
+const TaskItem = ({ title, category, due, priority }: any) => (
+    <div className="flex items-center justify-between px-8 py-6 border-b border-slate-50 last:border-0 hover:bg-emerald-50/30 transition-all group cursor-pointer text-left">
+        <div className="flex items-center gap-4 text-left">
+            <div className={cn(
+                "w-1.5 h-8 rounded-full shadow-sm",
+                priority === 'high' ? 'bg-rose-500 shadow-rose-500/20' : priority === 'medium' ? 'bg-amber-500 shadow-amber-500/20' : 'bg-slate-200'
+            )}></div>
+            <div>
+                <p className="text-sm font-bold text-slate-700 group-hover:text-emerald-800 transition-colors tracking-tight text-left">{title}</p>
+                <div className="flex items-center gap-3 mt-1.5">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{category}</span>
+                    <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{due}</span>
+                </div>
+            </div>
+        </div>
+        <ArrowUpRight size={16} className="text-slate-300 group-hover:text-emerald-600 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+    </div>
+);
+
+const PlaceholderBox = ({ title }: { title: string }) => (
+    <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 animate-in zoom-in-95 duration-500">
+         <div className="w-24 h-24 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-500 shadow-inner">
+            <LayoutDashboard size={40} />
+         </div>
+         <div className="space-y-3">
+            <h2 className="text-2xl font-bold text-[var(--text-main)] font-sans">{title} Calibration</h2>
+            <p className="text-sm font-medium text-slate-400 max-w-sm mx-auto leading-relaxed">We are currently synchronizing this module with the central grid. Full operational status expected in the next cycle.</p>
+         </div>
     </div>
 );
 

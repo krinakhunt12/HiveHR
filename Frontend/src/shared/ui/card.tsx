@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "../utils/cn"
+import { cn } from "@/shared/utils/cn"
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -8,7 +8,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-soft bg-surface text-main shadow-soft",
+      "rounded-[2rem] border bg-card text-card-foreground shadow-premium transition-all",
       className
     )}
     {...props}
@@ -22,7 +22,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1 p-6", className)}
+    className={cn("flex flex-col space-y-1.5 p-8", className)}
     {...props}
   />
 ))
@@ -34,7 +34,10 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("font-semibold text-base leading-none tracking-tight text-main", className)}
+    className={cn(
+      "text-2xl font-bold leading-none tracking-tight font-sans",
+      className
+    )}
     {...props}
   />
 ))
@@ -46,7 +49,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-slate-500 font-normal", className)}
+    className={cn("text-sm text-muted-foreground font-medium", className)}
     {...props}
   />
 ))
@@ -56,7 +59,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("p-8 pt-0", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
@@ -66,10 +69,11 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn("flex items-center p-8 pt-0", className)}
     {...props}
   />
 ))
 CardFooter.displayName = "CardFooter"
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+

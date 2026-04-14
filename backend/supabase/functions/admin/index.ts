@@ -1,12 +1,12 @@
 /**
- * Employee API — /functions/v1/employee
+ * Super Admin API — /functions/v1/admin
  * 
- * Role: 'employee'
+ * Role: 'admin'
  * Features:
- * - View/update own profile
- * - View assigned attendance logs
- * - Submit/View own leave requests
- * - View company policies
+ * - Manage all companies (CRUD)
+ * - Manage all users/employees across the system
+ * - Assign roles
+ * - System-wide analytics
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
@@ -22,7 +22,7 @@ function normalizePath(pathname: string): string {
   const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
   while (
     segments.length > 0 &&
-    ["functions", "v1", "employee"].includes(segments[0])
+    ["functions", "v1", "admin"].includes(segments[0])
   ) {
     segments.shift();
   }
@@ -37,104 +37,108 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
   const ctx = await getUserContext(req);
-  if (!ctx || !ctx.userId) return unauthorized();
+  if (!ctx) return unauthorized();
+
+  // STRICT RBAC: Only Super Admin
+  if (ctx.role !== "admin") {
+    return forbidden();
+  }
 
   const adminClient = createClient(supabaseUrl, serviceKey);
   const url = new URL(req.url);
   const path = normalizePath(url.pathname);
   const method = req.method;
-  const companyId = ctx.companyId;
-  const employeeId = ctx.employeeId;
 
   const segments = path.replace(/^\//, "").split("/");
-  const resource = segments[0]; // profile | attendance | leave | policies
+  const resource = segments[0]; // companies | users | employees | analytics
+  const resourceId = segments[1] || null;
 
   try {
     /* =========================================================================
-       PROFILE MANAGEMENT (Own)
+       COMPANIES MANAGEMENT
        ========================================================================= */
-    if (resource === "profile") {
+    if (resource === "companies") {
+      // GET /admin/companies
       if (method === "GET") {
         const { data, error } = await adminClient
-          .from("profiles")
-          .select("*, companies(name)")
-          .eq("user_id", ctx.userId)
-          .single();
+          .from("companies")
+          .select("*")
+          .order("name");
         if (error) throw error;
-        return jsonResponse(200, data);
+        return jsonResponse(200, { data });
       }
-
-      if (method === "PATCH") {
-        const { full_name } = await req.json();
+      
+      // POST /admin/companies
+      if (method === "POST") {
+        const body = await req.json();
         const { data, error } = await adminClient
-          .from("profiles")
-          .update({ full_name })
-          .eq("user_id", ctx.userId)
+          .from("companies")
+          .insert(body)
           .select()
           .single();
         if (error) throw error;
-        return jsonResponse(200, data);
+        return jsonResponse(201, { message: "Company created", data });
       }
-    }
 
-    /* =========================================================================
-       ATTENDANCE (Own)
-       ========================================================================= */
-    if (resource === "attendance") {
-      if (!employeeId) return jsonResponse(400, { error: "No employee record found" });
-
-      if (method === "GET") {
+      // PATCH /admin/companies/:id
+      if (method === "PATCH" && resourceId) {
+        const body = await req.json();
         const { data, error } = await adminClient
-          .from("attendance_logs")
-          .select("*")
-          .eq("employee_id", employeeId)
-          .order("attendance_date", { ascending: false })
-          .limit(30);
+            .from("companies")
+            .update(body)
+            .eq("id", resourceId)
+            .select()
+            .single();
         if (error) throw error;
         return jsonResponse(200, { data });
       }
     }
 
     /* =========================================================================
-       LEAVE REQUESTS (Own)
+       USER & ROLE MANAGEMENT
        ========================================================================= */
-    if (resource === "leave") {
-      if (!employeeId) return jsonResponse(400, { error: "No employee record found" });
-
+    if (resource === "users") {
+      // GET /admin/users
       if (method === "GET") {
         const { data, error } = await adminClient
-          .from("leave_requests")
-          .select("*")
-          .eq("employee_id", employeeId)
+          .from("profiles")
+          .select("*, companies(name)")
           .order("created_at", { ascending: false });
         if (error) throw error;
         return jsonResponse(200, { data });
       }
 
-      if (method === "POST") {
-        const body = await req.json();
+      // POST /admin/users/assign-role
+      if (method === "POST" && resourceId === "assign-role") {
+        const { user_id, role } = await req.json();
         const { data, error } = await adminClient
-          .from("leave_requests")
-          .insert({ ...body, employee_id: employeeId, status: "pending" })
+          .from("profiles")
+          .update({ role })
+          .eq("user_id", user_id)
           .select()
           .single();
         if (error) throw error;
-        return jsonResponse(201, data);
+        
+        // Also update Auth Metadata
+        await adminClient.auth.admin.updateUserById(user_id, {
+            user_metadata: { role },
+            app_metadata: { role }
+        });
+
+        return jsonResponse(200, { message: "Role assigned successfully", data });
       }
     }
 
     /* =========================================================================
-       POLICIES (Company Assigned)
+       SYSTEM-WIDE EMPLOYEES
        ========================================================================= */
-    if (resource === "policies") {
-      if (!companyId) return jsonResponse(400, { error: "No company associated" });
-
+    if (resource === "employees") {
       if (method === "GET") {
-        const { data, error } = await adminClient
-          .from("company_policies")
-          .select("*")
-          .eq("company_id", companyId)
-          .eq("is_active", true);
+        const companyId = url.searchParams.get("company_id");
+        let query = adminClient.from("employees").select("*, companies(name)");
+        if (companyId) query = query.eq("company_id", companyId);
+        
+        const { data, error } = await query;
         if (error) throw error;
         return jsonResponse(200, { data });
       }

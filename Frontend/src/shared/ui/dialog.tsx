@@ -23,28 +23,29 @@ export const Dialog = ({ isOpen, onClose, title, children, className }: DialogPr
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
             <div 
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" 
+                className="absolute inset-0 bg-emerald-950/20 backdrop-blur-md" 
                 onClick={onClose}
             />
             <div className={cn(
-                "relative bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200",
+                "relative bg-background rounded-[2.5rem] border shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300",
                 className
             )}>
-                <div className="flex items-center justify-between px-8 py-6 border-b border-soft">
-                    <h3 className="text-xl font-bold text-main tracking-tight">{title}</h3>
+                <div className="flex items-center justify-between px-10 py-8 border-b border-border/50 bg-slate-50/50">
+                    <h3 className="text-2xl font-bold text-foreground tracking-tight font-sans">{title}</h3>
                     <button 
                         onClick={onClose}
-                        className="p-2 hover:bg-bg rounded-xl transition-colors text-dim hover:text-main"
+                        className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-2xl transition-all text-muted-foreground hover:text-foreground shadow-sm hover:shadow-md"
                     >
                         <X size={20} />
                     </button>
                 </div>
-                <div className="p-8 max-h-[80vh] overflow-y-auto">
+                <div className="p-10 max-h-[85vh] overflow-y-auto">
                     {children}
                 </div>
             </div>
         </div>
     );
 };
+

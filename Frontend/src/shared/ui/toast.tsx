@@ -1,4 +1,5 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useState } from 'react'
+import { cn } from '@/shared/utils/cn'
 
 type ToastType = 'success' | 'error' | 'info'
 
@@ -23,7 +24,7 @@ export const ToasterProvider: React.FC<{ children?: React.ReactNode }> = ({ chil
     const toastItem: Toast = { id, title: t.title, description: t.description, type: t.type }
     setToasts((s) => [...s, toastItem])
 
-    const dur = t.duration ?? 4500
+    const dur = t.duration ?? 5000
     setTimeout(() => {
       setToasts((s) => s.filter((x) => x.id !== id))
     }, dur)
@@ -32,11 +33,19 @@ export const ToasterProvider: React.FC<{ children?: React.ReactNode }> = ({ chil
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+      <div className="fixed bottom-8 right-8 flex flex-col gap-4 z-[100]">
         {toasts.map((t) => (
-          <div key={t.id} className={`max-w-sm w-full p-3 rounded-lg shadow-md border flex flex-col ${t.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-800' : t.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-white border-slate-100 text-slate-800'}`}>
-            <div className="font-semibold text-sm">{t.title}</div>
-            {t.description && <div className="text-xs mt-1">{t.description}</div>}
+          <div 
+            key={t.id} 
+            className={cn(
+              "max-w-md w-full p-6 rounded-[1.5rem] shadow-2xl border backdrop-blur-xl animate-in slide-in-from-right-10 fade-in duration-500 flex flex-col gap-1",
+              t.type === 'error' ? 'bg-destructive/10 border-destructive/20 text-destructive' : 
+              t.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800' : 
+              'bg-background/80 border-border text-foreground shadow-premium'
+            )}
+          >
+            <div className="font-bold text-sm tracking-tight">{t.title}</div>
+            {t.description && <div className="text-xs font-medium opacity-80 leading-relaxed">{t.description}</div>}
           </div>
         ))}
       </div>
@@ -46,8 +55,12 @@ export const ToasterProvider: React.FC<{ children?: React.ReactNode }> = ({ chil
 
 export function useToast() {
   const ctx = useContext(ToastContext)
-  if (!ctx) throw new Error('useToast must be used within ToasterProvider')
+  if (!ctx || !ctx.toast) {
+    // Fallback if context is not available yet
+    return (t: any) => console.log('Toast:', t);
+  }
   return ctx.toast
 }
 
 export default ToasterProvider
+
