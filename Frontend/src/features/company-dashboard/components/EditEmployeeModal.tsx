@@ -51,20 +51,20 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Modify Stakeholder Metadata">
             <div className="mb-8">
-                <p className="text-sm font-medium text-slate-400">Update the occupational details and status of this ecosystem member.</p>
+                <p className="text-sm font-medium text-textSecondary">Update the occupational details and status of this ecosystem member.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Identity Name</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Identity Name</label>
                         <div className="relative group">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
                                 required
                                 value={formData.full_name}
                                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                                 placeholder="Stakeholder Name"
                             />
                         </div>
@@ -72,27 +72,27 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Operational Role</label>
+                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Operational Role</label>
                             <div className="relative group">
-                                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                                 <input
                                     required
                                     value={formData.designation}
                                     onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                    className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                                     placeholder="Designation"
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Ecosystem ID</label>
+                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Ecosystem ID</label>
                             <div className="relative group">
-                                <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                                <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                                 <input
                                     required
                                     value={formData.employee_code}
                                     onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
-                                    className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                                     placeholder="ID Code"
                                 />
                             </div>
@@ -100,13 +100,13 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Biological/System Status</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Biological/System Status</label>
                         <div className="relative group">
-                            <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <select
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all appearance-none"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none"
                             >
                                 <option value="active">Operational (Active)</option>
                                 <option value="inactive">Dormant (Inactive)</option>
@@ -121,7 +121,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-sm font-bold uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100 flex items-center justify-center gap-2"
+                        className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20 flex items-center justify-center gap-2"
                     >
                         <X size={14} />
                         Discard
@@ -129,7 +129,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex-[2] btn-primary py-4 h-auto shadow-xl shadow-emerald-500/20"
+                        className="flex-[2] btn-primary py-4 h-auto shadow-none"
                     >
                         {loading ? (
                             <div className="flex items-center gap-2">

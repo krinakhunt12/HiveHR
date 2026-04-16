@@ -64,7 +64,7 @@ const ResetPasswordPage = () => {
                     <form onSubmit={handleReset} className="space-y-6">
                         <div className="space-y-4">
                             <div className="relative">
-                                <label className="text-xs font-bold uppercase tracking-widest text-dim mb-1.5 block">New Password</label>
+                                <label className="text-sm font-bold uppercase tracking-widest text-dim mb-1.5 block">New Password</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
                                     <input
@@ -79,7 +79,7 @@ const ResetPasswordPage = () => {
                             </div>
 
                             <div className="relative">
-                                <label className="text-xs font-bold uppercase tracking-widest text-dim mb-1.5 block">Confirm Password</label>
+                                <label className="text-sm font-bold uppercase tracking-widest text-dim mb-1.5 block">Confirm Password</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
                                     <input

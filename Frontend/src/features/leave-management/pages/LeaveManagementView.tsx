@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Calendar,
     Clock,
     CheckCircle2,
     XCircle,
@@ -8,7 +7,7 @@ import {
     MoreVertical,
     Plus
 } from 'lucide-react';
-import { useListLeaves, useLeaveMutations, type LeaveRequest } from '@/shared/api/hooks/hrHooks';
+import { useListLeaves, useLeaveMutations } from '@/shared/api/hooks/hrHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { cn } from '@/shared/utils/cn';
@@ -46,9 +45,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'approved': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-            case 'rejected': return 'bg-rose-100 text-rose-700 border-rose-200';
-            default: return 'bg-amber-100 text-amber-700 border-amber-200';
+            case 'approved': return 'bg-success/10 text-success border-success/20';
+            case 'rejected': return 'bg-error/10 text-error border-error/20';
+            default: return 'bg-warning/10 text-warning border-warning/20';
         }
     };
 
@@ -56,9 +55,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="text-left">
-                    <h1 className="text-3xl font-bold text-[var(--text-main)] tracking-tight font-sans">Lifecycle Maintenance</h1>
-                    <p className="text-sm font-medium text-slate-400 mt-1">
-                        {isAdmin ? 'Review and manage time-off requests across the ecosystem.' : 'Manage your personal maintenance cycles and scheduled absences.'}
+                    <h1 className="text-xl font-medium text-textPrimary tracking-tight font-sans">Leave Management</h1>
+                    <p className="text-sm font-medium text-textSecondary mt-0.5">
+                        {isAdmin ? 'Review and manage time-off requests across the company.' : 'Manage your personal leave requests and scheduled absences.'}
                     </p>
                 </div>
                 {!isAdmin && (
@@ -75,77 +74,77 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Stats Summary */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="card-premium p-6 bg-white border-none shadow-premium">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Quota Allocation</h4>
+                    <div className="card-premium p-6 bg-surface border border-border shadow-none">
+                        <h4 className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-6">Quota Allocation</h4>
                         <div className="space-y-4">
-                            <QuotaProgress label="Paid (Annual)" used={12} total={24} color="emerald" />
-                            <QuotaProgress label="Health (Sick)" used={3} total={10} color="amber" />
-                            <QuotaProgress label="Unpaid Personal" used={2} total={5} color="slate" />
+                            <QuotaProgress label="Paid (Annual)" used={12} total={24} color="primary" />
+                            <QuotaProgress label="Health (Sick)" used={3} total={10} color="warning" />
+                            <QuotaProgress label="Unpaid Personal" used={2} total={5} color="textSecondary" />
                         </div>
                     </div>
 
-                    <div className="card-premium p-6 bg-gradient-to-br from-emerald-600 to-emerald-800 text-white border-none shadow-xl shadow-emerald-900/10">
-                        <p className="text-xs font-bold uppercase tracking-widest text-emerald-200 mb-2">Protocol Note</p>
-                        <p className="text-sm font-medium leading-relaxed">Ensure all maintenance requests are submitted 48 hours prior to commencement for optimal network stability.</p>
+                    <div className="card-premium p-6 bg-primary/10 border border-primary/10 shadow-none">
+                        <p className="text-sm font-medium uppercase tracking-widest text-primary mb-2">Protocol Note</p>
+                        <p className="text-sm font-medium leading-relaxed text-textSecondary">Ensure all leave requests are submitted 48 hours prior to commencement for optimal processing.</p>
                     </div>
                 </div>
 
                 {/* Leaves Table */}
-                <div className="lg:col-span-3 card-premium p-0 border-none shadow-premium overflow-hidden bg-white">
-                    <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
-                        <h3 className="text-lg font-bold">Request History</h3>
-                        <button className="p-2 hover:bg-slate-50 rounded-xl transition-colors text-slate-400">
-                            <Filter size={18} />
+                <div className="lg:col-span-3 card-premium p-0 border border-border shadow-none overflow-hidden bg-surface">
+                    <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-background/50">
+                        <h3 className="text-base font-medium text-textPrimary">Request History</h3>
+                        <button className="p-2 hover:bg-surface rounded-md transition-colors text-textSecondary border border-transparent hover:border-border">
+                            <Filter size={16} />
                         </button>
                     </div>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-slate-50/50">
+                            <thead className="bg-background/50">
                                 <tr>
-                                    <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Stakeholder</th>
-                                    <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Type & Duration</th>
-                                    <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                    {isAdmin && <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Action</th>}
+                                    <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Employee</th>
+                                    <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Type & Duration</th>
+                                    <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Status</th>
+                                    {isAdmin && <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest text-right">Action</th>}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-50">
+                            <tbody className="divide-y divide-border">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-slate-400">Synchronizing records...</td>
+                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">Synchronizing records...</td>
                                     </tr>
                                 ) : leaves.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-slate-400">No maintenance cycles recorded in the current epoch.</td>
+                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">No maintenance cycles recorded in the current epoch.</td>
                                     </tr>
                                 ) : leaves.map((leave: any) => (
-                                    <tr key={leave.id} className="group hover:bg-emerald-50/30 transition-all">
-                                        <td className="px-8 py-5">
+                                    <tr key={leave.id} className="group hover:bg-background transition-all">
+                                        <td className="px-6 py-4 text-left">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center font-bold text-slate-400 text-sm border border-slate-100 group-hover:bg-white group-hover:scale-110 transition-all">
+                                                <div className="w-9 h-9 rounded-md bg-background flex items-center justify-center font-medium text-textSecondary text-sm border border-border transition-all">
                                                     {leave.profiles?.full_name?.charAt(0) || 'U'}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-bold text-slate-700">{leave.profiles?.full_name || 'System Member'}</p>
-                                                    <p className="text-xs text-slate-400 font-bold uppercase">{leave.profiles?.employee_code || 'ID-REDACTED'}</p>
+                                                    <p className="text-sm font-medium text-textPrimary">{leave.profiles?.full_name || 'Member'}</p>
+                                                    <p className="text-sm text-textSecondary font-medium uppercase">{leave.profiles?.employee_code || 'ID-REDACTED'}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <p className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                        <td className="px-6 py-4">
+                                            <p className="text-sm font-medium text-textPrimary flex items-center gap-2">
                                                 <span className={cn(
                                                     "w-1.5 h-1.5 rounded-full",
-                                                    leave.leave_type === 'sick' ? 'bg-amber-400' : 'bg-emerald-400'
+                                                    leave.leave_type === 'sick' ? 'bg-warning' : 'bg-primary'
                                                 )} />
                                                 {(leave.leave_type || 'unspecified').charAt(0).toUpperCase() + (leave.leave_type || 'unspecified').slice(1)}
                                             </p>
-                                            <p className="text-xs text-slate-400 font-bold uppercase mt-1">
+                                            <p className="text-sm text-textSecondary font-medium uppercase mt-1">
                                                 {leave.start_date} → {leave.end_date}
                                             </p>
                                         </td>
-                                        <td className="px-8 py-5">
+                                        <td className="px-6 py-4">
                                             <span className={cn(
-                                                "px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border inline-flex items-center gap-2",
+                                                "px-2.5 py-1 rounded-md text-sm font-medium uppercase tracking-widest border inline-flex items-center gap-2",
                                                 getStatusColor(leave.status)
                                             )}>
                                                 {leave.status === 'approved' && <CheckCircle2 size={12} />}
@@ -155,26 +154,26 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                             </span>
                                         </td>
                                         {isAdmin && (
-                                            <td className="px-8 py-5 text-right">
+                                            <td className="px-6 py-4 text-right">
                                                 {leave.status === 'pending' ? (
                                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                         <button
                                                             onClick={() => handleAction(leave.id, 'approved')}
-                                                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-transparent hover:border-emerald-100"
+                                                            className="p-1.5 text-primary hover:bg-primary/10 rounded-md transition-all border border-transparent hover:border-primary/20"
                                                             title="Authorize"
                                                         >
-                                                            <CheckCircle2 size={18} />
+                                                            <CheckCircle2 size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleAction(leave.id, 'rejected')}
-                                                            className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-all border border-transparent hover:border-rose-100"
+                                                            className="p-1.5 text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20"
                                                             title="Terminate"
                                                         >
-                                                            <XCircle size={18} />
+                                                            <XCircle size={16} />
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <button className="p-2 text-slate-300 hover:text-slate-500 transition-colors">
+                                                    <button className="p-2 text-textSecondary hover:text-textPrimary transition-colors">
                                                         <MoreVertical size={16} />
                                                     </button>
                                                 )}
@@ -193,21 +192,21 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     );
 };
 
-const QuotaProgress = ({ label, used, total, color }: { label: string; used: number; total: number; color: 'emerald' | 'amber' | 'slate' }) => {
+const QuotaProgress = ({ label, used, total, color }: { label: string; used: number; total: number; color: 'primary' | 'warning' | 'textSecondary' }) => {
     const percentage = Math.min(100, (used / total) * 100);
     const colorClasses = {
-        emerald: 'bg-emerald-500 shadow-emerald-500/20',
-        amber: 'bg-amber-500 shadow-amber-500/20',
-        slate: 'bg-slate-500 shadow-slate-500/20'
+        primary: 'bg-primary shadow-none',
+        warning: 'bg-warning shadow-none',
+        textSecondary: 'bg-textSecondary shadow-none'
     };
 
     return (
         <div className="space-y-2">
             <div className="flex justify-between items-end">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-tight">{label}</span>
-                <span className="text-sm font-bold text-slate-700">{used} / {total} <span className="text-slate-300 text-xs font-medium">Days</span></span>
+                <span className="text-sm font-medium text-textSecondary uppercase tracking-tight">{label}</span>
+                <span className="text-sm font-medium text-textPrimary">{used} / {total} <span className="text-textSecondary text-sm font-medium">Days</span></span>
             </div>
-            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-background rounded-full overflow-hidden">
                 <div
                     className={cn("h-full rounded-full transition-all duration-1000", colorClasses[color])}
                     style={{ width: `${percentage}%` }}

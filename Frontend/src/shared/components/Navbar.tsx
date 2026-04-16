@@ -35,10 +35,10 @@ export const Navbar = () => {
             <div className="h-4 w-[1px] bg-slate-200"></div>
             <div className="flex items-center gap-4">
               <Link to="/login">
-                <Button variant="ghost" size="sm" className="font-bold text-xs uppercase tracking-widest text-slate-500 hover:text-emerald-600">Login</Button>
+                <Button variant="ghost" size="sm" className="font-bold text-sm uppercase tracking-widest text-slate-500 hover:text-emerald-600">Login</Button>
               </Link>
               <Link to="/signup">
-                <Button size="sm" className="font-bold text-xs uppercase tracking-widest px-6 py-5 rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95">Get Started</Button>
+                <Button size="sm" className="font-bold text-sm uppercase tracking-widest px-6 py-5 rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95">Get Started</Button>
               </Link>
             </div>
           </div>
@@ -71,10 +71,10 @@ export const Navbar = () => {
           ))}
           <div className="pt-4 flex flex-col gap-3">
             <Link to="/login" className="w-full">
-              <Button variant="outline" className="w-full text-xs font-bold uppercase tracking-widest h-12 rounded-2xl border-slate-200">Login</Button>
+              <Button variant="outline" className="w-full text-sm font-bold uppercase tracking-widest h-12 rounded-2xl border-slate-200">Login</Button>
             </Link>
             <Link to="/signup" className="w-full">
-              <Button className="w-full text-xs font-bold uppercase tracking-widest h-12 rounded-2xl bg-emerald-600">Get Started</Button>
+              <Button className="w-full text-sm font-bold uppercase tracking-widest h-12 rounded-2xl bg-emerald-600">Get Started</Button>
             </Link>
           </div>
         </div>

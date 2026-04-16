@@ -75,10 +75,10 @@ export const Footer = () => {
         </div>
 
         <div className="pt-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em]">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
           <div className="flex gap-8">
-            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[var(--primary)] transition-colors uppercase tracking-widest">Privacy Policy</a>
-            <a href="#" className="text-xs font-bold text-slate-400 hover:text-[var(--primary)] transition-colors uppercase tracking-widest">Cookie Policy</a>
+            <a href="#" className="text-sm font-bold text-slate-400 hover:text-[var(--primary)] transition-colors uppercase tracking-widest">Privacy Policy</a>
+            <a href="#" className="text-sm font-bold text-slate-400 hover:text-[var(--primary)] transition-colors uppercase tracking-widest">Cookie Policy</a>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ export const Footer = () => {
 
 const FooterCol = ({ title, links }: { title: string, links: { name: string, href: string }[] }) => (
   <div className="text-left">
-    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 mb-8">{title}</h4>
+    <h4 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 mb-8">{title}</h4>
     <ul className="space-y-4">
       {links.map((link) => (
         <li key={link.name}>

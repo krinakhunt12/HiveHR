@@ -31,7 +31,7 @@ export const PricingCard = ({ name, price, desc, features, featured = false }: a
     featured ? "border-indigo-600 scale-105 z-10 shadow-xl shadow-indigo-100/50" : "border-slate-100 hover:border-slate-200"
   )}>
     {featured && (
-      <div className="absolute top-0 right-0 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest px-4 py-1 rounded-bl-lg">Most Popular</div>
+      <div className="absolute top-0 right-0 bg-indigo-600 text-white text-sm font-black uppercase tracking-widest px-4 py-1 rounded-bl-lg">Most Popular</div>
     )}
     <CardContent className="p-8">
       <h3 className="text-lg font-semibold text-[var(--color-text-main)] mb-2 tracking-tight">{name}</h3>

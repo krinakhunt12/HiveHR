@@ -1,30 +1,28 @@
 @layer base {
   :root {
+    --color-primary: #2563EB;
+    --color-primary-light: #3B82F6;
+    --color-background: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-border: #E2E8F0;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #64748B;
+    --color-success: #22C55E;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
     --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 221 83% 53%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 221 83% 53%;
     --radius: 0.5rem;
-
-    /* Minimal Dashboard */
-    --bg-main: 210 40% 98%;
-    --bg-sidebar: 0 0% 100%;
-    --text-body: 215 25% 27%;
   }
 
   .dark {
@@ -64,13 +62,13 @@
 
 /* Minimalist Utilities */
 .card-premium {
-  @apply bg-white border border-slate-200/60 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-shadow duration-200 hover:shadow-sm;
+  @apply bg-surface border border-border rounded-lg shadow-none transition-all duration-200 hover:border-primary/30;
 }
 
 .btn-primary {
-  @apply bg-blue-600 text-white font-medium h-10 px-5 rounded-md hover:bg-blue-700 transition-colors shadow-sm active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2;
+  @apply bg-primary text-white font-medium h-10 px-5 rounded-md hover:bg-primaryLight transition-colors shadow-none active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2;
 }
 
 .input-premium {
-  @apply w-full bg-white border border-slate-200 rounded-md py-2 px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all placeholder:text-slate-400;
+  @apply w-full bg-surface border border-border rounded-md py-2 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all placeholder:text-textSecondary;
 }

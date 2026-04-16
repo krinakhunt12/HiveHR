@@ -8,7 +8,7 @@ const Integrations = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="lg:w-1/2">
-              <span className="text-xs font-black uppercase tracking-widest text-[var(--color-primary)]/70 mb-4 block">Connected Ecosystem</span>
+              <span className="text-sm font-black uppercase tracking-widest text-[var(--color-primary)]/70 mb-4 block">Connected Ecosystem</span>
               <h2 className="text-3xl lg:text-5xl font-semibold text-[var(--color-text-main)] mb-6 tracking-tight">Syncs with your entire stack.</h2>
               <p className="text-base lg:text-lg text-slate-400 font-medium leading-relaxed mb-10">
                 Native integrations with the tools your team already uses. No more manual data entry or fragmented workflows.
@@ -22,7 +22,7 @@ const Integrations = () => {
                 ].map((item) => (
                   <div key={item.name} className="p-4 rounded-xl border border-slate-50 bg-slate-50/30">
                     <p className="text-sm font-semibold text-[var(--color-text-main)] mb-1">{item.name}</p>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{item.desc}</p>
+                    <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">{item.desc}</p>
                   </div>
                 ))}
               </div>

@@ -121,7 +121,7 @@ const AdminDashboard = () => {
                         <CardHeader className="flex flex-row items-center justify-between py-5 border-b border-soft">
                             <CardTitle className="text-base font-semibold text-main">Global Directory</CardTitle>
                             <div className="flex gap-2">
-                                <Button onClick={() => setIsAddModalOpen(true)} className="h-7 px-3 text-xs font-bold uppercase tracking-wider">
+                                <Button onClick={() => setIsAddModalOpen(true)} className="h-7 px-3 text-sm font-bold uppercase tracking-wider">
                                     <Users size={12} className="mr-1.5" /> Invite Global
                                 </Button>
                                 <div className="relative">
@@ -142,9 +142,9 @@ const AdminDashboard = () => {
                                 <table className="w-full text-left">
                                     <thead className="bg-bg/50">
                                         <tr>
-                                            <th className="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">Member</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider">Tenant ID</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-muted uppercase tracking-wider text-right">Status</th>
+                                            <th className="px-6 py-3 text-sm font-semibold text-muted uppercase tracking-wider">Member</th>
+                                            <th className="px-6 py-3 text-sm font-semibold text-muted uppercase tracking-wider">Tenant ID</th>
+                                            <th className="px-6 py-3 text-sm font-semibold text-muted uppercase tracking-wider text-right">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-soft">
@@ -157,16 +157,16 @@ const AdminDashboard = () => {
                                                         </div>
                                                         <div>
                                                             <p className="text-sm font-medium text-main group-hover:text-primary transition-colors tracking-tight leading-none">{emp.full_name}</p>
-                                                            <p className="text-xs text-muted mt-1 font-medium">{emp.designation}</p>
+                                                            <p className="text-sm text-muted mt-1 font-medium">{emp.designation}</p>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <code className="text-xs font-mono text-muted bg-bg px-1.5 py-0.5 rounded border border-soft">{emp.company_id.slice(0, 8)}...</code>
+                                                    <code className="text-sm font-mono text-muted bg-bg px-1.5 py-0.5 rounded border border-soft">{emp.company_id.slice(0, 8)}...</code>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <span className={cn(
-                                                        "px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wide",
+                                                        "px-2 py-0.5 rounded-md text-sm font-semibold uppercase tracking-wide",
                                                         emp.status === 'active' ? 'bg-success-bg text-success border border-success/10' : 'bg-error-bg text-error border border-error/10'
                                                     )}>{emp.status}</span>
                                                 </td>
@@ -188,14 +188,14 @@ const AdminDashboard = () => {
                                     <Activity size={18} className="text-error/70" />
                                     <div>
                                         <p className="text-sm font-medium text-main leading-none mb-1 text-left">Ingress Rate Limit</p>
-                                        <p className="text-xs text-muted font-medium text-left">Spike in API cluster.</p>
+                                        <p className="text-sm text-muted font-medium text-left">Spike in API cluster.</p>
                                     </div>
                                 </div>
                                 <div className="p-4 rounded-xl border border-warning/10 flex gap-4 bg-white hover:bg-bg transition-colors">
                                     <Database size={18} className="text-warning/70" />
                                     <div>
                                         <p className="text-sm font-medium text-main leading-none mb-1 text-left">Primary DB Snapshot</p>
-                                        <p className="text-xs text-muted font-medium text-left">Snapshot delayed.</p>
+                                        <p className="text-sm text-muted font-medium text-left">Snapshot delayed.</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -208,11 +208,11 @@ const AdminDashboard = () => {
                             <CardContent className="p-0 text-left">
                                 <div className="px-6 py-4 border-b border-soft hover:bg-bg transition-colors cursor-pointer">
                                     <p className="text-sm font-medium text-main">Build v2.4.1</p>
-                                    <p className="text-xs text-muted uppercase tracking-widest mt-1">PROD • 2h ago</p>
+                                    <p className="text-sm text-muted uppercase tracking-widest mt-1">PROD • 2h ago</p>
                                 </div>
                                 <div className="px-6 py-4 hover:bg-bg transition-colors cursor-pointer">
                                     <p className="text-sm font-medium text-main">Build v2.4.0</p>
-                                    <p className="text-xs text-muted uppercase tracking-widest mt-1">STAGING • 6h ago</p>
+                                    <p className="text-sm text-muted uppercase tracking-widest mt-1">STAGING • 6h ago</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -231,7 +231,7 @@ const StatBox = ({ title, value, icon }: any) => (
                 {React.cloneElement(icon, { size: 20 })}
             </div>
             <div className="text-left">
-                <p className="text-xs font-medium text-muted mb-1">{title}</p>
+                <p className="text-sm font-medium text-muted mb-1">{title}</p>
                 <p className="text-xl font-semibold text-main tracking-tight leading-none">{value}</p>
             </div>
         </CardContent>

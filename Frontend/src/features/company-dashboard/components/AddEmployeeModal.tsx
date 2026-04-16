@@ -42,76 +42,76 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Onboard New Stakeholder">
             <div className="mb-8">
-                <p className="text-sm font-medium text-slate-400">Expand your digital ecosystem by inviting a new member to the organization.</p>
+                <p className="text-sm font-medium text-textSecondary">Expand your digital ecosystem by inviting a new member to the organization.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Identity Name</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Identity Name</label>
                         <div className="relative group">
-                            <UserPlus className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <UserPlus className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
                                 required
                                 value={formData.full_name}
                                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                                 placeholder="e.g. Samuel Green"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Communication Email</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Communication Email</label>
                         <div className="relative group">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
                                 required
                                 type="email"
                                 value={formData.email}
                                 onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                                 placeholder="samuel@farmgrid.io"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Operational Role</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Operational Role</label>
                         <div className="relative group">
-                            <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
                                 required
                                 value={formData.designation}
                                 onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                                 placeholder="Ecosystem Manager"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Ecosystem ID</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Ecosystem ID</label>
                         <div className="relative group">
-                            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
                                 required
                                 value={formData.employee_code}
                                 onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                                 placeholder="AGRI-2024-XP"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">System Permissions</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">System Permissions</label>
                         <div className="relative group">
-                            <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <select
                                 value={formData.role}
                                 onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all appearance-none"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none"
                             >
                                 <option value="employee">Standard Member</option>
                                 <option value="company_admin">Organization Lead</option>
@@ -120,14 +120,14 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Integration Date</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Integration Date</label>
                         <div className="relative group">
-                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="date"
                                 value={formData.joined_on}
                                 onChange={e => setFormData({ ...formData, joined_on: e.target.value })}
-                                className="input-premium pl-12 bg-slate-50 border-slate-100 hover:border-emerald-200 focus:bg-white transition-all"
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
                             />
                         </div>
                     </div>
@@ -137,14 +137,14 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-sm font-bold uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100"
+                        className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20"
                     >
                         Abort Invite
                     </button>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex-[2] btn-primary relative overflow-hidden group py-4 h-auto shadow-xl shadow-emerald-500/20"
+                        className="flex-[2] btn-primary relative overflow-hidden group py-4 h-auto shadow-none"
                     >
                         {loading ? (
                             <div className="flex items-center gap-2">

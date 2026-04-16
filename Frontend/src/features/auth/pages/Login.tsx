@@ -35,7 +35,7 @@ const Login = () => {
         <CardContent className="pt-8 px-8 pb-10">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-1.5 flex flex-col items-start w-full">
-              <label className="text-xs font-semibold text-muted uppercase tracking-wider ml-0.5">Work Email</label>
+              <label className="text-sm font-semibold text-muted uppercase tracking-wider ml-0.5">Work Email</label>
               <div className="relative group w-full">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
                 <input
@@ -51,8 +51,8 @@ const Login = () => {
 
             <div className="space-y-1.5 flex flex-col items-start w-full">
               <div className="flex justify-between items-center ml-0.5 w-full">
-                <label className="text-xs font-semibold text-muted uppercase tracking-wider">Password</label>
-                <Link to="#" className="text-xs font-semibold text-primary uppercase tracking-wider hover:opacity-70 transition-opacity">Forgot?</Link>
+                <label className="text-sm font-semibold text-muted uppercase tracking-wider">Password</label>
+                <Link to="#" className="text-sm font-semibold text-primary uppercase tracking-wider hover:opacity-70 transition-opacity">Forgot?</Link>
               </div>
               <div className="relative group w-full">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
@@ -68,7 +68,7 @@ const Login = () => {
             </div>
 
             <div className="space-y-1.5 flex flex-col items-start w-full">
-              <label className="text-xs font-semibold text-muted uppercase tracking-wider ml-0.5">Login as</label>
+              <label className="text-sm font-semibold text-muted uppercase tracking-wider ml-0.5">Login as</label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as AppRole)}
@@ -100,7 +100,7 @@ const Login = () => {
         </CardContent>
       </Card>
 
-      <div className="mt-10 text-xs font-medium text-dim uppercase tracking-widest text-center flex items-center gap-3">
+      <div className="mt-10 text-sm font-medium text-dim uppercase tracking-widest text-center flex items-center gap-3">
         <span>© 2026 HIVEHR</span>
         <span className="w-1 h-1 bg-border rounded-full"></span>
         <span>Secure Infrastructure</span>

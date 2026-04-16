@@ -20,7 +20,7 @@ const LeaveSummary = ({ paid, sick }: Props) => {
           <div className="p-2 bg-bg rounded-lg mb-2">
             <Calendar size={16} />
           </div>
-          <p className="text-xs text-muted uppercase tracking-wider">Paid Leave</p>
+          <p className="text-sm text-muted uppercase tracking-wider">Paid Leave</p>
           <p className="text-sm font-semibold text-main">{paid} Days</p>
         </div>
 
@@ -28,7 +28,7 @@ const LeaveSummary = ({ paid, sick }: Props) => {
           <div className="p-2 bg-bg rounded-lg mb-2">
             <LifeBuoy size={16} />
           </div>
-          <p className="text-xs text-muted uppercase tracking-wider">Sick Leave</p>
+          <p className="text-sm text-muted uppercase tracking-wider">Sick Leave</p>
           <p className="text-sm font-semibold text-main">{sick} Days</p>
         </div>
 
@@ -36,7 +36,7 @@ const LeaveSummary = ({ paid, sick }: Props) => {
           <div className="p-2 bg-bg rounded-lg mb-2">
             <Activity size={16} />
           </div>
-          <p className="text-xs text-muted uppercase tracking-wider">Total</p>
+          <p className="text-sm text-muted uppercase tracking-wider">Total</p>
           <p className="text-sm font-semibold text-main">{total} Days</p>
         </div>
       </CardContent>
