@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  Users, 
-  Bell, 
-  ChevronRight,
+import {
+  Bell,
   LogOut,
   Menu,
   X,
@@ -27,8 +25,8 @@ interface DashboardLayoutProps {
   navItems: NavItem[];
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
-  children, 
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({
+  children,
   navItems
 }) => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -41,8 +39,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const userName = user?.full_name || 'User';
   const rawRole = detectRole(user);
   const userRoleDisplay = rawRole === 'company_admin' ? 'Company Admin' : rawRole === 'admin' ? 'System Admin' : 'Staff Member';
-  
-  const userInitials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+  const userInitials = userName.split(' ').map((n: any[]) => n[0]).join('').slice(0, 2).toUpperCase();
 
   const handleNavClick = (item: NavItem) => {
     if (item.onClick) {
@@ -54,28 +52,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   return (
     <div className="min-h-screen bg-[var(--bg-main)] flex font-sans antialiased text-[var(--text-body)]">
       {/* Sidebar */}
-      <aside 
+      <aside
         className={cn(
-          "hidden lg:flex flex-col bg-[var(--bg-sidebar)] transition-all duration-500 fixed h-full z-30 shadow-2xl overflow-hidden border-r border-white/5",
-          isSidebarExpanded ? "w-72" : "w-24"
+          "hidden lg:flex flex-col bg-sidebar transition-all duration-300 fixed h-full z-40 overflow-hidden border-r border-slate-100",
+          isSidebarExpanded ? "w-64" : "w-20"
         )}
       >
-        <div className="h-24 flex items-center px-6 mb-4">
-          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-950/20 group relative overflow-hidden">
-             <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-white opacity-50"></div>
-             <Leaf className="text-emerald-600 w-6 h-6 relative z-10 animate-float" />
+        <div className="h-16 flex items-center px-6 mb-2">
+          <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0 border border-blue-100/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-white opacity-50"></div>
+            <Leaf className="text-blue-600 w-5 h-5 relative z-10 animate-float" />
           </div>
           {isSidebarExpanded && (
-            <div className="ml-4 overflow-hidden">
-                <span className="block font-bold text-xl text-white tracking-tight leading-none font-sans">HiveHr</span>
-                <span className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest mt-1 block">Agri-Enterprise</span>
+            <div className="ml-3 overflow-hidden">
+              <span className="block font-medium text-lg text-slate-900 tracking-tight leading-none font-sans">HiveHr</span>
+              <span className="text-sm font-medium text-slate-400 tracking-wider mt-1 block uppercase">Management Hub</span>
             </div>
           )}
         </div>
 
         <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar">
           {navItems.map((item) => {
-            const isActive = item.onClick 
+            const isActive = item.onClick
               ? (activeInternalTab === item.path || (!activeInternalTab && navItems.indexOf(item) === 0))
               : location.pathname === item.path;
 
@@ -83,25 +81,25 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               <>
                 <div className={cn(
                   "shrink-0 transition-all duration-300",
-                  isActive ? "text-white scale-110" : "text-emerald-100/40 group-hover:text-white"
+                  isActive ? "text-blue-600 scale-105" : "text-slate-400 group-hover:text-slate-600"
                 )}>
-                  {React.cloneElement(item.icon as React.ReactElement, { size: isSidebarExpanded ? 20 : 24 } as any)}
+                  {React.cloneElement(item.icon as React.ReactElement, { size: isSidebarExpanded ? 18 : 22 } as any)}
                 </div>
                 {isSidebarExpanded && (
                   <span className={cn(
-                    "text-sm font-semibold tracking-tight transition-all",
-                    isActive ? "opacity-100" : "opacity-60 group-hover:opacity-100"
+                    "text-sm font-medium tracking-tight transition-all",
+                    isActive ? "text-blue-700" : "text-slate-500 group-hover:text-slate-900"
                   )}>{item.label}</span>
                 )}
-                {isActive && isSidebarExpanded && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />}
+                {isActive && isSidebarExpanded && <div className="ml-auto w-1 h-1 rounded-full bg-blue-500" />}
               </>
             );
 
             const className = cn(
-              "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative cursor-pointer",
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative cursor-pointer mx-1",
               isActive
-                ? "bg-white/10 text-white shadow-sm border border-white/10 backdrop-blur-md" 
-                : "text-emerald-100/60 hover:text-white hover:bg-white/5"
+                ? "bg-blue-50/50 text-blue-700 border border-blue-100/50"
+                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
             );
 
             if (item.onClick) {
@@ -120,74 +118,75 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           })}
         </nav>
 
-        <div className="mt-auto border-t border-white/5 p-4 space-y-2 bg-black/10 backdrop-blur-sm">
-            {isSidebarExpanded ? (
-                <div className="p-3 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-white/10 group cursor-pointer">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white rounded-xl flex items-center justify-center font-bold text-xs border border-white/10 shadow-md">
-                            {userInitials}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-white truncate">{userName}</p>
-                            <p className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-wide mt-0.5">{userRoleDisplay}</p>
-                        </div>
-                        <ChevronDown size={14} className="text-white/40 group-hover:text-white transition-colors" />
-                    </div>
+        <div className="mt-auto border-t border-slate-100 p-4 space-y-2">
+          {isSidebarExpanded ? (
+            <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 transition-all hover:border-slate-200 group cursor-pointer">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 text-white rounded-md flex items-center justify-center font-bold text-sm border border-white/10 shadow-md">
+                  {userInitials}
                 </div>
-            ) : (
-                <div className="flex justify-center py-2">
-                    <div className="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center font-bold text-xs border border-emerald-500/20">
-                        {userInitials}
-                    </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-900 truncate tracking-tight">{userName}</p>
+                  <p className="text-sm font-medium text-slate-400 uppercase tracking-wide mt-0.5">{userRoleDisplay}</p>
                 </div>
+                <ChevronDown size={12} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center py-2">
+              <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center font-bold text-sm border border-blue-100">
+                {userInitials}
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={() => logout()}
+            className={cn(
+              "flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-all duration-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 active:scale-95 group",
+              !isSidebarExpanded && "justify-center"
             )}
-            
-            <button 
-                onClick={() => logout()}
-                className={cn(
-                    "flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl transition-all duration-300 text-rose-400 hover:bg-rose-500/10 active:scale-95 group",
-                    !isSidebarExpanded && "justify-center"
-                )}
-            >
-                <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-                {isSidebarExpanded && <span className="text-[11px] font-bold tracking-widest uppercase">Sign Out</span>}
-            </button>
+          >
+            <LogOut size={16} className="transition-transform" />
+            {isSidebarExpanded && <span className="text-sm font-medium tracking-wide uppercase">Sign Out</span>}
+          </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <main className={cn(
         "flex-1 flex flex-col min-h-screen transition-all duration-500",
-        isSidebarExpanded ? "lg:ml-72" : "lg:ml-24"
+        "flex-1 flex flex-col min-h-screen transition-all duration-300 bg-[#F8FAFC]",
+        isSidebarExpanded ? "lg:ml-64" : "lg:ml-20"
       )}>
         {/* Top Header */}
-        <header className="h-20 bg-white/70 backdrop-blur-xl border-b border-white sticky top-0 z-20 flex items-center justify-between px-8 lg:px-12">
-            <div className="flex items-center gap-6">
-                <button 
-                    onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-                    className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all active:scale-90 border border-transparent hover:border-emerald-100"
-                >
-                    {isSidebarExpanded ? <X size={20} /> : <Menu size={20} />}
-                </button>
-                <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden md:block"></div>
-                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest hidden md:block">Workspace Control</h2>
+        <header className="h-14 bg-white border-b border-slate-100 flex items-center justify-between px-8 sticky top-0 z-20">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+              className="p-1 px-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all active:scale-95"
+            >
+              {isSidebarExpanded ? <X size={16} /> : <Menu size={16} />}
+            </button>
+            <div className="h-4 w-[1px] bg-slate-200 hidden md:block"></div>
+            <h2 className="text-sm font-medium text-slate-400 uppercase tracking-widest hidden md:block">Management Console</h2>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-blue-50 rounded border border-blue-100">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+              <span className="text-sm font-medium text-blue-700 uppercase tracking-wider">Live</span>
             </div>
 
-            <div className="flex items-center gap-4">
-                <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">System Online</span>
-                </div>
-                
-                <button className="relative p-2.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 transition-all rounded-xl border border-transparent hover:border-emerald-100 group">
-                    <Bell size={20} className="group-hover:rotate-12 transition-transform" />
-                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
-                </button>
-            </div>
+            <button className="relative p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all rounded-md group">
+              <Bell size={16} />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-rose-500 rounded-full border border-white"></span>
+            </button>
+          </div>
         </header>
 
         <div className="p-8 lg:p-12 w-full max-w-7xl mx-auto">
-            {children}
+          {children}
         </div>
       </main>
     </div>

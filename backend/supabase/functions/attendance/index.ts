@@ -56,10 +56,11 @@ Deno.serve(async (req) => {
     }
 
     /* =========================================================================
-       POST /attendance -> Mark attendance
+       POST /attendance -> Mark attendance (Punch In)
        ========================================================================= */
     if (method === "POST") {
       const body = await req.json();
+      const today = new Date().toISOString().slice(0, 10);
       
       // If employee, enforce own employee_id and company_id
       if (ctx.role === "employee") {
@@ -68,8 +69,23 @@ Deno.serve(async (req) => {
         body.company_id = ctx.companyId;
       }
 
-      if (!body.employee_id || !body.company_id || !body.date) {
-        return badRequest("Missing employee_id, company_id, or date");
+      body.date = body.date || today;
+      body.status = body.status || "present";
+      body.check_in_at = new Date().toISOString();
+
+      if (!body.employee_id || !body.company_id) {
+        return badRequest("Missing employee_id or company_id");
+      }
+
+      // Check if already checked in for today
+      const { data: existing } = await supabase.from("attendance")
+        .select("id")
+        .eq("employee_id", body.employee_id)
+        .eq("date", body.date)
+        .single();
+
+      if (existing) {
+        return jsonResponse(200, { data: existing, message: "Already checked in" });
       }
 
       const { data, error } = await supabase.from("attendance").insert(body).select().single();
@@ -80,19 +96,31 @@ Deno.serve(async (req) => {
     }
 
     /* =========================================================================
-       PATCH /attendance/:id -> Update record (Admin only)
+       PATCH /attendance/:id -> Update record (Punch Out or Admin Edit)
        ========================================================================= */
     if (method === "PATCH") {
       const segments = path.replace(/^\//, "").split("/");
       const resourceId = segments[0] || null;
       if (!resourceId) return badRequest("Missing attendance id");
 
-      if (ctx.role === "employee") return forbidden();
-
       const body = await req.json();
-      
-      // Verification for company_admin
-      if (ctx.role === "company_admin") {
+
+      // If employee IS punching out, we allow it
+      if (ctx.role === "employee") {
+        // Enforce safety: Employee can only update their own record and only the check_out_at field (usually)
+        const { data: existing } = await supabase.from("attendance").select("employee_id, company_id, check_in_at").eq("id", resourceId).single();
+        if (!existing || existing.employee_id !== ctx.employeeId) return forbidden();
+        
+        // Auto-set check_out_at if not provided in body (standard punch out)
+        if (!body.check_out_at) body.check_out_at = new Date().toISOString();
+        
+        // Calculate work minutes if possible
+        if (existing.check_in_at) {
+          const start = new Date(existing.check_in_at).getTime();
+          const end = new Date(body.check_out_at).getTime();
+          body.work_minutes = Math.round((end - start) / (1000 * 60));
+        }
+      } else if (ctx.role === "company_admin") {
          const { data: existing } = await supabase.from("attendance").select("company_id").eq("id", resourceId).single();
          if (!existing || existing.company_id !== ctx.companyId) return forbidden();
       }
@@ -106,6 +134,7 @@ Deno.serve(async (req) => {
 
     return jsonResponse(404, { error: "Resource not found" });
   } catch (err: any) {
+    console.error("[attendance] Error:", err);
     return badRequest(err.message);
   }
 });

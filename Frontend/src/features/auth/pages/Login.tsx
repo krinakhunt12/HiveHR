@@ -29,59 +29,59 @@ const Login = () => {
 
       <Card className="w-full max-w-[400px] border-soft shadow-sm rounded-xl overflow-hidden bg-surface">
         <CardHeader className="text-center pt-10 pb-2 space-y-2">
-            <CardTitle className="text-2xl font-semibold text-main tracking-tight">Welcome back</CardTitle>
-            <p className="text-sm font-medium text-muted">Enter your credentials to access your portal</p>
+          <CardTitle className="text-2xl font-semibold text-main tracking-tight">Welcome back</CardTitle>
+          <p className="text-sm font-medium text-muted">Enter your credentials to access your portal</p>
         </CardHeader>
         <CardContent className="pt-8 px-8 pb-10">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-1.5 flex flex-col items-start w-full">
-                <label className="text-[11px] font-semibold text-muted uppercase tracking-wider ml-0.5">Work Email</label>
-                <div className="relative group w-full">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
-                    <input 
-                        type="email" 
-                        required 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" 
-                        placeholder="name@company.com"
-                    />
-                </div>
+              <label className="text-xs font-semibold text-muted uppercase tracking-wider ml-0.5">Work Email</label>
+              <div className="relative group w-full">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim"
+                  placeholder="name@company.com"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5 flex flex-col items-start w-full">
-                <div className="flex justify-between items-center ml-0.5 w-full">
-                    <label className="text-[11px] font-semibold text-muted uppercase tracking-wider">Password</label>
-                    <Link to="#" className="text-[10px] font-semibold text-primary uppercase tracking-wider hover:opacity-70 transition-opacity">Forgot?</Link>
-                </div>
-                <div className="relative group w-full">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
-                    <input 
-                        type="password" 
-                        required 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" 
-                        placeholder="••••••••••••"
-                    />
-                </div>
+              <div className="flex justify-between items-center ml-0.5 w-full">
+                <label className="text-xs font-semibold text-muted uppercase tracking-wider">Password</label>
+                <Link to="#" className="text-xs font-semibold text-primary uppercase tracking-wider hover:opacity-70 transition-opacity">Forgot?</Link>
+              </div>
+              <div className="relative group w-full">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim"
+                  placeholder="••••••••••••"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5 flex flex-col items-start w-full">
-                <label className="text-[11px] font-semibold text-muted uppercase tracking-wider ml-0.5">Login as</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as AppRole)}
-                  className="w-full px-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main"
-                >
-                  <option value="admin">{roleLabels.admin}</option>
-                  <option value="company_admin">{roleLabels.company_admin}</option>
-                  <option value="employee">{roleLabels.employee}</option>
-                </select>
+              <label className="text-xs font-semibold text-muted uppercase tracking-wider ml-0.5">Login as</label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as AppRole)}
+                className="w-full px-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main"
+              >
+                <option value="admin">{roleLabels.admin}</option>
+                <option value="company_admin">{roleLabels.company_admin}</option>
+                <option value="employee">{roleLabels.employee}</option>
+              </select>
             </div>
 
             {login.error && (
-              <div className="px-3 py-2 rounded-lg bg-error-bg border border-error/10 text-error text-xs font-medium flex items-center gap-2">
+              <div className="px-3 py-2 rounded-lg bg-error-bg border border-error/10 text-error text-sm font-medium flex items-center gap-2">
                 <AlertCircle size={14} />
                 {String((login.error as any)?.message ?? 'Login failed')}
               </div>
@@ -94,13 +94,13 @@ const Login = () => {
 
           <div className="mt-8 text-center pt-6 border-t border-soft">
             <p className="text-sm font-medium text-muted">
-                New to the platform? <Link to="/signup" className="text-primary font-semibold hover:text-primary-hover transition-colors">Apply for access</Link>
+              New to the platform? <Link to="/signup" className="text-primary font-semibold hover:text-primary-hover transition-colors">Apply for access</Link>
             </p>
           </div>
         </CardContent>
       </Card>
-      
-      <div className="mt-10 text-[10px] font-medium text-dim uppercase tracking-widest text-center flex items-center gap-3">
+
+      <div className="mt-10 text-xs font-medium text-dim uppercase tracking-widest text-center flex items-center gap-3">
         <span>© 2026 HIVEHR</span>
         <span className="w-1 h-1 bg-border rounded-full"></span>
         <span>Secure Infrastructure</span>

@@ -1,21 +1,21 @@
 import React, { useMemo, useState } from 'react';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
-import { 
-  Users, 
-  UserPlus, 
-  Search,
-  Briefcase,
-  Clock,
-  Calendar,
-  FileText,
-  LayoutDashboard,
-  Filter,
-  AlertCircle,
-  Trash2,
-  Edit3,
-  ArrowLeft,
-  Wind,
-  Target
+import {
+    Users,
+    UserPlus,
+    Search,
+    Briefcase,
+    Clock,
+    Calendar,
+    FileText,
+    LayoutDashboard,
+    Filter,
+    AlertCircle,
+    Trash2,
+    Edit3,
+    ArrowLeft,
+    Wind,
+    Target
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
@@ -96,7 +96,7 @@ const CompanyDashboard = () => {
                     <p className="text-sm font-medium text-slate-400 mt-1">Real-time vitals for your agricultural organization.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="px-6 py-3 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all border border-slate-200 hover:border-emerald-200">Generate Report</button>
+                    <button className="px-6 py-3 text-sm font-bold uppercase tracking-widest text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all border border-slate-200 hover:border-emerald-200">Generate Report</button>
                     <button onClick={() => setIsAddModalOpen(true)} className="btn-primary">
                         <UserPlus size={18} />
                         Add Stakeholder
@@ -115,7 +115,7 @@ const CompanyDashboard = () => {
                 <div className="lg:col-span-2 card-premium p-8 border-none shadow-premium bg-white text-left">
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="text-lg font-bold font-sans">Member Distribution</h3>
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
                             <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Active
                             <span className="w-2 h-2 rounded-full bg-slate-200 ml-4"></span> Inactive
                         </div>
@@ -123,7 +123,7 @@ const CompanyDashboard = () => {
                     <div className="h-64 flex items-end gap-4 px-4 overflow-hidden">
                         {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
                             <div key={i} className="flex-1 bg-slate-50 rounded-t-2xl relative group transition-all duration-500 hover:bg-emerald-50">
-                                <div 
+                                <div
                                     className="absolute bottom-0 left-0 right-0 bg-emerald-500 rounded-t-2xl transition-all duration-1000 group-hover:bg-emerald-600"
                                     style={{ height: `${h}%` }}
                                 ></div>
@@ -137,8 +137,8 @@ const CompanyDashboard = () => {
                     <div className="space-y-4">
                         {policies.slice(0, 3).map(p => (
                             <div key={p.id} className="p-4 rounded-2xl border border-slate-50 bg-slate-50/50 hover:bg-emerald-50/30 transition-all group cursor-pointer">
-                                <p className="text-xs font-bold text-slate-700 group-hover:text-emerald-800">{p.title}</p>
-                                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-2">{p.policy_type}</p>
+                                <p className="text-sm font-bold text-slate-700 group-hover:text-emerald-800">{p.title}</p>
+                                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mt-2">{p.policy_type}</p>
                             </div>
                         ))}
                     </div>
@@ -156,9 +156,9 @@ const CompanyDashboard = () => {
                 </div>
                 <div className="flex items-center gap-4 bg-white px-6 py-2 rounded-2xl border border-slate-100 shadow-sm w-full md:w-96 focus-within:ring-4 focus-within:ring-emerald-500/5 transition-all">
                     <Search size={18} className="text-slate-300" />
-                    <input 
-                        type="text" 
-                        placeholder="Filter by name or identity..." 
+                    <input
+                        type="text"
+                        placeholder="Filter by name or identity..."
                         className="bg-transparent border-none outline-none text-sm font-medium w-full py-2 placeholder:text-slate-300"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -171,11 +171,11 @@ const CompanyDashboard = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50/50">
                             <tr>
-                                <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Stakeholder</th>
-                                <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Identity Node</th>
-                                <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Join Cycle</th>
-                                <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                                <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Stakeholder</th>
+                                <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Identity Node</th>
+                                <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Join Cycle</th>
+                                <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                <th className="px-8 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -183,23 +183,23 @@ const CompanyDashboard = () => {
                                 <tr key={emp.id} className="group hover:bg-emerald-50/30 transition-all">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center font-bold text-slate-400 text-xs border border-slate-100 group-hover:bg-white group-hover:scale-110 transition-all">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center font-bold text-slate-400 text-sm border border-slate-100 group-hover:bg-white group-hover:scale-110 transition-all">
                                                 {emp.full_name.charAt(0)}
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-slate-700">{emp.full_name}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase">{emp.employee_code}</p>
+                                                <p className="text-xs text-slate-400 font-bold uppercase">{emp.employee_code}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
                                         <p className="text-sm font-bold text-slate-700">{emp.designation}</p>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">{emp.employment_type}</p>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mt-1">{emp.employment_type}</p>
                                     </td>
                                     <td className="px-8 py-5 text-sm font-medium text-slate-500">{emp.joined_on}</td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border",
+                                            "px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border",
                                             emp.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'
                                         )}>
                                             {emp.status}
@@ -207,13 +207,13 @@ const CompanyDashboard = () => {
                                     </td>
                                     <td className="px-8 py-5 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                            <button 
+                                            <button
                                                 onClick={() => setEditingEmployee(emp)}
                                                 className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
                                             >
                                                 <Edit3 size={18} />
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => handleDeleteEmployee(emp.id, emp.full_name)}
                                                 className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                                             >
@@ -237,15 +237,15 @@ const CompanyDashboard = () => {
                 {policies.map(p => (
                     <Card key={p.id} className="card-premium group border-none shadow-premium bg-white">
                         <CardHeader className="pb-2">
-                           <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
                                 <FileText size={20} />
-                           </div>
-                           <CardTitle className="text-lg font-bold">{p.title}</CardTitle>
-                           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{p.policy_type}</p>
+                            </div>
+                            <CardTitle className="text-lg font-bold">{p.title}</CardTitle>
+                            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">{p.policy_type}</p>
                         </CardHeader>
                         <CardContent className="pt-4">
                             <p className="text-sm text-slate-500 leading-relaxed line-clamp-3">{p.content}</p>
-                            <button className="mt-6 text-xs font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-2">
+                            <button className="mt-6 text-sm font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-2">
                                 Review Protocol <ArrowLeft size={14} className="rotate-180" />
                             </button>
                         </CardContent>
@@ -257,13 +257,13 @@ const CompanyDashboard = () => {
 
     const renderPlaceholder = (title: string) => (
         <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 animate-in zoom-in-95 duration-500">
-             <div className="w-24 h-24 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-500 shadow-inner">
+            <div className="w-24 h-24 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-500 shadow-inner">
                 <LayoutDashboard size={40} />
-             </div>
-             <div className="space-y-3">
+            </div>
+            <div className="space-y-3">
                 <h2 className="text-2xl font-bold text-[var(--text-main)] font-sans">{title} Hub</h2>
                 <p className="text-sm font-medium text-slate-400 max-w-sm mx-auto leading-relaxed">We are currently synchronizing this module with the central organization grid. Full operational status expected shortly.</p>
-             </div>
+            </div>
         </div>
     );
 
@@ -296,10 +296,10 @@ const CompanyDashboard = () => {
                 {currentView === 'time' && renderPlaceholder('Time & Attendance')}
             </main>
             <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-            <EditEmployeeModal 
-                isOpen={!!editingEmployee} 
-                onClose={() => setEditingEmployee(null)} 
-                employee={editingEmployee} 
+            <EditEmployeeModal
+                isOpen={!!editingEmployee}
+                onClose={() => setEditingEmployee(null)}
+                employee={editingEmployee}
             />
         </DashboardLayout>
     );
@@ -323,7 +323,7 @@ const ManagerStat = ({ title, value, icon, theme }: any) => {
                     {React.cloneElement(icon, { size: 20 })}
                 </div>
                 <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{title}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{title}</p>
                     <p className="text-2xl font-bold text-[var(--text-main)] tracking-tight">{value}</p>
                 </div>
             </div>

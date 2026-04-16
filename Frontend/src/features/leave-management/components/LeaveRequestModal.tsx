@@ -44,7 +44,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Maintenance Type</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Maintenance Type</label>
                         <select
                             required
                             value={formData.leave_type}
@@ -59,7 +59,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Commencement Date</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Commencement Date</label>
                             <div className="relative group">
                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
@@ -72,7 +72,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Conclusion Date</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Conclusion Date</label>
                             <div className="relative group">
                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
@@ -87,7 +87,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Reason for Absence</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Reason for Absence</label>
                         <div className="relative group">
                             <MessageSquare className="absolute left-4 top-4 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                             <textarea
@@ -102,16 +102,16 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                 </div>
 
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100 flex items-center justify-center gap-2"
+                        className="flex-1 py-4 px-6 text-sm font-bold uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100 flex items-center justify-center gap-2"
                     >
                         <X size={14} />
                         Cancel
                     </button>
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         disabled={loading}
                         className="flex-[2] btn-primary py-4 h-auto shadow-xl shadow-emerald-500/20 group"
                     >

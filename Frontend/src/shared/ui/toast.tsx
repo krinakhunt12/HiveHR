@@ -35,17 +35,17 @@ export const ToasterProvider: React.FC<{ children?: React.ReactNode }> = ({ chil
       {children}
       <div className="fixed bottom-8 right-8 flex flex-col gap-4 z-[100]">
         {toasts.map((t) => (
-          <div 
-            key={t.id} 
+          <div
+            key={t.id}
             className={cn(
               "max-w-md w-full p-6 rounded-[1.5rem] shadow-2xl border backdrop-blur-xl animate-in slide-in-from-right-10 fade-in duration-500 flex flex-col gap-1",
-              t.type === 'error' ? 'bg-destructive/10 border-destructive/20 text-destructive' : 
-              t.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800' : 
-              'bg-background/80 border-border text-foreground shadow-premium'
+              t.type === 'error' ? 'bg-destructive/10 border-destructive/20 text-destructive' :
+                t.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800' :
+                  'bg-background/80 border-border text-foreground shadow-premium'
             )}
           >
             <div className="font-bold text-sm tracking-tight">{t.title}</div>
-            {t.description && <div className="text-xs font-medium opacity-80 leading-relaxed">{t.description}</div>}
+            {t.description && <div className="text-sm font-medium opacity-80 leading-relaxed">{t.description}</div>}
           </div>
         ))}
       </div>

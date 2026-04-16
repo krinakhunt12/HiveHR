@@ -17,11 +17,11 @@ export const FeatureCard = ({ icon, title, description }: any) => (
 
 export const Testimonial = ({ quote, author, role }: any) => (
   <div className="relative">
-      <p className="text-lg font-medium italic text-slate-500 leading-relaxed mb-6">"{quote}"</p>
-      <div>
-          <p className="text-sm font-semibold text-[var(--color-text-main)]">{author}</p>
-          <p className="text-xs text-slate-400 font-medium">{role}</p>
-      </div>
+    <p className="text-lg font-medium italic text-slate-500 leading-relaxed mb-6">"{quote}"</p>
+    <div>
+      <p className="text-sm font-semibold text-[var(--color-text-main)]">{author}</p>
+      <p className="text-sm text-slate-400 font-medium">{role}</p>
+    </div>
   </div>
 );
 
@@ -31,7 +31,7 @@ export const PricingCard = ({ name, price, desc, features, featured = false }: a
     featured ? "border-indigo-600 scale-105 z-10 shadow-xl shadow-indigo-100/50" : "border-slate-100 hover:border-slate-200"
   )}>
     {featured && (
-      <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-bl-lg">Most Popular</div>
+      <div className="absolute top-0 right-0 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest px-4 py-1 rounded-bl-lg">Most Popular</div>
     )}
     <CardContent className="p-8">
       <h3 className="text-lg font-semibold text-[var(--color-text-main)] mb-2 tracking-tight">{name}</h3>
@@ -42,7 +42,7 @@ export const PricingCard = ({ name, price, desc, features, featured = false }: a
       <p className="text-sm text-slate-500 font-medium mb-8 leading-relaxed">{desc}</p>
       <ul className="space-y-4 mb-10">
         {features.map((f: string) => (
-          <li key={f} className="flex items-center gap-3 text-xs font-medium text-slate-600">
+          <li key={f} className="flex items-center gap-3 text-sm font-medium text-slate-600">
             <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
             <span>{f}</span>
           </li>

@@ -28,7 +28,7 @@ const ResetPasswordPage = () => {
         try {
             await authApi.updatePassword(password);
             toast({ title: 'Updated', description: 'Your password has been changed successfully.', type: 'success' });
-            
+
             // Clear the force_password_reset flag in the local session
             if (session) {
                 setSession({
@@ -42,7 +42,7 @@ const ResetPasswordPage = () => {
             if (role === 'admin') navigate('/dashboard/admin');
             else if (role === 'company_admin') navigate('/dashboard/company');
             else navigate('/dashboard/employee');
-            
+
         } catch (err: any) {
             toast({ title: 'Error', description: err.message || 'Failed to update password', type: 'error' });
         } finally {
@@ -64,7 +64,7 @@ const ResetPasswordPage = () => {
                     <form onSubmit={handleReset} className="space-y-6">
                         <div className="space-y-4">
                             <div className="relative">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-dim mb-1.5 block">New Password</label>
+                                <label className="text-xs font-bold uppercase tracking-widest text-dim mb-1.5 block">New Password</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
                                     <input
@@ -79,7 +79,7 @@ const ResetPasswordPage = () => {
                             </div>
 
                             <div className="relative">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-dim mb-1.5 block">Confirm Password</label>
+                                <label className="text-xs font-bold uppercase tracking-widest text-dim mb-1.5 block">Confirm Password</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
                                     <input
@@ -94,8 +94,8 @@ const ResetPasswordPage = () => {
                             </div>
                         </div>
 
-                        <Button 
-                            type="submit" 
+                        <Button
+                            type="submit"
                             className="w-full h-12 rounded-2xl text-sm font-bold shadow-lg shadow-indigo-500/20 group"
                             loading={loading}
                         >

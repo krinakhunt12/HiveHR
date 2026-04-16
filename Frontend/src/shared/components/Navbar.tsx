@@ -16,7 +16,7 @@ export const Navbar = () => {
             </div>
             <span className="text-xl font-bold text-[var(--text-main)] tracking-tight font-sans">HiveHr</span>
           </Link>
-          
+
           <div className="hidden md:flex items-center gap-10">
             {[
               { name: 'Ecosystem', path: '/#features' },
@@ -24,10 +24,10 @@ export const Navbar = () => {
               { name: 'Pricing', path: '/pricing' },
               { name: 'Cultivate', path: '/contact' }
             ].map((item) => (
-              <Link 
-                key={item.name} 
-                to={item.path} 
-                className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-[var(--primary)] transition-colors"
+              <Link
+                key={item.name}
+                to={item.path}
+                className="text-sm font-bold uppercase tracking-widest text-slate-500 hover:text-[var(--primary)] transition-colors"
               >
                 {item.name}
               </Link>
@@ -35,10 +35,10 @@ export const Navbar = () => {
             <div className="h-4 w-[1px] bg-slate-200"></div>
             <div className="flex items-center gap-4">
               <Link to="/login">
-                <Button variant="ghost" size="sm" className="font-bold text-[11px] uppercase tracking-widest text-slate-500 hover:text-emerald-600">Login</Button>
+                <Button variant="ghost" size="sm" className="font-bold text-xs uppercase tracking-widest text-slate-500 hover:text-emerald-600">Login</Button>
               </Link>
               <Link to="/signup">
-                <Button size="sm" className="font-bold text-[11px] uppercase tracking-widest px-6 py-5 rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95">Get Started</Button>
+                <Button size="sm" className="font-bold text-xs uppercase tracking-widest px-6 py-5 rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-95">Get Started</Button>
               </Link>
             </div>
           </div>
@@ -60,10 +60,10 @@ export const Navbar = () => {
             { name: 'Pricing', path: '/pricing' },
             { name: 'Cultivate', path: '/contact' }
           ].map((item) => (
-            <Link 
-              key={item.name} 
-              to={item.path} 
-              onClick={() => setIsMenuOpen(false)} 
+            <Link
+              key={item.name}
+              to={item.path}
+              onClick={() => setIsMenuOpen(false)}
               className="block text-sm font-bold text-slate-500 uppercase tracking-widest hover:text-emerald-600 px-2 py-1"
             >
               {item.name}
@@ -71,10 +71,10 @@ export const Navbar = () => {
           ))}
           <div className="pt-4 flex flex-col gap-3">
             <Link to="/login" className="w-full">
-              <Button variant="outline" className="w-full text-[11px] font-bold uppercase tracking-widest h-12 rounded-2xl border-slate-200">Login</Button>
+              <Button variant="outline" className="w-full text-xs font-bold uppercase tracking-widest h-12 rounded-2xl border-slate-200">Login</Button>
             </Link>
             <Link to="/signup" className="w-full">
-              <Button className="w-full text-[11px] font-bold uppercase tracking-widest h-12 rounded-2xl bg-emerald-600">Get Started</Button>
+              <Button className="w-full text-xs font-bold uppercase tracking-widest h-12 rounded-2xl bg-emerald-600">Get Started</Button>
             </Link>
           </div>
         </div>

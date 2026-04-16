@@ -8,7 +8,7 @@ const ErrorPage: React.FC<{ error?: Error | null }> = ({ error = null }) => {
         <h1 className="text-2xl font-semibold mb-2">Something went wrong</h1>
         <p className="text-sm text-slate-500 mb-4">An unexpected error occurred. Try refreshing the page or contact support if the problem persists.</p>
         {error && (
-          <pre className="text-xs text-rose-600 bg-rose-50 p-3 rounded mb-4 overflow-auto">{String(error.message)}</pre>
+          <pre className="text-sm text-rose-600 bg-rose-50 p-3 rounded mb-4 overflow-auto">{String(error.message)}</pre>
         )}
         <div className="flex gap-3 justify-center">
           <button

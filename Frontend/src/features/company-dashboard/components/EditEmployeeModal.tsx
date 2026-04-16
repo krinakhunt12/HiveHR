@@ -57,7 +57,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Identity Name</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Identity Name</label>
                         <div className="relative group">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                             <input
@@ -72,7 +72,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Operational Role</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Operational Role</label>
                             <div className="relative group">
                                 <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
@@ -85,7 +85,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Ecosystem ID</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Ecosystem ID</label>
                             <div className="relative group">
                                 <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
@@ -100,7 +100,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Biological/System Status</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 ml-1">Biological/System Status</label>
                         <div className="relative group">
                             <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                             <select
@@ -118,16 +118,16 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                 </div>
 
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100 flex items-center justify-center gap-2"
+                        className="flex-1 py-4 px-6 text-sm font-bold uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100 flex items-center justify-center gap-2"
                     >
                         <X size={14} />
                         Discard
                     </button>
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         disabled={loading}
                         className="flex-[2] btn-primary py-4 h-auto shadow-xl shadow-emerald-500/20"
                     >

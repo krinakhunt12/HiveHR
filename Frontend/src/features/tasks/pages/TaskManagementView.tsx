@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  CheckSquare, 
-  Clock, 
-  AlertCircle, 
-  Plus, 
-  MoreVertical,
-  ChevronRight,
-  Target,
-  Search,
-  Filter
+import {
+    CheckSquare,
+    Clock,
+    AlertCircle,
+    Plus,
+    MoreVertical,
+    ChevronRight,
+    Target,
+    Search,
+    Filter
 } from 'lucide-react';
 import { useListTasks, useTaskMutations, type TaskDirective } from '@/shared/api/hooks/hrHooks';
 import { useAuthStore } from '@/shared/auth/store';
@@ -26,8 +26,8 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
     const { session } = useAuthStore();
     const { toast } = useToast();
     const [filterStatus, setFilterStatus] = useState<string>('all');
-    
-    const params = isAdmin ? {} : { };
+
+    const params = isAdmin ? {} : {};
     const { data: tasksResponse, isLoading, refetch } = useListTasks(params, isAdmin);
     const { update } = useTaskMutations(isAdmin);
 
@@ -36,10 +36,10 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
     const handleStatusUpdate = async (id: string, newStatus: string) => {
         try {
             await update.mutateAsync({ id, payload: { status: newStatus as any } });
-            toast({ 
-                title: 'Directive Updated', 
+            toast({
+                title: 'Directive Updated',
                 description: 'The strategic directive has been synchronized with the central grid.',
-                type: 'success' 
+                type: 'success'
             });
         } catch (err: any) {
             toast({ title: 'Sync Failed', description: err.message || 'Failed to update directive', type: 'error' });
@@ -74,7 +74,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                     </p>
                 </div>
                 {isAdmin && (
-                    <Button 
+                    <Button
                         className="btn-primary"
                     >
                         <Plus size={18} />
@@ -87,16 +87,16 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                 {/* Lateral Control Panel */}
                 <div className="lg:col-span-1 space-y-6">
                     <Card className="card-premium p-6 border-none shadow-premium bg-white">
-                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 px-1">Control Filter</h4>
+                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 px-1">Control Filter</h4>
                         <div className="space-y-2">
                             {['all', 'pending', 'in_progress', 'completed', 'blocked'].map((status) => (
                                 <button
                                     key={status}
                                     onClick={() => setFilterStatus(status)}
                                     className={cn(
-                                        "w-full text-left px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all",
-                                        filterStatus === status 
-                                            ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-900/5 ring-1 ring-emerald-100" 
+                                        "w-full text-left px-4 py-3 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all",
+                                        filterStatus === status
+                                            ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-900/5 ring-1 ring-emerald-100"
                                             : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
                                     )}
                                 >
@@ -105,14 +105,14 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                             ))}
                         </div>
                     </Card>
-                    
+
                     <div className="card-premium p-6 bg-gradient-to-br from-emerald-800 to-emerald-950 text-white border-none shadow-xl shadow-emerald-900/20 overflow-hidden relative group">
                         <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <Target size={120} />
                         </div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-2 relative z-10">Efficiency Metric</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-2 relative z-10">Efficiency Metric</p>
                         <p className="text-2xl font-bold relative z-10">84.2%</p>
-                        <p className="text-[10px] font-medium text-emerald-300/60 mt-4 relative z-10">Operational output is within 5% of peak seasonal parameters.</p>
+                        <p className="text-xs font-medium text-emerald-300/60 mt-4 relative z-10">Operational output is within 5% of peak seasonal parameters.</p>
                     </div>
                 </div>
 
@@ -121,9 +121,9 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                     <div className="flex items-center gap-4 bg-slate-50/50 p-2 rounded-2xl border border-slate-100">
                         <div className="flex-1 flex items-center gap-3 px-4">
                             <Search size={18} className="text-slate-300" />
-                            <input 
-                                type="text" 
-                                placeholder="Search Directives..." 
+                            <input
+                                type="text"
+                                placeholder="Search Directives..."
                                 className="bg-transparent border-none outline-none text-sm font-medium w-full placeholder:text-slate-300"
                             />
                         </div>
@@ -151,7 +151,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                         <div className={cn("w-1.5 h-10 rounded-full", getPriorityColor(task.priority))} />
                                         <div className="flex gap-2">
                                             <span className={cn(
-                                                "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                                                "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest",
                                                 getStatusInfo(task.status).color
                                             )}>
                                                 {getStatusInfo(task.status).label}
@@ -161,30 +161,30 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                     <h3 className="text-lg font-bold text-slate-700 mb-2 truncate group-hover:text-emerald-700 transition-colors">{task.title}</h3>
-                                    <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed mb-6">
+                                    <p className="text-sm text-slate-400 font-medium line-clamp-2 leading-relaxed mb-6">
                                         {task.description}
                                     </p>
-                                    
+
                                     <div className="flex items-center justify-between pt-6 border-t border-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                                            <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-bold text-slate-400">
                                                 {task.employees?.full_name?.charAt(0) || 'G'}
                                             </div>
-                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight truncate max-w-[100px]">
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-tight truncate max-w-[100px]">
                                                 {task.employees?.full_name || 'Global'}
                                             </p>
                                         </div>
-                                        
+
                                         <div className="flex items-center gap-4">
                                             <div className="flex items-center gap-1.5 text-slate-300">
                                                 <Clock size={12} />
-                                                <span className="text-[10px] font-bold uppercase">{task.due_date || 'Ongoing'}</span>
+                                                <span className="text-xs font-bold uppercase">{task.due_date || 'Ongoing'}</span>
                                             </div>
-                                            
+
                                             {!isAdmin && task.status !== 'completed' && (
-                                                <button 
+                                                <button
                                                     onClick={() => handleStatusUpdate(task.id, 'completed')}
                                                     className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
                                                     title="Complete Directive"

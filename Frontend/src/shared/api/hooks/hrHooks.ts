@@ -114,7 +114,7 @@ export const useAttendanceMutations = () => {
   })
 
   const checkOut = useMutation({
-    mutationFn: () => employeeApi.checkOut(),
+    mutationFn: (id: string) => employeeApi.checkOut(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['attendance'] })
   })
 

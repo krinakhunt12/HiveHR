@@ -1,76 +1,60 @@
 import { invokeApi, type Employee, type CompanyPolicy, type LeaveRequest, type TaskDirective } from "./baseApi";
 
 export const companyAdminApi = {
-  // --- Employees ---
-  listEmployees: async (params: { search?: string; status?: string; page?: number; limit?: number } = {}) => {
-    const query = new URLSearchParams(params as any).toString();
-    const data = await invokeApi(`company/employees?${query}`, { method: 'GET' });
-    return data as { data: Employee[]; pagination: any };
+  // --- Dashboard / Info ---
+  getCompanyInfo: async () => {
+     const data = await invokeApi('company/info', { method: 'GET' });
+     return data;
   },
 
-  getEmployee: async (id: string) => {
-    const data = await invokeApi(`company/employees/${id}`, { method: 'GET' });
-    return data as Employee;
+  updateCompanyInfo: async (payload: any) => {
+     const data = await invokeApi('company/info', { method: 'PATCH', body: payload });
+     return data;
+  },
+
+  // --- Employees ---
+  listEmployees: async (params: { search?: string; status?: string } = {}) => {
+    const query = new URLSearchParams(params as any).toString();
+    const data = await invokeApi(`employee?${query}`, { method: 'GET' });
+    return data as { data: Employee[] };
   },
 
   createEmployee: async (payload: any) => {
-    const data = await invokeApi('company/employees', { method: 'POST', body: payload });
+    const data = await invokeApi('employee', { method: 'POST', body: payload });
     return data;
   },
 
   updateEmployee: async (id: string, payload: any) => {
-    const data = await invokeApi(`company/employees/${id}`, { method: 'PATCH', body: payload });
+    const data = await invokeApi(`employee/${id}`, { method: 'PATCH', body: payload });
     return data;
   },
 
   deleteEmployee: async (id: string) => {
-    const data = await invokeApi(`company/employees/${id}`, { method: 'DELETE' });
+    const data = await invokeApi(`employee/${id}`, { method: 'DELETE' });
     return data;
   },
 
   // --- Policies ---
-  listPolicies: async (params: { type?: string; include_inactive?: boolean } = {}) => {
+  listPolicies: async (params: { type?: string } = {}) => {
     const query = new URLSearchParams(params as any).toString();
-    const data = await invokeApi(`company/policies?${query}`, { method: 'GET' });
-    return data as { data: CompanyPolicy[]; pagination: any };
+    const data = await invokeApi(`policies?${query}`, { method: 'GET' });
+    return data as { data: CompanyPolicy[] };
   },
 
   createPolicy: async (payload: any) => {
-    const data = await invokeApi('company/policies', { method: 'POST', body: payload });
+    const data = await invokeApi('policies', { method: 'POST', body: payload });
     return data;
   },
 
   // --- Leave ---
-  listLeaves: async (params: { status?: string; employee_id?: string; from?: string; to?: string } = {}) => {
+  listLeaves: async (params: { status?: string; employee_id?: string } = {}) => {
     const query = new URLSearchParams(params as any).toString();
-    const data = await invokeApi(`company/leaves?${query}`, { method: 'GET' });
-    return data as { data: LeaveRequest[]; pagination: any };
+    const data = await invokeApi(`leave?${query}`, { method: 'GET' });
+    return data as { data: LeaveRequest[] };
   },
 
-  reviewLeave: async (id: string, payload: { status: string; admin_comment?: string }) => {
-    const data = await invokeApi(`company/leaves/${id}`, { method: 'PATCH', body: payload });
+  reviewLeave: async (id: string, payload: { status: string }) => {
+    const data = await invokeApi(`leave/${id}`, { method: 'PATCH', body: payload });
     return data;
   },
-
-  // --- Tasks (Directives) ---
-  listTasks: async (params: { employee_id?: string; status?: string; priority?: string } = {}) => {
-    const query = new URLSearchParams(params as any).toString();
-    const data = await invokeApi(`company/tasks?${query}`, { method: 'GET' });
-    return data as { data: TaskDirective[]; pagination: any };
-  },
-
-  createTask: async (payload: Partial<TaskDirective>) => {
-    const data = await invokeApi('company/tasks', { method: 'POST', body: payload });
-    return data;
-  },
-
-  updateTask: async (id: string, payload: Partial<TaskDirective>) => {
-    const data = await invokeApi(`company/tasks/${id}`, { method: 'PATCH', body: payload });
-    return data;
-  },
-
-  deleteTask: async (id: string) => {
-    const data = await invokeApi(`company/tasks/${id}`, { method: 'DELETE' });
-    return data;
-  }
 };
