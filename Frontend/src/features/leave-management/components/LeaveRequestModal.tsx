@@ -105,7 +105,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-xs font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20 flex items-center justify-center gap-2"
+                        className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20 flex items-center justify-center gap-2"
                     >
                         <X size={14} />
                         Cancel
