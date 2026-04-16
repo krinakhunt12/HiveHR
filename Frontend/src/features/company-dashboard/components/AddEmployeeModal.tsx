@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useEmployeeMutations } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
-import { UserPlus, Mail, Briefcase, Hash, Shield, Calendar, ArrowRight } from 'lucide-react';
+import { UserPlus, Mail, Briefcase, Hash, Shield, Calendar, ArrowRight, Save } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
 
 interface AddEmployeeModalProps {
     isOpen: boolean;
@@ -135,30 +136,22 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                 </div>
 
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20"
+                        className="flex-1"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        disabled={loading}
-                        className="flex-[2] btn-primary relative overflow-hidden group py-4 h-auto shadow-none"
+                        loading={loading}
+                        className="flex-[2] py-4 h-auto"
                     >
-                        {loading ? (
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>Saving...</span>
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-2">
-                                <span>Add Employee</span>
-                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        )}
-                    </button>
+                        <span>Add Employee</span>
+                        {!loading && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
+                    </Button>
                 </div>
             </form>
         </Dialog>

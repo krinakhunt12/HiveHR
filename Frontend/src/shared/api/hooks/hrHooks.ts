@@ -143,7 +143,17 @@ export const usePolicyMutations = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['policies'] })
   })
 
-  return { create }
+  const update = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => companyAdminApi.updatePolicy(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['policies'] })
+  })
+
+  const remove = useMutation({
+    mutationFn: (id: string) => companyAdminApi.deletePolicy(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['policies'] })
+  })
+
+  return { create, update, remove }
 }
 
 /**
@@ -188,6 +198,25 @@ export const useLeaveMutations = () => {
     });
 
     return { submit, review };
+}
+
+export const useLeaveConfigurations = () => {
+    return useQuery({
+        queryKey: ['leave-configurations'],
+        queryFn: () => employeeApi.getLeaveConfigurations(),
+        retry: false
+    });
+}
+
+export const useLeaveConfigMutations = () => {
+    const queryClient = useQueryClient();
+    const update = useMutation({
+        mutationFn: (configs: any[]) => companyAdminApi.updateLeaveConfigurations(configs),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['leave-configurations'] });
+        }
+    });
+    return { update };
 }
 
 /**

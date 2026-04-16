@@ -11,20 +11,20 @@ import {
     LayoutDashboard,
     Trash2,
     Edit3,
-    ArrowLeft,
     Wind,
     Target
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/utils/cn';
 import { useListEmployees, useListPolicies, useEmployeeMutations, type Employee } from '@/shared/api/hooks/hrHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { AddEmployeeModal } from '../components/AddEmployeeModal';
 import { EditEmployeeModal } from '../components/EditEmployeeModal';
-import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
 import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
+import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
+import { PolicyManagementView } from './PolicyManagementView';
 
 type View = 'overview' | 'directory' | 'jobs' | 'time' | 'policies' | 'leaves' | 'tasks';
 
@@ -38,14 +38,12 @@ const CompanyDashboard = () => {
     const companyId = session?.user?.company_id ?? undefined;
 
     const { data: employeesResponse, isLoading: loadingEmployees, error: employeesError } = useListEmployees({ company_id: companyId });
-    const { data: policiesResponse, isLoading: loadingPolicies, error: policiesError } = useListPolicies({ company_id: companyId });
+    const { data: policiesResponse } = useListPolicies({ company_id: companyId });
     const { remove: removeEmployee } = useEmployeeMutations();
 
     const employees = employeesResponse?.data || [];
-    const policies = policiesResponse?.data || [];
-
-    const isLoading = loadingEmployees || loadingPolicies;
-    const error = (employeesError as any)?.message ?? (policiesError as any)?.message ?? null;
+    const isLoading = loadingEmployees;
+    const error = (employeesError as any)?.message ?? null;
 
     const filteredEmployees = useMemo(() => {
         const normalized = query.trim().toLowerCase();
@@ -93,11 +91,11 @@ const CompanyDashboard = () => {
                     <p className="text-sm font-medium text-textSecondary mt-0.5">Quick look at your company information.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all border border-border hover:border-primary/30">Get Report</button>
-                    <button onClick={() => setIsAddModalOpen(true)} className="btn-primary">
+                    <Button variant="outline" className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider">Get Report</Button>
+                    <Button onClick={() => setIsAddModalOpen(true)}>
                         <UserPlus size={16} />
                         Add Employee
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -132,10 +130,10 @@ const CompanyDashboard = () => {
                 <div className="card-premium p-6 border border-border shadow-none bg-surface text-left">
                     <h4 className="text-sm font-medium mb-6 font-sans uppercase tracking-widest text-textSecondary">New Policies</h4>
                     <div className="space-y-4">
-                        {policies.slice(0, 3).map(p => (
+                        {(policiesResponse?.data || []).slice(0, 3).map((p: any) => (
                             <div key={p.id} className="p-3 rounded-md border border-border bg-background/50 hover:bg-primary/5 transition-all group cursor-pointer">
                                 <p className="text-sm font-medium text-textPrimary group-hover:text-primary">{p.title}</p>
-                                <p className="text-sm uppercase tracking-widest text-textSecondary font-medium mt-1">{p.policy_type}</p>
+                                <p className="text-sm uppercase tracking-widest text-textSecondary font-medium mt-1">{p.type}</p>
                             </div>
                         ))}
                     </div>
@@ -176,7 +174,17 @@ const CompanyDashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {filteredEmployees.map((emp) => (
+                            {isLoading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <tr key={i}>
+                                        <td className="px-6 py-4"><Skeleton className="h-10 w-40" /></td>
+                                        <td className="px-6 py-4"><Skeleton className="h-10 w-32" /></td>
+                                        <td className="px-6 py-4"><Skeleton className="h-10 w-24" /></td>
+                                        <td className="px-6 py-4"><Skeleton className="h-6 w-20" /></td>
+                                        <td className="px-6 py-4 text-right"><Skeleton className="ml-auto h-8 w-16" /></td>
+                                    </tr>
+                                ))
+                            ) : filteredEmployees.map((emp) => (
                                 <tr key={emp.id} className="group hover:bg-background transition-all">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
@@ -204,18 +212,22 @@ const CompanyDashboard = () => {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                            <button
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => setEditingEmployee(emp)}
-                                                className="p-1.5 text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all border border-transparent hover:border-primary/20"
+                                                className="h-8 w-8 text-textSecondary hover:text-primary hover:bg-primary/10"
                                             >
                                                 <Edit3 size={16} />
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleDeleteEmployee(emp.id, emp.full_name)}
-                                                className="p-1.5 text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20"
+                                                className="h-8 w-8 text-textSecondary hover:text-error hover:bg-error/10"
                                             >
                                                 <Trash2 size={16} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
@@ -227,30 +239,6 @@ const CompanyDashboard = () => {
         </div>
     );
 
-    const renderPolicies = () => (
-        <div className="space-y-8 animate-in fade-in duration-500 text-left">
-            <h2 className="text-xl font-medium tracking-tight">Policies</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {policies.map(p => (
-                    <Card key={p.id} className="card-premium group border border-border shadow-none bg-surface">
-                        <CardHeader className="pb-2">
-                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform border border-primary/10">
-                                <FileText size={18} />
-                            </div>
-                            <CardTitle className="text-base font-medium text-textPrimary">{p.title}</CardTitle>
-                            <p className="text-sm font-medium uppercase tracking-widest text-textSecondary">{p.policy_type}</p>
-                        </CardHeader>
-                        <CardContent className="pt-4">
-                            <p className="text-sm text-textSecondary leading-relaxed line-clamp-3 font-medium">{p.content}</p>
-                            <button className="mt-6 text-sm font-medium text-primary uppercase tracking-widest flex items-center gap-2 hover:text-primaryLight transition-colors">
-                                View Details <ArrowLeft size={14} className="rotate-180" />
-                            </button>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </div>
-    );
 
     const renderPlaceholder = (title: string) => (
         <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 animate-in zoom-in-95 duration-500">
@@ -288,7 +276,7 @@ const CompanyDashboard = () => {
                 {currentView === 'directory' && renderDirectory()}
                 {currentView === 'tasks' && <TaskManagementView isAdmin={true} />}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={true} />}
-                {currentView === 'policies' && renderPolicies()}
+                {currentView === 'policies' && <PolicyManagementView isAdmin={true} />}
                 {currentView === 'jobs' && renderPlaceholder('Recruitment')}
                 {currentView === 'time' && renderPlaceholder('Time & Attendance')}
             </main>

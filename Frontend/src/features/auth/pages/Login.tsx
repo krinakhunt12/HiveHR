@@ -15,7 +15,7 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login.mutate({ email, password });
+    login.mutate({ email, password, role });
   };
 
   return (
@@ -81,14 +81,26 @@ const Login = () => {
             </div>
 
             {login.error && (
-              <div className="px-3 py-2 rounded-lg bg-error-bg border border-error/10 text-error text-sm font-medium flex items-center gap-2">
-                <AlertCircle size={14} />
-                {String((login.error as any)?.message ?? 'Login failed')}
+              <div className="px-4 py-3 rounded-xl bg-error/5 border border-error/15 text-error text-[13px] font-medium animate-in fade-in slide-in-from-top-1 duration-300">
+                <div className="flex items-start gap-3">
+                  <AlertCircle size={15} className="mt-0.5 shrink-0 opacity-80" />
+                  <div className="space-y-1">
+                    {Array.isArray((login.error as any)?.errors) ? (
+                      <ul className="list-disc list-inside space-y-0.5">
+                        {(login.error as any).errors.map((err: string, i: number) => (
+                          <li key={i}>{err}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>{String((login.error as any)?.message ?? 'Login failed')}</p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
-            <Button type="submit" disabled={login.isPending} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2" variant="default">
-              {login.isPending ? 'Signing in...' : 'Sign in'} <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
+            <Button type="submit" loading={login.isPending} className="w-full h-11 font-semibold text-sm rounded-lg group mt-2" variant="default">
+              Sign in <ArrowRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-0.5 transition-transform" />
             </Button>
           </form>
 

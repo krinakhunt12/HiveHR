@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders } from "../_shared/cors.ts";
 import {
   getUserContext,
@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
        GET /leave -> List records
        ========================================================================= */
     if (method === "GET") {
-      let query = supabase.from("leaves").select("*, employees(full_name)");
+      let query = supabase.from("leaves").select("*, employees(full_name, employee_code)");
 
       if (ctx.role === "employee") {
         if (!ctx.employeeId) return badRequest("No employee record found");

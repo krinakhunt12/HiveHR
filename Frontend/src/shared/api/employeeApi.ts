@@ -47,4 +47,10 @@ export const employeeApi = {
     const data = await invokeApi('leave', { method: 'POST', body: payload });
     return data;
   },
+
+  getLeaveConfigurations: async () => {
+    const data = await invokeApi('company/leave-configurations', { method: 'GET' });
+    return data as { data: { id: string; leave_type: string; annual_allowance: number }[] };
+  },
 };
+

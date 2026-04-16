@@ -55,7 +55,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <aside
         className={cn(
           "hidden lg:flex flex-col bg-surface transition-all duration-300 fixed h-full z-40 overflow-hidden border-r border-border",
-          isSidebarExpanded ? "w-64" : "w-20"
+          isSidebarExpanded ? "w-84" : "w-20"
         )}
       >
         <div className="h-16 flex items-center px-6 mb-2">
@@ -70,7 +70,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           )}
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 px-4 md:px-8 space-y-2 overflow-y-auto custom-scrollbar">
           {navItems.map((item) => {
             const isActive = item.onClick
               ? (activeInternalTab === item.path || (!activeInternalTab && navItems.indexOf(item) === 0))
@@ -95,7 +95,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             );
 
             const className = cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative cursor-pointer mx-1",
+              "flex items-center w-full px-3 gap-3 py-2.5 rounded-lg transition-all duration-200 relative cursor-pointer mx-1",
               isActive
                 ? "bg-primary/10 text-primary border border-primary/10"
                 : "text-textSecondary hover:text-textPrimary hover:bg-background"

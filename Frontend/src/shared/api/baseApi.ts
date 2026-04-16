@@ -22,10 +22,8 @@ export interface CompanyPolicy {
   id: string;
   company_id: string;
   title: string;
-  policy_type: string;
-  content: string;
-  effective_from: string | null;
-  is_active: boolean;
+  type: string;
+  rules: string;
   created_at: string;
 }
 

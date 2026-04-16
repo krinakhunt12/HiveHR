@@ -5,13 +5,17 @@ import {
     XCircle,
     Filter,
     MoreVertical,
+    Settings,
     Plus
 } from 'lucide-react';
-import { useListLeaves, useLeaveMutations } from '@/shared/api/hooks/hrHooks';
+import { useListLeaves, useLeaveMutations, useLeaveConfigurations } from '@/shared/api/hooks/hrHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { cn } from '@/shared/utils/cn';
 import { LeaveRequestModal } from '../components/LeaveRequestModal';
+import { LeaveSettingsModal } from '../components/LeaveSettingsModal';
+import { Button } from '@/shared/ui/button';
+import { Skeleton } from '@/shared/ui/skeleton';
 
 interface LeaveManagementViewProps {
     isAdmin: boolean;
@@ -21,10 +25,13 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     const { session } = useAuthStore();
     const { toast } = useToast();
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
     // If admin, we don't pass employee_id to see all, but the API might need company_id
     const params = isAdmin ? { company_id: session?.user?.company_id } : {};
     const { data: leavesResponse, isLoading, refetch } = useListLeaves(params);
+    const { data: configsRes } = useLeaveConfigurations();
+    const configs = configsRes?.data || [];
     const { review } = useLeaveMutations();
 
     const leaves = leavesResponse?.data || [];
@@ -60,32 +67,91 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         {isAdmin ? 'Manage leave requests for your employees.' : 'View and request leaves.'}
                     </p>
                 </div>
+                {isAdmin && (
+                    <Button
+                        variant="outline"
+                        onClick={() => setIsSettingsModalOpen(true)}
+                        className="gap-2 px-5 py-2.5 text-xs font-bold"
+                    >
+                        <Settings size={18} />
+                        Policy Settings
+                    </Button>
+                )}
                 {!isAdmin && (
-                    <button
+                    <Button
                         onClick={() => setIsRequestModalOpen(true)}
-                        className="btn-primary"
                     >
                         <Plus size={18} />
                         Request Leave
-                    </button>
+                    </Button>
                 )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Stats Summary */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="card-premium p-6 bg-surface border border-border shadow-none">
-                        <h4 className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-6">Leave Balance</h4>
-                        <div className="space-y-4">
-                            <QuotaProgress label="Paid" used={12} total={24} color="primary" />
-                            <QuotaProgress label="Sick" used={3} total={10} color="warning" />
-                            <QuotaProgress label="Unpaid" used={2} total={5} color="textSecondary" />
+                    {isAdmin ? (
+                        <div className="card-premium p-6 bg-surface border border-border shadow-none">
+                            <h4 className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-6">Company Overview</h4>
+                            <div className="space-y-6">
+                                <div className="p-4 rounded-xl bg-warning/5 border border-warning/10">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-warning/80 mb-1">Pending Approval</p>
+                                    <p className="text-2xl font-bold text-textPrimary tracking-tight">
+                                        {leaves.filter((l: any) => l.status === 'pending').length}
+                                    </p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-success/5 border border-success/10">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-success/80 mb-1">Total Approved</p>
+                                    <p className="text-2xl font-bold text-textPrimary tracking-tight">
+                                        {leaves.filter((l: any) => l.status === 'approved').length}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="card-premium p-6 bg-surface border border-border shadow-none">
+                            <h4 className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-6">Leave Balance</h4>
+                            <div className="space-y-4">
+                                {isLoading ? (
+                                    <>
+                                        <Skeleton className="h-10 w-full" />
+                                        <Skeleton className="h-10 w-full" />
+                                        <Skeleton className="h-10 w-full" />
+                                    </>
+                                ) : configs.length > 0 ? (
+                                    configs.map((c: any) => (
+                                        <QuotaProgress 
+                                            key={c.id} 
+                                            label={c.leave_type} 
+                                            used={0} 
+                                            total={c.annual_allowance} 
+                                            color={c.leave_type === 'sick' ? 'warning' : 'primary'} 
+                                        />
+                                    ))
+                                ) : (
+                                    <>
+                                        <QuotaProgress label="Paid" used={12} total={24} color="primary" />
+                                        <QuotaProgress label="Sick" used={3} total={10} color="warning" />
+                                        <QuotaProgress label="Unpaid" used={2} total={5} color="textSecondary" />
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
-                    <div className="card-premium p-6 bg-primary/10 border border-primary/10 shadow-none">
-                        <p className="text-sm font-medium uppercase tracking-widest text-primary mb-2">Note</p>
-                        <p className="text-sm font-medium leading-relaxed text-textSecondary">Please send leave requests 48 hours in advance for quick approval.</p>
+                    <div className={cn(
+                        "card-premium p-6 border shadow-none",
+                        isAdmin ? "bg-bg border-soft" : "bg-primary/10 border-primary/10"
+                    )}>
+                        <p className={cn(
+                            "text-sm font-medium uppercase tracking-widest mb-2",
+                            isAdmin ? "text-textSecondary" : "text-primary"
+                        )}>{isAdmin ? 'Admin Help' : 'Note'}</p>
+                        <p className="text-sm font-medium leading-relaxed text-textSecondary">
+                            {isAdmin 
+                                ? 'Review pending requests from the table. Rejected requests can be re-evaluated later.' 
+                                : 'Please send leave requests 48 hours in advance for quick approval.'}
+                        </p>
                     </div>
                 </div>
 
@@ -110,9 +176,14 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                             </thead>
                             <tbody className="divide-y divide-border">
                                 {isLoading ? (
-                                    <tr>
-                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">Loading records...</td>
-                                    </tr>
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <tr key={i}>
+                                            <td className="px-6 py-4"><Skeleton className="h-10 w-32" /></td>
+                                            <td className="px-6 py-4"><Skeleton className="h-10 w-24" /></td>
+                                            <td className="px-6 py-4"><Skeleton className="h-6 w-20" /></td>
+                                            {isAdmin && <td className="px-6 py-4 text-right"><Skeleton className="h-8 w-16 ml-auto" /></td>}
+                                        </tr>
+                                    ))
                                 ) : leaves.length === 0 ? (
                                     <tr>
                                         <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">No leave requests found.</td>
@@ -122,11 +193,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                         <td className="px-6 py-4 text-left">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-9 h-9 rounded-md bg-background flex items-center justify-center font-medium text-textSecondary text-sm border border-border transition-all">
-                                                    {leave.profiles?.full_name?.charAt(0) || 'U'}
+                                                    {leave.employees?.full_name?.charAt(0) || 'U'}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-medium text-textPrimary">{leave.profiles?.full_name || 'Member'}</p>
-                                                    <p className="text-sm text-textSecondary font-medium uppercase">{leave.profiles?.employee_code || 'ID-REDACTED'}</p>
+                                                    <p className="text-sm font-medium text-textPrimary">{leave.employees?.full_name || 'Member'}</p>
+                                                    <p className="text-sm text-textSecondary font-medium uppercase">{leave.employees?.employee_code || 'ID-REDACTED'}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -134,12 +205,12 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                             <p className="text-sm font-medium text-textPrimary flex items-center gap-2">
                                                 <span className={cn(
                                                     "w-1.5 h-1.5 rounded-full",
-                                                    leave.leave_type === 'sick' ? 'bg-warning' : 'bg-primary'
+                                                    (leave.leave_type || leave.type) === 'sick' ? 'bg-warning' : 'bg-primary'
                                                 )} />
-                                                {(leave.leave_type || 'unspecified').charAt(0).toUpperCase() + (leave.leave_type || 'unspecified').slice(1)}
+                                                {(leave.leave_type || leave.type || 'unspecified').charAt(0).toUpperCase() + (leave.leave_type || leave.type || 'unspecified').slice(1)}
                                             </p>
                                             <p className="text-sm text-textSecondary font-medium uppercase mt-1">
-                                                {leave.start_date} → {leave.end_date}
+                                                {leave.dates?.start || leave.start_date} → {leave.dates?.end || leave.end_date}
                                             </p>
                                         </td>
                                         <td className="px-6 py-4">
@@ -157,20 +228,24 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                             <td className="px-6 py-4 text-right">
                                                 {leave.status === 'pending' ? (
                                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                                        <button
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            loading={review.isPending && review.variables?.id === leave.id && review.variables?.payload?.status === 'approved'}
                                                             onClick={() => handleAction(leave.id, 'approved')}
-                                                            className="p-1.5 text-primary hover:bg-primary/10 rounded-md transition-all border border-transparent hover:border-primary/20"
-                                                            title="Approve"
+                                                            className="h-8 w-8 text-primary hover:bg-primary/10"
                                                         >
                                                             <CheckCircle2 size={16} />
-                                                        </button>
-                                                        <button
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            loading={review.isPending && review.variables?.id === leave.id && review.variables?.payload?.status === 'rejected'}
                                                             onClick={() => handleAction(leave.id, 'rejected')}
-                                                            className="p-1.5 text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20"
-                                                            title="Reject"
+                                                            className="h-8 w-8 text-error hover:bg-error/10"
                                                         >
                                                             <XCircle size={16} />
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 ) : (
                                                     <button className="p-2 text-textSecondary hover:text-textPrimary transition-colors">
@@ -188,6 +263,10 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             </div>
 
             <LeaveRequestModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
+            <LeaveSettingsModal isOpen={isSettingsModalOpen} onClose={() => {
+                setIsSettingsModalOpen(false);
+                refetch();
+            }} />
         </div>
     );
 };

@@ -51,3 +51,9 @@ verify_jwt = false
 
 [functions.policies]
 verify_jwt = false
+
+[functions.company]
+verify_jwt = false
+
+[functions.admin]
+verify_jwt = false

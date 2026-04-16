@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
-import { useLeaveMutations } from '@/shared/api/hooks/hrHooks';
+import { useLeaveMutations, useLeaveConfigurations } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { Calendar, MessageSquare, ArrowRight, X } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
 
 interface LeaveRequestModalProps {
     isOpen: boolean;
@@ -11,6 +12,8 @@ interface LeaveRequestModalProps {
 
 export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) => {
     const { submit } = useLeaveMutations();
+    const { data: configsRes } = useLeaveConfigurations();
+    const configs = configsRes?.data || [];
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
@@ -51,9 +54,19 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                             onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
                             className="input-premium bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none text-sm font-medium"
                         >
-                            <option value="paid">Paid Leave</option>
-                            <option value="sick">Sick Leave</option>
-                            <option value="unpaid">Unpaid Leave</option>
+                            {configs.length > 0 ? (
+                                configs.map(c => (
+                                    <option key={c.id} value={c.leave_type}>
+                                        {c.leave_type.charAt(0).toUpperCase() + c.leave_type.slice(1)} Leave
+                                    </option>
+                                ))
+                            ) : (
+                                <>
+                                    <option value="paid">Paid Leave</option>
+                                    <option value="sick">Sick Leave</option>
+                                    <option value="unpaid">Unpaid Leave</option>
+                                </>
+                            )}
                         </select>
                     </div>
 
@@ -102,31 +115,23 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                 </div>
 
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20 flex items-center justify-center gap-2"
+                        className="flex-1"
                     >
                         <X size={14} />
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        disabled={loading}
-                        className="flex-[2] btn-primary py-4 h-auto shadow-none group"
+                        loading={loading}
+                        className="flex-[2] py-4 h-auto"
                     >
-                        {loading ? (
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>Sending...</span>
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-2">
-                                <span>Send Request</span>
-                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        )}
-                    </button>
+                        <span>Send Request</span>
+                        {!loading && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
+                    </Button>
                 </div>
             </form>
         </Dialog>

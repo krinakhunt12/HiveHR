@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders } from "../_shared/cors.ts";
 import {
   getUserContext,
@@ -32,7 +32,10 @@ Deno.serve(async (req) => {
   if (!ctx) return unauthorized();
   
   // RBAC: company_admin or admin
-  if (ctx.role !== "company_admin" && ctx.role !== "admin") return forbidden();
+  // RBAC: GET is allowed for all company members, other methods need admin/company_admin
+  if (req.method !== "GET" && ctx.role !== "company_admin" && ctx.role !== "admin") {
+    return forbidden();
+  }
   
   const companyId = ctx.companyId;
   if (!companyId) return badRequest("User is not associated with a company");
@@ -59,6 +62,38 @@ Deno.serve(async (req) => {
         const { data, error } = await supabase.from("companies").update(body).eq("id", companyId).select().single();
         if (error) throw error;
         await logAction(supabase, ctx, "UPDATE_COMPANY", "companies", companyId, body);
+        return jsonResponse(200, { data });
+      }
+    }
+
+    if (resource === "leave-configurations") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("leave_configurations")
+          .select("*")
+          .eq("company_id", companyId)
+          .order("leave_type");
+        if (error) throw error;
+        return jsonResponse(200, { data });
+      }
+
+      if (method === "PUT") {
+        const { configurations } = await req.json();
+        if (!Array.isArray(configurations)) return badRequest("configurations must be an array");
+
+        const rows = configurations.map((c: any) => ({
+          company_id: companyId,
+          leave_type: c.leave_type,
+          annual_allowance: c.annual_allowance
+        }));
+
+        const { data, error } = await supabase
+          .from("leave_configurations")
+          .upsert(rows, { onConflict: "company_id,leave_type" })
+          .select();
+        
+        if (error) throw error;
+        await logAction(supabase, ctx, "UPDATE_LEAVE_CONFIG", "leave_configurations", companyId, configurations);
         return jsonResponse(200, { data });
       }
     }

@@ -3,6 +3,7 @@ import { Dialog } from '@/shared/ui/dialog';
 import { useEmployeeMutations, type Employee } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { User, Briefcase, Hash, Shield, Save, X } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
 
 interface EditEmployeeModalProps {
     isOpen: boolean;
@@ -118,31 +119,23 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                 </div>
 
                 <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={onClose}
-                        className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20 flex items-center justify-center gap-2"
+                        className="flex-1"
                     >
                         <X size={14} />
                         Cancel
-                    </button>
-                <button
+                    </Button>
+                    <Button
                         type="submit"
-                        disabled={loading}
-                        className="flex-[2] btn-primary py-4 h-auto shadow-none"
+                        loading={loading}
+                        className="flex-[2] py-4 h-auto"
                     >
-                        {loading ? (
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>Saving...</span>
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-2 font-bold">
-                                <Save size={16} />
-                                <span>Update Employee</span>
-                            </div>
-                        )}
-                    </button>
+                        <Save size={16} />
+                        <span>Update Employee</span>
+                    </Button>
                 </div>
             </form>
         </Dialog>

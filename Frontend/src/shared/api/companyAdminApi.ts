@@ -46,6 +46,16 @@ export const companyAdminApi = {
     return data;
   },
 
+  updatePolicy: async (id: string, payload: any) => {
+    const data = await invokeApi(`policies/${id}`, { method: 'PATCH', body: payload });
+    return data;
+  },
+
+  deletePolicy: async (id: string) => {
+    const data = await invokeApi(`policies/${id}`, { method: 'DELETE' });
+    return data;
+  },
+
   // --- Leave ---
   listLeaves: async (params: { status?: string; employee_id?: string } = {}) => {
     const query = new URLSearchParams(params as any).toString();
@@ -57,4 +67,16 @@ export const companyAdminApi = {
     const data = await invokeApi(`leave/${id}`, { method: 'PATCH', body: payload });
     return data;
   },
+
+  // --- Leave Configurations ---
+  getLeaveConfigurations: async () => {
+    const data = await invokeApi('company/leave-configurations', { method: 'GET' });
+    return data as { data: { id: string; leave_type: string; annual_allowance: number }[] };
+  },
+
+  updateLeaveConfigurations: async (configurations: { leave_type: string; annual_allowance: number }[]) => {
+    const data = await invokeApi('company/leave-configurations', { method: 'PUT', body: { configurations } });
+    return data;
+  },
 };
+

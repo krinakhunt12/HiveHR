@@ -1,4 +1,4 @@
-import { SupabaseClient, createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { SupabaseClient, createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
 export interface UserContext {
   userId: string;

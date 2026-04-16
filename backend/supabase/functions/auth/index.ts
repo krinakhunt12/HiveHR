@@ -6,7 +6,7 @@
  *
  * verify_jwt = false (public endpoint)
  */
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders } from "../_shared/cors.ts";
 
 function jsonRes(status: number, body: unknown): Response {
@@ -58,9 +58,22 @@ Deno.serve(async (req) => {
           company_id?: string;
         };
 
-      if (!email || !password || !full_name || !role) {
-        return jsonRes(400, {
-          error: "email, password, full_name, and role are required",
+      const validationErrors: string[] = [];
+      if (!email) validationErrors.push("Email is required");
+      if (!password) validationErrors.push("Password is required");
+      else if (password.length < 6) validationErrors.push("Password must be at least 6 characters");
+      if (!full_name) validationErrors.push("Full name is required");
+      if (!role) validationErrors.push("Role is required");
+      
+      if (role === "company_admin" && !company_id && !company_name) {
+        validationErrors.push("Company name is required for company registration");
+      }
+
+      if (validationErrors.length > 0) {
+        return jsonRes(400, { 
+          message: "Validation failed", 
+          errors: validationErrors,
+          error: validationErrors[0] // Fallback for single-error handlers
         });
       }
 
@@ -75,9 +88,15 @@ Deno.serve(async (req) => {
           .single();
         if (compErr) throw compErr;
         finalCompanyId = comp.id;
-      }
 
-      // Create auth user (pre-confirmed)
+        // Seed default leave policies (12 paid + 6 sick = 18 total)
+        await adminClient.from("leave_configurations").insert([
+          { company_id: finalCompanyId, leave_type: 'paid', annual_allowance: 12 },
+          { company_id: finalCompanyId, leave_type: 'sick', annual_allowance: 6 }
+        ]);
+      }
+      
+      // ... (rest of signup logic)
       const { data: authData, error: authError } =
         await adminClient.auth.admin.createUser({
           email,
@@ -86,11 +105,17 @@ Deno.serve(async (req) => {
           user_metadata: { full_name, role, company_id: finalCompanyId },
           app_metadata: { role },
         });
-      if (authError || !authData.user) throw authError!;
+      if (authError || !authData.user) {
+        return jsonRes(400, { error: authError?.message ?? "Auth creation failed" });
+      }
 
       const userId = authData.user.id;
-
-      // Upsert profile (trigger may have already inserted a bare row)
+      
+      // ... (rest of signup logic continues)
+      // (Abbreviated for brevity in this replacement chunk, but I'll ensure it stays consistent)
+      // Actually I should probably provide the full block to be safe.
+      
+      // Upsert profile
       const { error: profileError } = await adminClient
         .from("profiles")
         .upsert(
@@ -104,7 +129,6 @@ Deno.serve(async (req) => {
         );
       if (profileError) throw profileError;
 
-      // If employee role and company known, create membership
       if (finalCompanyId) {
         await adminClient.from("company_memberships").upsert(
           {
@@ -116,7 +140,6 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Log activity
       await adminClient.from("auth_activity_logs").insert({
         user_id: userId,
         email,
@@ -136,13 +159,22 @@ Deno.serve(async (req) => {
 
     /* ─────────────────────────── LOGIN ──────────────────────────── */
     if (req.method === "POST" && path === "/login") {
-      const { email, password } = payload as {
+      const { email, password, role: requestedRole } = payload as {
         email: string;
         password: string;
+        role?: string;
       };
 
-      if (!email || !password) {
-        return jsonRes(400, { error: "email and password are required" });
+      const validationErrors: string[] = [];
+      if (!email) validationErrors.push("Work email is required");
+      if (!password) validationErrors.push("Password is required");
+
+      if (validationErrors.length > 0) {
+        return jsonRes(400, { 
+          message: "Validation failed", 
+          errors: validationErrors,
+          error: validationErrors[0]
+        });
       }
 
       const { data: loginData, error: loginError } =
@@ -155,9 +187,15 @@ Deno.serve(async (req) => {
           action: "login",
           status: "failed",
           error_message: loginError?.message ?? "Unknown error",
-          metadata: {},
+          metadata: { requested_role: requestedRole },
         });
-        return jsonRes(401, { error: loginError?.message ?? "Login failed" });
+        
+        let errorMsg = loginError?.message ?? "Login failed";
+        if (errorMsg === "Invalid login credentials") {
+          errorMsg = "The email or password you entered is incorrect.";
+        }
+        
+        return jsonRes(401, { error: errorMsg, message: errorMsg });
       }
 
       const userId = loginData.user.id;
@@ -170,6 +208,27 @@ Deno.serve(async (req) => {
         .single();
 
       if (profErr) throw profErr;
+
+      // ROLE VERIFICATION: Ensure the user actually has the role they selected to login as
+      if (requestedRole && profile.role !== requestedRole) {
+        // Log unauthorized role attempt
+        await adminClient.from("auth_activity_logs").insert({
+          user_id: userId,
+          email,
+          action: "login",
+          status: "denied",
+          error_message: `Role mismatch: Requested ${requestedRole}, Actual ${profile.role}`,
+          metadata: { requested_role: requestedRole, actual_role: profile.role },
+        });
+
+        // Sign out since sessions are created by signInWithPassword even if we reject it here
+        await publicClient.auth.signOut();
+        
+        return jsonRes(403, { 
+          error: `Access Denied: Your account does not have ${requestedRole} permissions.`,
+          message: `Access Denied: Your account does not have ${requestedRole} permissions.`
+        });
+      }
 
       const companyName = (profile as any)?.companies?.name ?? null;
       const companyId = profile?.company_id ?? null;
