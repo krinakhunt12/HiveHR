@@ -1,18 +1,11 @@
-/**
- * Attendance Edge Function — /functions/v1/attendance
- *
- * POST /check-in   — mark start of work day
- * POST /check-out  — mark end of work day
- * GET  /           — get today's attendance status
- *
- * verify_jwt = true
- */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { corsHeaders } from "../_shared/cors.ts";
 import {
   getUserContext,
   jsonResponse,
   unauthorized,
+  logAction,
+  badRequest,
   forbidden,
 } from "../_shared/auth.ts";
 
@@ -32,97 +25,87 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, serviceKey);
 
   const ctx = await getUserContext(req);
   if (!ctx) return unauthorized();
-
-  const adminClient = createClient(supabaseUrl, serviceKey);
-
-  // Non-employees (admins who aren't assigned as employees) handle differently
-  if (!ctx.employeeId) {
-    return jsonResponse(400, { error: "User is not associated with an employee record" });
-  }
-
+  
   const url = new URL(req.url);
   const path = normalizePath(url.pathname);
   const method = req.method;
-  const today = new Date().toISOString().split("T")[0];
 
   try {
-    /* ── GET / — Get today's status ── */
-    if (method === "GET" && path === "/") {
-      const { data, error } = await adminClient
-        .from("attendance_logs")
-        .select("*")
-        .eq("employee_id", ctx.employeeId)
-        .eq("attendance_date", today)
-        .maybeSingle();
+    /* =========================================================================
+       GET /attendance -> List records
+       ========================================================================= */
+    if (method === "GET") {
+      let query = supabase.from("attendance").select("*, employees(full_name)");
 
+      if (ctx.role === "employee") {
+        if (!ctx.employeeId) return badRequest("No employee record found");
+        query = query.eq("employee_id", ctx.employeeId);
+      } else if (ctx.role === "company_admin") {
+        query = query.eq("company_id", ctx.companyId);
+      } 
+      // Super admin sees all
+
+      const { data, error } = await query.order("date", { ascending: false });
       if (error) throw error;
-      return jsonResponse(200, data || { status: "absent" });
+      return jsonResponse(200, { data });
     }
 
-    /* ── POST /check-in ── */
-    if (method === "POST" && path === "/check-in") {
-      const { data, error } = await adminClient
-        .from("attendance_logs")
-        .upsert(
-          {
-            employee_id: ctx.employeeId,
-            company_id: ctx.companyId,
-            attendance_date: today,
-            check_in_at: new Date().toISOString(),
-          },
-          { onConflict: "employee_id,attendance_date" }
-        )
-        .select()
-        .single();
-
-      if (error) throw error;
-      return jsonResponse(200, { message: "Checked in successfully", data });
-    }
-
-    /* ── POST /check-out ── */
-    if (method === "POST" && path === "/check-out") {
-      // Find existing log for today
-      const { data: existing, error: fetchError } = await adminClient
-        .from("attendance_logs")
-        .select("*")
-        .eq("employee_id", ctx.employeeId)
-        .eq("attendance_date", today)
-        .single();
-
-      if (fetchError || !existing) {
-        return jsonResponse(400, { error: "No check-in record found for today" });
+    /* =========================================================================
+       POST /attendance -> Mark attendance
+       ========================================================================= */
+    if (method === "POST") {
+      const body = await req.json();
+      
+      // If employee, enforce own employee_id and company_id
+      if (ctx.role === "employee") {
+        if (!ctx.employeeId) return badRequest("No employee record found");
+        body.employee_id = ctx.employeeId;
+        body.company_id = ctx.companyId;
       }
 
-      if (existing.check_out_at) {
-        return jsonResponse(400, { error: "Already checked out for today" });
+      if (!body.employee_id || !body.company_id || !body.date) {
+        return badRequest("Missing employee_id, company_id, or date");
       }
 
-      const checkOutAt = new Date();
-      const checkInAt = new Date(existing.check_in_at);
-      const diffMs = checkOutAt.getTime() - checkInAt.getTime();
-      const workMinutes = Math.round(diffMs / 60000);
-
-      const { data, error } = await adminClient
-        .from("attendance_logs")
-        .update({
-          check_out_at: checkOutAt.toISOString(),
-          work_minutes: workMinutes,
-        })
-        .eq("id", existing.id)
-        .select()
-        .single();
-
+      const { data, error } = await supabase.from("attendance").insert(body).select().single();
       if (error) throw error;
-      return jsonResponse(200, { message: "Checked out successfully", data });
+
+      await logAction(supabase, ctx, "MARK_ATTENDANCE", "attendance", data.id, body);
+      return jsonResponse(201, { data });
     }
 
-    return jsonResponse(405, { error: "Method not allowed" });
+    /* =========================================================================
+       PATCH /attendance/:id -> Update record (Admin only)
+       ========================================================================= */
+    if (method === "PATCH") {
+      const segments = path.replace(/^\//, "").split("/");
+      const resourceId = segments[0] || null;
+      if (!resourceId) return badRequest("Missing attendance id");
+
+      if (ctx.role === "employee") return forbidden();
+
+      const body = await req.json();
+      
+      // Verification for company_admin
+      if (ctx.role === "company_admin") {
+         const { data: existing } = await supabase.from("attendance").select("company_id").eq("id", resourceId).single();
+         if (!existing || existing.company_id !== ctx.companyId) return forbidden();
+      }
+
+      const { data, error } = await supabase.from("attendance").update(body).eq("id", resourceId).select().single();
+      if (error) throw error;
+
+      await logAction(supabase, ctx, "UPDATE_ATTENDANCE", "attendance", resourceId, body);
+      return jsonResponse(200, { data });
+    }
+
+    return jsonResponse(404, { error: "Resource not found" });
   } catch (err: any) {
-    return jsonResponse(400, { error: err.message });
+    return badRequest(err.message);
   }
 });
