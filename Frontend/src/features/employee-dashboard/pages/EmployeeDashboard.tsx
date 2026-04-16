@@ -16,13 +16,14 @@ import { cn } from '@/shared/utils/cn';
 import { useTodayAttendance, useListPolicies, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
 import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
+import { ForcePasswordChangeModal } from '@/features/auth/components/ForcePasswordChangeModal';
 
 type View = 'dashboard' | 'leaves' | 'tasks' | 'messages' | 'performance';
 
 const EmployeeDashboard = () => {
     const [currentView, setCurrentView] = useState<View>('dashboard');
     const [isSavingAttendance, setIsSavingAttendance] = useState(false);
-    const { data: user } = useGetMe();
+    const { data: user, refetch: refetchMe } = useGetMe();
     const userName = user?.full_name?.split(' ')[0] || 'User';
 
     const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
@@ -189,6 +190,12 @@ const EmployeeDashboard = () => {
                 {currentView === 'messages' && <PlaceholderBox title="Messages" />}
                 {currentView === 'performance' && <PlaceholderBox title="Performance" />}
             </main>
+
+            {/* Mandatory First Login Flow */}
+            <ForcePasswordChangeModal 
+                isOpen={!!(user?.role === 'employee' && user?.is_first_login)} 
+                onSuccess={() => refetchMe()}
+            />
         </DashboardLayout>
     );
 };

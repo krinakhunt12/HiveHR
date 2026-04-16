@@ -74,6 +74,7 @@ export interface Profile {
   full_name: string;
   role: UserRole;
   company_id: string | null;
+  is_first_login: boolean;
   created_at: string;
   companies?: { id: string; name: string };
 }

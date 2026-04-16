@@ -22,6 +22,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
         employee_code: '',
         role: 'employee',
         employment_type: 'full_time',
+        is_first_login: true,
         joined_on: new Date().toISOString().split('T')[0]
     });
 
@@ -141,7 +142,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     >
                         Cancel
                     </button>
-                <button
+                    <button
                         type="submit"
                         disabled={loading}
                         className="flex-[2] btn-primary relative overflow-hidden group py-4 h-auto shadow-none"
