@@ -5,7 +5,7 @@
 @theme {
   --font-sans: "Inter", "Poppins", ui-sans-serif, system-ui, sans-serif;
 
-  --text-sm: 0.875rem;
+  --text-xs: 0.875rem;
   /* 14px - Strict Minimum */
   --text-sm: 0.9375rem;
   /* 15px - Labels/Inputs */
@@ -20,16 +20,16 @@
   --text-2xl: 1.5rem;
   /* 24px - Main Headlines */
 
-  --color-primary: var(--color-primary);
-  --color-primaryLight: var(--color-primary-light);
-  --color-background: var(--color-background);
-  --color-surface: var(--color-surface);
-  --color-border: var(--color-border);
-  --color-textPrimary: var(--color-text-primary);
-  --color-textSecondary: var(--color-text-secondary);
-  --color-success: var(--color-success);
-  --color-error: var(--color-error);
-  --color-warning: var(--color-warning);
+  --color-primary: var(--tok-primary);
+  --color-primaryLight: var(--tok-primary-light);
+  --color-background: var(--tok-background);
+  --color-surface: var(--tok-surface);
+  --color-border: var(--tok-border);
+  --color-textPrimary: var(--tok-text-primary);
+  --color-textSecondary: var(--tok-text-secondary);
+  --color-success: var(--tok-success);
+  --color-error: var(--tok-error);
+  --color-warning: var(--tok-warning);
 
   /* Shadcn compat */
   --color-card: hsl(var(--card));
@@ -45,15 +45,8 @@
   --shadow-premium: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 
   @keyframes float {
-
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-
-    50% {
-      transform: translateY(-2px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
   }
 
   --animate-float: float 5s ease-in-out infinite;
@@ -65,32 +58,32 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-blue-100 selection:text-blue-900;
+    @apply bg-background text-textPrimary font-sans antialiased selection:bg-primary/10 selection:text-primary;
   }
 }
 
 @layer components {
   .card-premium {
-    @apply rounded-lg border border-slate-200 bg-white text-foreground shadow-sm hover:shadow-md transition-all duration-200;
+    @apply rounded-lg border border-border bg-surface text-textPrimary shadow-none transition-all duration-200 hover:border-primary/30;
   }
 
   .input-premium {
-    @apply w-full px-4 py-2 bg-white border border-slate-200 rounded-md focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/40 transition-all outline-none text-sm placeholder:text-slate-400 text-slate-900;
+    @apply w-full px-4 py-2 bg-surface border border-border rounded-md focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all outline-none text-sm placeholder:text-textSecondary text-textPrimary;
   }
 
   .btn-primary {
-    @apply px-5 py-2.5 bg-blue-600 text-white rounded-md font-medium text-sm shadow-sm hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2;
+    @apply px-5 py-2.5 bg-primary text-white rounded-md font-medium text-sm shadow-none hover:bg-primaryLight transition-all active:scale-[0.98] flex items-center justify-center gap-2;
   }
 
   .nav-item-minimal {
-    @apply flex items-center gap-3 px-3 py-2 rounded-md transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm;
+    @apply flex items-center gap-3 px-3 py-2 rounded-md transition-all text-textSecondary hover:text-textPrimary hover:bg-background font-medium text-sm;
   }
 
   .nav-item-active {
-    @apply flex items-center gap-3 px-3 py-2 rounded-md bg-blue-50 text-blue-700 font-semibold text-sm border border-blue-100/50;
+    @apply flex items-center gap-3 px-3 py-2 rounded-md bg-primary/10 text-primary font-semibold text-sm border border-primary/20;
   }
 
   .glass-effect {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-sm;
+    @apply bg-surface/80 backdrop-blur-md border border-border/20 shadow-none;
   }
 }

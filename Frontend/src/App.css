@@ -1,15 +1,15 @@
 @layer base {
   :root {
-    --color-primary: #2563EB;
-    --color-primary-light: #3B82F6;
-    --color-background: #F8FAFC;
-    --color-surface: #FFFFFF;
-    --color-border: #E2E8F0;
-    --color-text-primary: #0F172A;
-    --color-text-secondary: #64748B;
-    --color-success: #22C55E;
-    --color-error: #EF4444;
-    --color-warning: #F59E0B;
+    --tok-primary: #2563EB;
+    --tok-primary-light: #3B82F6;
+    --tok-background: #F8FAFC;
+    --tok-surface: #FFFFFF;
+    --tok-border: #E2E8F0;
+    --tok-text-primary: #0F172A;
+    --tok-text-secondary: #64748B;
+    --tok-success: #22C55E;
+    --tok-error: #EF4444;
+    --tok-warning: #F59E0B;
 
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;

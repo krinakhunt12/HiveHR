@@ -80,14 +80,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               <>
                 <div className={cn(
                   "shrink-0 transition-all duration-300",
-                  isActive ? "text-primary scale-105" : "text-textSecondary group-hover:text-textPrimary"
+                  isActive ? "text-primary scale-105" : "text-textSecondary hover:text-textPrimary"
                 )}>
                   {React.cloneElement(item.icon as React.ReactElement, { size: isSidebarExpanded ? 18 : 22 } as any)}
                 </div>
                 {isSidebarExpanded && (
                   <span className={cn(
-                    "text-sm font-medium tracking-tight transition-all",
-                    isActive ? "text-primary" : "text-textSecondary group-hover:text-textPrimary"
+                    "text-base font-medium tracking-tight transition-all",
+                    isActive ? "text-primary" : "text-textSecondary hover:text-textPrimary"
                   )}>{item.label}</span>
                 )}
                 {isActive && isSidebarExpanded && <div className="ml-auto w-1 h-1 rounded-full bg-primary" />}
