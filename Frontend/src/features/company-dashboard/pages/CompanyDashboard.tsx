@@ -60,24 +60,24 @@ const CompanyDashboard = () => {
 
     // --- ACTIONS ---
     const handleDeleteEmployee = async (id: string, name: string) => {
-        if (!window.confirm(`Are you sure you want to remove ${name} from the ecosystem? This action is irreversible.`)) return;
+        if (!window.confirm(`Are you sure you want to remove ${name}? This action cannot be undone.`)) return;
         try {
             await removeEmployee.mutateAsync(id);
-            toast({ title: 'Stakeholder Removed', description: `${name} has been detached from the organization.`, type: 'success' });
+            toast({ title: 'Employee Removed', description: `${name} has been removed successfully.`, type: 'success' });
         } catch (err: any) {
             toast({ title: 'Removal Failed', description: err.message || 'Failed to remove member', type: 'error' });
         }
     }
 
-    // --- SHARED COMPONENTS ---
+    // --- UI CONFIG ---
     const navItems = [
-        { icon: <LayoutDashboard size={18} />, label: 'Overview', path: 'overview' },
-        { icon: <Users size={18} />, label: 'Directory', path: 'directory' },
-        { icon: <Target size={18} />, label: 'Directives', path: 'tasks' },
-        { icon: <Wind size={18} />, label: 'Lifecycle', path: 'leaves' },
-        { icon: <Briefcase size={18} />, label: 'Vacancies', path: 'jobs' },
-        { icon: <Clock size={18} />, label: 'Work-Logs', path: 'time' },
-        { icon: <FileText size={18} />, label: 'Protocols', path: 'policies' },
+        { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: 'overview' },
+        { icon: <Users size={18} />, label: 'Employees', path: 'directory' },
+        { icon: <Target size={18} />, label: 'Tasks', path: 'tasks' },
+        { icon: <Wind size={18} />, label: 'Leaves', path: 'leaves' },
+        { icon: <Briefcase size={18} />, label: 'Jobs', path: 'jobs' },
+        { icon: <Clock size={18} />, label: 'Attendance', path: 'time' },
+        { icon: <FileText size={18} />, label: 'Policies', path: 'policies' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -89,23 +89,23 @@ const CompanyDashboard = () => {
         <div className="space-y-12">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
                 <div className="text-left">
-                    <h1 className="text-xl font-medium text-textPrimary tracking-tight font-sans">Ecosystem Overview</h1>
-                    <p className="text-sm font-medium text-textSecondary mt-0.5">Real-time vitals for your agricultural organization.</p>
+                    <h1 className="text-xl font-medium text-textPrimary tracking-tight font-sans">Dashboard</h1>
+                    <p className="text-sm font-medium text-textSecondary mt-0.5">Quick look at your company information.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all border border-border hover:border-primary/30">Generate Report</button>
+                    <button className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all border border-border hover:border-primary/30">Get Report</button>
                     <button onClick={() => setIsAddModalOpen(true)} className="btn-primary">
                         <UserPlus size={16} />
-                        Add Stakeholder
+                        Add Employee
                     </button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <ManagerStat title="Active Stakeholders" value={String(activeEmployees)} icon={<Users />} theme="primary" />
-                <ManagerStat title="Workload Index" value="92%" icon={<Clock />} theme="warning" />
-                <ManagerStat title="Upcoming Cycles" value="12" icon={<Calendar />} theme="primary" />
-                <ManagerStat title="Protocol Compliance" value="100%" icon={<FileText />} theme="primary" />
+                <ManagerStat title="Total Employees" value={String(activeEmployees)} icon={<Users />} theme="primary" />
+                <ManagerStat title="Work Progress" value="92%" icon={<Clock />} theme="warning" />
+                <ManagerStat title="Upcoming Leaves" value="12" icon={<Calendar />} theme="primary" />
+                <ManagerStat title="Active Policies" value="100%" icon={<FileText />} theme="primary" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -130,7 +130,7 @@ const CompanyDashboard = () => {
                 </div>
 
                 <div className="card-premium p-6 border border-border shadow-none bg-surface text-left">
-                    <h4 className="text-sm font-medium mb-6 font-sans uppercase tracking-widest text-textSecondary">Latest Protocols</h4>
+                    <h4 className="text-sm font-medium mb-6 font-sans uppercase tracking-widest text-textSecondary">New Policies</h4>
                     <div className="space-y-4">
                         {policies.slice(0, 3).map(p => (
                             <div key={p.id} className="p-3 rounded-md border border-border bg-background/50 hover:bg-primary/5 transition-all group cursor-pointer">
@@ -148,14 +148,14 @@ const CompanyDashboard = () => {
         <div className="space-y-8 animate-in fade-in duration-500 text-left">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-xl font-medium tracking-tight text-textPrimary">Stakeholder Registry</h2>
-                    <p className="text-sm font-medium text-textSecondary mt-0.5">Total operational members: {employees.length}</p>
+                    <h2 className="text-xl font-medium tracking-tight text-textPrimary">Employees</h2>
+                    <p className="text-sm font-medium text-textSecondary mt-0.5">Total staff: {employees.length}</p>
                 </div>
                 <div className="flex items-center gap-4 bg-surface px-4 py-1.5 rounded-lg border border-border shadow-none w-full md:w-96 focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                     <Search size={16} className="text-textSecondary" />
                     <input
                         type="text"
-                        placeholder="Filter by name or identity..."
+                        placeholder="Search by name..."
                         className="bg-transparent border-none outline-none text-sm font-medium w-full py-1.5 placeholder:text-textSecondary"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -168,9 +168,9 @@ const CompanyDashboard = () => {
                     <table className="w-full text-left">
                         <thead className="bg-background/50">
                             <tr>
-                                <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Stakeholder</th>
-                                <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Identity Node</th>
-                                <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Join Cycle</th>
+                                <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Name</th>
+                                <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Role</th>
+                                <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Joined On</th>
                                 <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Status</th>
                                 <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest text-right">Actions</th>
                             </tr>
@@ -229,7 +229,7 @@ const CompanyDashboard = () => {
 
     const renderPolicies = () => (
         <div className="space-y-8 animate-in fade-in duration-500 text-left">
-            <h2 className="text-2xl font-bold tracking-tight">Organizational Protocols</h2>
+            <h2 className="text-xl font-medium tracking-tight">Policies</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {policies.map(p => (
                     <Card key={p.id} className="card-premium group border border-border shadow-none bg-surface">
@@ -243,7 +243,7 @@ const CompanyDashboard = () => {
                         <CardContent className="pt-4">
                             <p className="text-sm text-textSecondary leading-relaxed line-clamp-3 font-medium">{p.content}</p>
                             <button className="mt-6 text-sm font-medium text-primary uppercase tracking-widest flex items-center gap-2 hover:text-primaryLight transition-colors">
-                                Review Protocol <ArrowLeft size={14} className="rotate-180" />
+                                View Details <ArrowLeft size={14} className="rotate-180" />
                             </button>
                         </CardContent>
                     </Card>
@@ -258,8 +258,8 @@ const CompanyDashboard = () => {
                 <LayoutDashboard size={32} />
             </div>
             <div className="space-y-3">
-                <h2 className="text-xl font-medium text-textPrimary font-sans">{title} Hub</h2>
-                <p className="text-sm font-medium text-textSecondary max-w-sm mx-auto leading-relaxed">We are currently synchronizing this module with the central organization grid. Full operational status expected shortly.</p>
+                <h2 className="text-xl font-medium text-textPrimary font-sans">{title}</h2>
+                <p className="text-sm font-medium text-textSecondary max-w-sm mx-auto leading-relaxed">This section is being updated. It will be ready soon.</p>
             </div>
         </div>
     );

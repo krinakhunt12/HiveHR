@@ -64,8 +64,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </div>
           {isSidebarExpanded && (
             <div className="ml-3 overflow-hidden">
-              <span className="block font-medium text-lg text-textPrimary tracking-tight leading-none font-sans">HiveHr</span>
-              <span className="text-sm font-medium text-textSecondary tracking-wider mt-1 block uppercase">Management Hub</span>
+              <span className="block font-medium text-lg text-textPrimary tracking-tight leading-none font-sans">HiveHR</span>
+              <span className="text-sm font-medium text-textSecondary tracking-wider mt-1 block uppercase">Admin</span>
             </div>
           )}
         </div>
@@ -147,7 +147,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             )}
           >
             <LogOut size={16} className="transition-transform" />
-            {isSidebarExpanded && <span className="text-sm font-medium tracking-wide uppercase">Sign Out</span>}
+            {isSidebarExpanded && <span className="text-sm font-medium tracking-wide uppercase">Logout</span>}
           </button>
         </div>
       </aside>
@@ -167,7 +167,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               {isSidebarExpanded ? <X size={16} /> : <Menu size={16} />}
             </button>
             <div className="h-4 w-[1px] bg-border hidden md:block"></div>
-            <h2 className="text-sm font-medium text-textSecondary uppercase tracking-widest hidden md:block">Management Console</h2>
+            <h2 className="text-sm font-medium text-textSecondary uppercase tracking-widest hidden md:block">Dashboard</h2>
           </div>
 
           <div className="flex items-center gap-3">

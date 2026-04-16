@@ -30,25 +30,25 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
         setLoading(true);
         try {
             await create.mutateAsync(formData);
-            toast({ title: 'Stakeholder Added', description: `${formData.full_name} has been integrated into the ecosystem.`, type: 'success' });
+            toast({ title: 'Employee Added', description: `${formData.full_name} is now part of the company.`, type: 'success' });
             onClose();
         } catch (err: any) {
-            toast({ title: 'Integration Failed', description: err.message || 'Failed to add member', type: 'error' });
+            toast({ title: 'Add Failed', description: err.message || 'Could not add employee', type: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} title="Onboard New Stakeholder">
+        <Dialog isOpen={isOpen} onClose={onClose} title="Add Employee">
             <div className="mb-8">
-                <p className="text-sm font-medium text-textSecondary">Expand your digital ecosystem by inviting a new member to the organization.</p>
+                <p className="text-sm font-medium text-textSecondary">Add a new member to your company.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Identity Name</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Name</label>
                         <div className="relative group">
                             <UserPlus className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
@@ -62,7 +62,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Communication Email</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Email</label>
                         <div className="relative group">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
@@ -77,7 +77,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Operational Role</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Role</label>
                         <div className="relative group">
                             <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
@@ -91,7 +91,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Ecosystem ID</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Employee ID</label>
                         <div className="relative group">
                             <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
@@ -105,7 +105,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">System Permissions</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Permissions</label>
                         <div className="relative group">
                             <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <select
@@ -113,14 +113,14 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                                 onChange={e => setFormData({ ...formData, role: e.target.value })}
                                 className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none"
                             >
-                                <option value="employee">Standard Member</option>
-                                <option value="company_admin">Organization Lead</option>
+                                <option value="employee">Employee</option>
+                                <option value="company_admin">Admin</option>
                             </select>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Integration Date</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Join Date</label>
                         <div className="relative group">
                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
@@ -139,9 +139,9 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                         onClick={onClose}
                         className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20"
                     >
-                        Abort Invite
+                        Cancel
                     </button>
-                    <button
+                <button
                         type="submit"
                         disabled={loading}
                         className="flex-[2] btn-primary relative overflow-hidden group py-4 h-auto shadow-none"
@@ -149,11 +149,11 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                         {loading ? (
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>Synchronizing...</span>
+                                <span>Saving...</span>
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <span>Complete Onboarding</span>
+                                <span>Add Employee</span>
                                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </div>
                         )}

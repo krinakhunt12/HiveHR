@@ -33,13 +33,13 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
         try {
             await review.mutateAsync({ id, payload: { status } });
             toast({
-                title: status === 'approved' ? 'Request Authorized' : 'Request Terminated',
-                description: `Cycle maintenance request for the stakeholder has been ${status}.`,
+                title: status === 'approved' ? 'Approved' : 'Rejected',
+                description: `The leave request has been ${status}.`,
                 type: status === 'approved' ? 'success' : 'error'
             });
             refetch();
         } catch (err: any) {
-            toast({ title: 'Operation Failed', description: err.message || 'Failed to update request', type: 'error' });
+            toast({ title: 'Update Failed', description: err.message || 'Could not update request', type: 'error' });
         }
     };
 
@@ -55,9 +55,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="text-left">
-                    <h1 className="text-xl font-medium text-textPrimary tracking-tight font-sans">Leave Management</h1>
+                    <h1 className="text-xl font-medium text-textPrimary tracking-tight font-sans">Leaves</h1>
                     <p className="text-sm font-medium text-textSecondary mt-0.5">
-                        {isAdmin ? 'Review and manage time-off requests across the company.' : 'Manage your personal leave requests and scheduled absences.'}
+                        {isAdmin ? 'Manage leave requests for your employees.' : 'View and request leaves.'}
                     </p>
                 </div>
                 {!isAdmin && (
@@ -66,7 +66,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         className="btn-primary"
                     >
                         <Plus size={18} />
-                        Request Maintenance
+                        Request Leave
                     </button>
                 )}
             </div>
@@ -75,24 +75,24 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 {/* Stats Summary */}
                 <div className="lg:col-span-1 space-y-6">
                     <div className="card-premium p-6 bg-surface border border-border shadow-none">
-                        <h4 className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-6">Quota Allocation</h4>
+                        <h4 className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-6">Leave Balance</h4>
                         <div className="space-y-4">
-                            <QuotaProgress label="Paid (Annual)" used={12} total={24} color="primary" />
-                            <QuotaProgress label="Health (Sick)" used={3} total={10} color="warning" />
-                            <QuotaProgress label="Unpaid Personal" used={2} total={5} color="textSecondary" />
+                            <QuotaProgress label="Paid" used={12} total={24} color="primary" />
+                            <QuotaProgress label="Sick" used={3} total={10} color="warning" />
+                            <QuotaProgress label="Unpaid" used={2} total={5} color="textSecondary" />
                         </div>
                     </div>
 
                     <div className="card-premium p-6 bg-primary/10 border border-primary/10 shadow-none">
-                        <p className="text-sm font-medium uppercase tracking-widest text-primary mb-2">Protocol Note</p>
-                        <p className="text-sm font-medium leading-relaxed text-textSecondary">Ensure all leave requests are submitted 48 hours prior to commencement for optimal processing.</p>
+                        <p className="text-sm font-medium uppercase tracking-widest text-primary mb-2">Note</p>
+                        <p className="text-sm font-medium leading-relaxed text-textSecondary">Please send leave requests 48 hours in advance for quick approval.</p>
                     </div>
                 </div>
 
                 {/* Leaves Table */}
                 <div className="lg:col-span-3 card-premium p-0 border border-border shadow-none overflow-hidden bg-surface">
                     <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-background/50">
-                        <h3 className="text-base font-medium text-textPrimary">Request History</h3>
+                        <h3 className="text-base font-medium text-textPrimary">Requests</h3>
                         <button className="p-2 hover:bg-surface rounded-md transition-colors text-textSecondary border border-transparent hover:border-border">
                             <Filter size={16} />
                         </button>
@@ -103,19 +103,19 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                             <thead className="bg-background/50">
                                 <tr>
                                     <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Employee</th>
-                                    <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Type & Duration</th>
+                                    <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Type</th>
                                     <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest">Status</th>
-                                    {isAdmin && <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest text-right">Action</th>}
+                                    {isAdmin && <th className="px-6 py-3 text-sm font-medium text-textSecondary uppercase tracking-widest text-right">Actions</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">Synchronizing records...</td>
+                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">Loading records...</td>
                                     </tr>
                                 ) : leaves.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">No maintenance cycles recorded in the current epoch.</td>
+                                        <td colSpan={4} className="px-8 py-12 text-center text-sm text-textSecondary">No leave requests found.</td>
                                     </tr>
                                 ) : leaves.map((leave: any) => (
                                     <tr key={leave.id} className="group hover:bg-background transition-all">
@@ -160,14 +160,14 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                         <button
                                                             onClick={() => handleAction(leave.id, 'approved')}
                                                             className="p-1.5 text-primary hover:bg-primary/10 rounded-md transition-all border border-transparent hover:border-primary/20"
-                                                            title="Authorize"
+                                                            title="Approve"
                                                         >
                                                             <CheckCircle2 size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleAction(leave.id, 'rejected')}
                                                             className="p-1.5 text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20"
-                                                            title="Terminate"
+                                                            title="Reject"
                                                         >
                                                             <XCircle size={16} />
                                                         </button>

@@ -63,11 +63,10 @@ const EmployeeDashboard = () => {
 
     const navItems = [
         { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: 'dashboard' },
-        { icon: <Target size={18} />, label: 'Directives', path: 'tasks' },
-        { icon: <Wind size={18} />, label: 'Lifecycle', path: 'leaves' },
-        { icon: <CheckSquare size={18} />, label: 'Tasks', path: 'tasks' },
+        { icon: <Target size={18} />, label: 'Tasks', path: 'tasks' },
+        { icon: <Wind size={18} />, label: 'Leaves', path: 'leaves' },
         { icon: <MessageSquare size={18} />, label: 'Messages', path: 'messages' },
-        { icon: <Award size={18} />, label: 'Excellence', path: 'performance' },
+        { icon: <Award size={18} />, label: 'Performance', path: 'performance' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -79,7 +78,7 @@ const EmployeeDashboard = () => {
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
                 <div>
-                    <h1 className="text-xl font-medium text-slate-900 tracking-tight font-sans">Growth Cycle, {userName}</h1>
+                    <h1 className="text-xl font-medium text-slate-900 tracking-tight font-sans">Welcome, {userName}</h1>
                     <p className="text-sm font-medium text-slate-400 mt-0.5">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
                 <div className="flex gap-3">
@@ -101,7 +100,7 @@ const EmployeeDashboard = () => {
                         onClick={canCheckIn ? onCheckIn : onCheckOut}
                         disabled={isSavingAttendance || (!canCheckIn && !canCheckOut)}
                     >
-                        {isSavingAttendance ? 'Syncing...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Completed'}
+                        {isSavingAttendance ? 'Saving...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Done'}
                     </button>
                 </div>
             </div>
@@ -114,9 +113,9 @@ const EmployeeDashboard = () => {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard title="Ecosystem Contribution" value="98.4%" trend="+1.2%" icon={<Clock />} theme="primary" />
+                <StatCard title="Performance" value="98.4%" trend="+1.2%" icon={<Clock />} theme="primary" />
                 <div className="card-premium p-6 border border-border flex flex-col justify-center bg-surface shadow-none">
-                    <p className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-4">Maintenance Quota</p>
+                    <p className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-4">Leaves Left</p>
                     <div className="flex items-center gap-4">
                         <div className="flex-1 h-2 bg-background rounded-full overflow-hidden">
                             <div className="h-full bg-primary w-[60%] rounded-full"></div>
@@ -124,8 +123,8 @@ const EmployeeDashboard = () => {
                         <span className="text-sm font-medium text-textPrimary">14/24 <span className="text-sm text-textSecondary">Days</span></span>
                     </div>
                 </div>
-                <StatCard title="Active Directives" value="08" icon={<CheckSquare />} theme="warning" />
-                <StatCard title="Operational Minutes" value={String(todaysMinutes)} icon={<Award />} theme="primary" />
+                <StatCard title="Active Tasks" value="08" icon={<CheckSquare />} theme="warning" />
+                <StatCard title="Total Minutes" value={String(todaysMinutes)} icon={<Award />} theme="primary" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -156,7 +155,7 @@ const EmployeeDashboard = () => {
                             </div>
                         ))}
                         {policies.length === 0 && (
-                            <p className="text-sm font-medium text-textSecondary uppercase tracking-widest text-center py-4">No protocols found.</p>
+                            <p className="text-sm font-medium text-textSecondary uppercase tracking-widest text-center py-4">No policies found.</p>
                         )}
                     </div>
                 </div>
@@ -187,8 +186,8 @@ const EmployeeDashboard = () => {
                 {currentView === 'dashboard' && renderDashboard()}
                 {currentView === 'tasks' && <TaskManagementView isAdmin={false} />}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={false} />}
-                {currentView === 'messages' && <PlaceholderBox title="Comms Node" />}
-                {currentView === 'performance' && <PlaceholderBox title="Excellence Metrics" />}
+                {currentView === 'messages' && <PlaceholderBox title="Messages" />}
+                {currentView === 'performance' && <PlaceholderBox title="Performance" />}
             </main>
         </DashboardLayout>
     );
@@ -245,8 +244,8 @@ const PlaceholderBox = ({ title }: { title: string }) => (
             <LayoutDashboard size={24} />
         </div>
         <div className="space-y-2">
-            <h2 className="text-lg font-medium text-textPrimary font-sans">{title} Module</h2>
-            <p className="text-sm font-medium text-textSecondary max-w-xs mx-auto leading-relaxed">This section is being synchronized. Detailed metrics will be available in the next update cycle.</p>
+            <h2 className="text-lg font-medium text-textPrimary font-sans">{title}</h2>
+            <p className="text-sm font-medium text-textSecondary max-w-xs mx-auto leading-relaxed">This section will be ready soon.</p>
         </div>
     </div>
 );

@@ -7,10 +7,10 @@
 
   --text-xs: 0.875rem;
   /* 14px - Strict Minimum */
-  --text-sm: 0.9375rem;
-  /* 15px - Labels/Inputs */
-  --text-base: 1rem;
-  /* 16px - Default Body */
+  --text-sm: 0.875rem;
+  /* 14px - Labels/Inputs */
+  --text-base: 0.9375rem;
+  /* 15px - Default Body */
   --text-md: 1rem;
   /* 16px - Consistency */
   --text-lg: 1.125rem;

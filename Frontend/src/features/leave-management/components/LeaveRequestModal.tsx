@@ -26,40 +26,40 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
         setLoading(true);
         try {
             await submit.mutateAsync(formData);
-            toast({ title: 'Request Transmitted', description: 'Your time-off request is being reviewed by the ecosystem leads.', type: 'success' });
+            toast({ title: 'Request Sent', description: 'Your leave request has been sent for approval.', type: 'success' });
             onClose();
         } catch (err: any) {
-            toast({ title: 'Submission Failed', description: err.message || 'Failed to request leave', type: 'error' });
+            toast({ title: 'Request Failed', description: err.message || 'Could not send request', type: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} title="Request Lifecycle Maintenance">
+        <Dialog isOpen={isOpen} onClose={onClose} title="Request Leave">
             <div className="mb-8">
-                <p className="text-xs font-medium text-textSecondary font-sans">Submit a request for scheduled time away from the digital grid.</p>
+                <p className="text-sm font-medium text-textSecondary font-sans">Request time off from work.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
                     <div className="space-y-2 text-left">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Maintenance Type</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Leave Type</label>
                         <select
                             required
                             value={formData.leave_type}
                             onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
-                            className="input-premium bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none text-xs font-medium"
+                            className="input-premium bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none text-sm font-medium"
                         >
-                            <option value="paid">Paid (Annual) Leave</option>
-                            <option value="sick">Health Maintenance (Sick)</option>
-                            <option value="unpaid">Unpaid Personal Time</option>
+                            <option value="paid">Paid Leave</option>
+                            <option value="sick">Sick Leave</option>
+                            <option value="unpaid">Unpaid Leave</option>
                         </select>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2 text-left">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Commencement Date</label>
+                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Start Date</label>
                             <div className="relative group">
                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                                 <input
@@ -67,12 +67,12 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                     type="date"
                                     value={formData.start_date}
                                     onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-xs font-medium"
+                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-sm font-medium"
                                 />
                             </div>
                         </div>
                         <div className="space-y-2 text-left">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Conclusion Date</label>
+                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">End Date</label>
                             <div className="relative group">
                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                                 <input
@@ -80,22 +80,22 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                     type="date"
                                     value={formData.end_date}
                                     onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-xs font-medium"
+                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-sm font-medium"
                                 />
                             </div>
                         </div>
                     </div>
 
                     <div className="space-y-2 text-left">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Reason for Absence</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Reason</label>
                         <div className="relative group">
                             <MessageSquare className="absolute left-4 top-4 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <textarea
                                 required
                                 value={formData.reason}
                                 onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all min-h-[120px] pt-3 text-xs font-medium"
-                                placeholder="Describe the necessity for this maintenance cycle..."
+                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all min-h-[120px] pt-3 text-sm font-medium"
+                                placeholder="Why are you taking leave?"
                             />
                         </div>
                     </div>
@@ -118,11 +118,11 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                         {loading ? (
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>Transmitting...</span>
+                                <span>Sending...</span>
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <span>Submit Request</span>
+                                <span>Send Request</span>
                                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </div>
                         )}

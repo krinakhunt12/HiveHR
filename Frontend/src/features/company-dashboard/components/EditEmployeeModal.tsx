@@ -39,25 +39,25 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
         setLoading(true);
         try {
             await update.mutateAsync({ id: employee.id, payload: formData });
-            toast({ title: 'Profile Updated', description: `Changes for ${formData.full_name} have been synchronized.`, type: 'success' });
+            toast({ title: 'Profile Updated', description: `Changes for ${formData.full_name} have been saved.`, type: 'success' });
             onClose();
         } catch (err: any) {
-            toast({ title: 'Update Failed', description: err.message || 'Failed to modify member', type: 'error' });
+            toast({ title: 'Save Failed', description: err.message || 'Could not update employee', type: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} title="Modify Stakeholder Metadata">
+        <Dialog isOpen={isOpen} onClose={onClose} title="Edit Employee">
             <div className="mb-8">
-                <p className="text-sm font-medium text-textSecondary">Update the occupational details and status of this ecosystem member.</p>
+                <p className="text-sm font-medium text-textSecondary">Update the information for this employee.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Identity Name</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Name</label>
                         <div className="relative group">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <input
@@ -72,7 +72,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Operational Role</label>
+                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Role</label>
                             <div className="relative group">
                                 <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                                 <input
@@ -85,7 +85,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Ecosystem ID</label>
+                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Employee ID</label>
                             <div className="relative group">
                                 <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                                 <input
@@ -100,7 +100,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Biological/System Status</label>
+                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Status</label>
                         <div className="relative group">
                             <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
                             <select
@@ -108,10 +108,10 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
                                 className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none"
                             >
-                                <option value="active">Operational (Active)</option>
-                                <option value="inactive">Dormant (Inactive)</option>
-                                <option value="on_leave">Maintenance (On Leave)</option>
-                                <option value="terminated">Decommissioned (Terminated)</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="on_leave">On Leave</option>
+                                <option value="terminated">Terminated</option>
                             </select>
                         </div>
                     </div>
@@ -124,9 +124,9 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                         className="flex-1 py-4 px-6 text-sm font-medium uppercase tracking-widest text-textSecondary hover:text-error hover:bg-error/10 rounded-md transition-all border border-transparent hover:border-error/20 flex items-center justify-center gap-2"
                     >
                         <X size={14} />
-                        Discard
+                        Cancel
                     </button>
-                    <button
+                <button
                         type="submit"
                         disabled={loading}
                         className="flex-[2] btn-primary py-4 h-auto shadow-none"
@@ -134,12 +134,12 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                         {loading ? (
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>Saving Changes...</span>
+                                <span>Saving...</span>
                             </div>
                         ) : (
                             <div className="flex items-center gap-2 font-bold">
                                 <Save size={16} />
-                                <span>Commit Lifecycle Changes</span>
+                                <span>Update Employee</span>
                             </div>
                         )}
                     </button>

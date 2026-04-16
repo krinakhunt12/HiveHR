@@ -35,12 +35,12 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
         try {
             await update.mutateAsync({ id, payload: { status: newStatus as any } });
             toast({
-                title: 'Directive Updated',
-                description: 'The strategic directive has been synchronized with the central grid.',
+                title: 'Task Updated',
+                description: 'The task has been updated successfully.',
                 type: 'success'
             });
         } catch (err: any) {
-            toast({ title: 'Sync Failed', description: err.message || 'Failed to update directive', type: 'error' });
+            toast({ title: 'Update Failed', description: err.message || 'Could not update task', type: 'error' });
         }
     };
 
@@ -66,9 +66,9 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="text-left">
-                    <h1 className="text-xl font-medium text-textPrimary tracking-tight font-sans">Task Management</h1>
+                    <h1 className="text-xl font-medium text-textPrimary tracking-tight font-sans">Tasks</h1>
                     <p className="text-sm font-medium text-textSecondary mt-0.5">
-                        {isAdmin ? 'Deploy and monitor work objectives across the company.' : 'Maintain and execute assigned operational tasks.'}
+                        {isAdmin ? 'Create and track tasks for your company.' : 'View and update your assigned tasks.'}
                     </p>
                 </div>
                 {isAdmin && (
@@ -84,8 +84,8 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Lateral Control Panel */}
                 <div className="lg:col-span-1 space-y-6">
-                    <Card className="card-premium p-6 border-none shadow-premium bg-white">
-                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 px-1">Control Filter</h4>
+                    <Card className="card-premium p-6 border-none shadow-none bg-white">
+                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 px-1">Filter</h4>
                         <div className="space-y-2">
                             {['all', 'pending', 'in_progress', 'completed', 'blocked'].map((status) => (
                                 <button
@@ -108,13 +108,13 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                         <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
                             <Target size={120} className="text-primary" />
                         </div>
-                        <p className="text-sm font-medium uppercase tracking-widest text-primary mb-2 relative z-10">Efficiency Metric</p>
+                        <p className="text-sm font-medium uppercase tracking-widest text-primary mb-2 relative z-10">Performance</p>
                         <p className="text-xl font-medium text-textPrimary relative z-10">84.2%</p>
-                        <p className="text-sm font-medium text-textSecondary mt-4 relative z-10">Operational output is within 5% of peak seasonal parameters.</p>
+                        <p className="text-sm font-medium text-textSecondary mt-4 relative z-10">Tasks are being completed on time.</p>
                     </div>
                 </div>
 
-                {/* Directive Grid */}
+                {/* Task Grid */}
                 <div className="lg:col-span-3 space-y-6">
                     <div className="flex items-center gap-4 bg-surface p-1 rounded-lg border border-border">
                         <div className="flex-1 flex items-center gap-3 px-3">
@@ -140,7 +140,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                 <div className="w-16 h-16 bg-background rounded-lg flex items-center justify-center mx-auto mb-4 text-border border border-border">
                                     <CheckSquare size={32} />
                                 </div>
-                                <p className="text-sm font-medium text-textSecondary uppercase tracking-widest">No Active Tasks In Range</p>
+                                <p className="text-sm font-medium text-textSecondary uppercase tracking-widest">No tasks found.</p>
                             </div>
                         ) : tasks.map((task: any) => (
                             <Card key={task.id} className="card-premium group border border-border shadow-none hover:border-primary/40 transition-all duration-300 bg-surface">
