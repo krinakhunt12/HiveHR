@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { companyAdminApi } from '@/shared/api/companyAdminApi';
-import { Save, Plus, Trash2, ShieldCheck, ArrowRight, X } from 'lucide-react';
+import { Save, Plus, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
 interface LeaveSettingsModalProps {

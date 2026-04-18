@@ -9,7 +9,6 @@ import {
     Filter
 } from 'lucide-react';
 import { useListTasks, useTaskMutations } from '@/shared/api/hooks/hrHooks';
-import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { cn } from '@/shared/utils/cn';
 import { Button } from '@/shared/ui/button';
@@ -21,12 +20,11 @@ interface TaskManagementViewProps {
 }
 
 export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin }) => {
-    const { session } = useAuthStore();
     const { toast } = useToast();
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
     const params = isAdmin ? {} : {};
-    const { data: tasksResponse, isLoading, refetch } = useListTasks(params, isAdmin);
+    const { data: tasksResponse, isLoading } = useListTasks(params, isAdmin);
     const { update } = useTaskMutations(isAdmin);
 
     const tasks = tasksResponse?.data || [];

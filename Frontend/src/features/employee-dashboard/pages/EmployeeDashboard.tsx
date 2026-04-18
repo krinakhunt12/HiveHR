@@ -27,7 +27,6 @@ const EmployeeDashboard = () => {
     const userName = user?.full_name?.split(' ')[0] || 'User';
 
     const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
-    const today = new Date().toISOString().slice(0, 10);
 
     const { data: attendanceToday, isLoading: loadingAttendance, error: attendanceError } = useTodayAttendance();
     const { data: policiesResponse, isLoading: loadingPolicies, error: policiesError } = useListPolicies({ company_id: companyId });
@@ -189,7 +188,7 @@ const EmployeeDashboard = () => {
                         {policies.slice(0, 3).map((policy) => (
                             <div key={policy.id} className="p-3 rounded-md border border-border bg-surface hover:border-primary/30 transition-all group cursor-pointer text-left">
                                 <p className="text-sm font-medium text-textPrimary group-hover:text-primary transition-colors">{policy.title}</p>
-                                <p className="text-sm uppercase tracking-wider text-textSecondary font-medium mt-1">{policy.policy_type}</p>
+                                <p className="text-sm uppercase tracking-wider text-textSecondary font-medium mt-1">{policy.type}</p>
                             </div>
                         ))}
                         {policies.length === 0 && (

@@ -6,11 +6,9 @@ import {
     Trash2, 
     Calendar,
     ChevronRight,
-    Search,
-    Filter
+    Search
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
-import { cn } from '@/shared/utils/cn';
 import { 
     useListPolicies, 
     usePolicyMutations 

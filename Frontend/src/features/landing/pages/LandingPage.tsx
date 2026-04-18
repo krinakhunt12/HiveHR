@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, CheckCircle2, Clock, CreditCard, ShieldCheck, Users, Zap } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-import { Card, CardContent } from '@/shared/ui/card';
+import { Card } from '@/shared/ui/card';
 import MarketingLayout from '@/shared/layouts/MarketingLayout';
 import { FeatureCard, Testimonial, PricingCard } from '@/shared/components/MarketingComponents';
 
