@@ -11,6 +11,7 @@ import {
   type TaskDirective
 } from '../hrApi'
 import { useAuthStore } from '@/shared/auth/store'
+import { queryKeys } from '../queryKeys'
 
 /**
  * --- PROFILE HOOKS (Employee & Admin) ---
@@ -19,7 +20,7 @@ export const useGetMe = () => {
   const { session } = useAuthStore();
   
   return useQuery({ 
-    queryKey: ['me', session?.user?.id], 
+    queryKey: queryKeys.auth.me(session?.user?.id), 
     queryFn: () => employeeApi.getMe(),
     enabled: !!session,
     retry: false
@@ -30,7 +31,31 @@ export const useUpdateMe = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: Partial<Profile>) => employeeApi.updateMe(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['auth'] })
+  });
+}
+
+/**
+ * --- COMPANY HOOKS (Company Admin) ---
+ */
+export const useCompanyInfo = () => {
+  const { session } = useAuthStore();
+  return useQuery({
+    queryKey: ['company', 'info'],
+    queryFn: async () => {
+      const res = await companyAdminApi.getCompanyInfo();
+      return res.data;
+    },
+    enabled: !!session && session?.user?.role === 'company_admin',
+    retry: false
+  });
+}
+
+export const useUpdateCompanyInfo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: any) => companyAdminApi.updateCompanyInfo(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['company', 'info'] })
   });
 }
 
@@ -41,8 +66,11 @@ export const useListEmployees = (params: any = {}) => {
   const { session } = useAuthStore();
 
   return useQuery({ 
-    queryKey: ['employees', params], 
-    queryFn: () => companyAdminApi.listEmployees(params),
+    queryKey: queryKeys.employees.list(params), 
+    queryFn: async () => {
+      const res = await companyAdminApi.listEmployees(params);
+      return res.data;
+    },
     enabled: !!session,
     retry: false
   })
@@ -50,8 +78,11 @@ export const useListEmployees = (params: any = {}) => {
 
 export const useGetEmployee = (id?: string) => {
   return useQuery({
-    queryKey: ['employee', id],
-    queryFn: () => companyAdminApi.getEmployee(id!),
+    queryKey: queryKeys.employees.detail(id!),
+    queryFn: async () => {
+       const res = await companyAdminApi.getEmployee(id!);
+       return res.data;
+    },
     enabled: !!id,
     retry: false
   })
@@ -62,20 +93,20 @@ export const useEmployeeMutations = () => {
 
   const create = useMutation({
     mutationFn: (payload: any) => companyAdminApi.createEmployee(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['employees'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.employees.list() })
   })
 
   const update = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) => companyAdminApi.updateEmployee(id, payload),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] });
-      queryClient.invalidateQueries({ queryKey: ['employee', variables.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.detail(variables.id) });
     }
   })
 
   const remove = useMutation({
     mutationFn: (id: string) => companyAdminApi.deleteEmployee(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['employees'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.employees.list() })
   })
 
   return { create, update, remove }
@@ -87,7 +118,7 @@ export const useEmployeeMutations = () => {
 export const useTodayAttendance = () => {
     const { session } = useAuthStore();
     return useQuery({
-        queryKey: ['attendance', 'today', session?.user?.id],
+        queryKey: queryKeys.attendance.today(session?.user?.id),
         queryFn: () => employeeApi.getTodayAttendance(),
         enabled: !!session,
         retry: false
@@ -96,7 +127,7 @@ export const useTodayAttendance = () => {
 
 export const useListAttendance = (params: any = {}) => {
   return useQuery({ 
-    queryKey: ['attendance', 'list', params], 
+    queryKey: queryKeys.attendance.list(params), 
     queryFn: async () => {
       const data = await employeeApi.getTodayAttendance();
       return Array.isArray(data) ? data : [data].filter(d => 'id' in d);
@@ -129,8 +160,11 @@ export const useListPolicies = (params: any = {}) => {
   const api = (params.include_inactive || params.company_id) ? companyAdminApi : employeeApi;
   
   return useQuery({ 
-    queryKey: ['policies', params], 
-    queryFn: () => api.listPolicies(params),
+    queryKey: queryKeys.policies.list(params), 
+    queryFn: async () => {
+      const res = await api.listPolicies(params);
+      return res.data;
+    },
     retry: false
   })
 }
@@ -140,17 +174,17 @@ export const usePolicyMutations = () => {
 
   const create = useMutation({
     mutationFn: (payload: any) => companyAdminApi.createPolicy(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['policies'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.policies.list() })
   })
 
   const update = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => companyAdminApi.updatePolicy(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['policies'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.policies.list() })
   })
 
   const remove = useMutation({
     mutationFn: (id: string) => companyAdminApi.deletePolicy(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['policies'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.policies.list() })
   })
 
   return { create, update, remove }
@@ -160,20 +194,24 @@ export const usePolicyMutations = () => {
  * --- LEAVE HOOKS ---
  */
 export const useListLeaves = (params: any = {}) => {
-    // If employee_id is present, it's likely an admin viewing or employee viewing their own
-    // but the endpoints are similar. We'll use employeeApi as default unless specified.
     const api = params.employee_id ? companyAdminApi : employeeApi;
     return useQuery({
-        queryKey: ['leaves', params],
-        queryFn: () => api.listLeaves(params),
+        queryKey: queryKeys.leaves.list(params),
+        queryFn: async () => {
+          const res = await api.listLeaves(params);
+          return res.data;
+        },
         retry: false
     })
 }
 
 export const useLeaveSummary = (year?: number) => {
     return useQuery({
-        queryKey: ['leave-summary', year],
-        queryFn: () => employeeApi.getLeaveSummary(year),
+        queryKey: queryKeys.leaves.summary(year),
+        queryFn: async () => {
+           const res = await employeeApi.getLeaveSummary(year);
+           return res.data;
+        },
         retry: false
     })
 }
@@ -185,7 +223,6 @@ export const useLeaveMutations = () => {
         mutationFn: (payload: any) => employeeApi.submitLeave(payload),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['leaves'] });
-            queryClient.invalidateQueries({ queryKey: ['leave-summary'] });
         }
     });
 
@@ -193,7 +230,6 @@ export const useLeaveMutations = () => {
         mutationFn: ({ id, payload }: { id: string; payload: any }) => companyAdminApi.reviewLeave(id, payload),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['leaves'] });
-            queryClient.invalidateQueries({ queryKey: ['leave-summary'] });
         }
     });
 
@@ -202,8 +238,11 @@ export const useLeaveMutations = () => {
 
 export const useLeaveConfigurations = () => {
     return useQuery({
-        queryKey: ['leave-configurations'],
-        queryFn: () => employeeApi.getLeaveConfigurations(),
+        queryKey: queryKeys.leaves.configs(),
+        queryFn: async () => {
+          const res = await employeeApi.getLeaveConfigurations();
+          return res.data;
+        },
         retry: false
     });
 }
@@ -213,7 +252,7 @@ export const useLeaveConfigMutations = () => {
     const update = useMutation({
         mutationFn: (configs: any[]) => companyAdminApi.updateLeaveConfigurations(configs),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['leave-configurations'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.leaves.configs() });
         }
     });
     return { update };
@@ -227,8 +266,11 @@ export const useListTasks = (params: any = {}, isAdmin: boolean = false) => {
   const api = isAdmin ? companyAdminApi : employeeApi;
 
   return useQuery({
-    queryKey: ['tasks', params, isAdmin],
-    queryFn: () => api.listTasks(params),
+    queryKey: queryKeys.tasks.list(params, isAdmin),
+    queryFn: async () => {
+      const res = await api.listTasks(params);
+      return res.data;
+    },
     enabled: !!session,
     retry: false
   });
@@ -261,14 +303,17 @@ export const useTaskMutations = (isAdmin: boolean = false) => {
  */
 export const useListAllEmployees = (params: any = {}) => {
   return useQuery({
-    queryKey: ['all-employees', params],
-    queryFn: () => mainAdminApi.listAllEmployees(params),
+    queryKey: queryKeys.employees.all(params),
+    queryFn: async () => {
+      const res = await mainAdminApi.listAllEmployees(params);
+      return res.data;
+    },
     retry: false
   })
 }
 
 export const useHealth = () => useQuery({
-  queryKey: ['health'],
+  queryKey: queryKeys.system.health(),
   queryFn: async () => ({ ok: true, status: 'healthy', project: 'HiveHR-Real-Roles' }),
   retry: false
 })

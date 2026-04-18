@@ -1,27 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { corsHeaders } from "../_shared/cors.ts";
-import {
-  getUserContext,
-  logAction,
-} from "../_shared/auth.ts";
-
-function jsonRes(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-function normalizePath(pathname: string): string {
-  const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
-  while (
-    segments.length > 0 &&
-    ["functions", "v1", "admin"].includes(segments[0])
-  ) {
-    segments.shift();
-  }
-  return segments.length > 0 ? `/${segments.join("/")}` : "/";
-}
+import { getUserContext, logAction } from "../_shared/auth.ts";
+import { jsonRes, normalizePath, corsHeaders, errorRes } from "../_shared/responses.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS")
@@ -39,11 +18,11 @@ Deno.serve(async (req) => {
   if (ctx.role !== "admin") return jsonRes(403, { error: "Forbidden" });
 
   const url = new URL(req.url);
-  const path = normalizePath(url.pathname);
+  const path = normalizePath(url.pathname, "admin");
   const method = req.method;
 
   const segments = path.replace(/^\//, "").split("/");
-  const resource = segments[0]; // companies | users | employees | attendance | leaves
+  const resource = segments[0] || null;
   const resourceId = segments[1] || null;
 
   try {
@@ -94,7 +73,7 @@ Deno.serve(async (req) => {
       if (method === "PATCH" && resourceId) {
         const body = await req.json();
         const { role, company_id, full_name } = body;
-        
+
         const { data, error } = await adminClient.from("profiles").update({ role, company_id, full_name }).eq("user_id", resourceId).select().single();
         if (error) throw error;
 
@@ -134,6 +113,6 @@ Deno.serve(async (req) => {
 
     return jsonRes(404, { error: "Resource not found" });
   } catch (err: any) {
-    return jsonRes(400, { error: err.message });
+    return errorRes(err, "admin");
   }
 });

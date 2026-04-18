@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useEmployeeMutations } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
-import { UserPlus, Mail, Briefcase, Hash, Shield, Calendar, ArrowRight, Save } from 'lucide-react';
+import { UserPlus, Mail, Briefcase, Hash, Shield, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
 interface AddEmployeeModalProps {
@@ -13,7 +13,6 @@ interface AddEmployeeModalProps {
 export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => {
     const { create } = useEmployeeMutations();
     const { toast } = useToast();
-    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -29,17 +28,15 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         try {
             await create.mutateAsync(formData);
             toast({ title: 'Employee Added', description: `${formData.full_name} is now part of the company.`, type: 'success' });
             onClose();
         } catch (err: any) {
             toast({ title: 'Add Failed', description: err.message || 'Could not add employee', type: 'error' });
-        } finally {
-            setLoading(false);
         }
     };
+
 
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Add Employee">
@@ -146,11 +143,11 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     </Button>
                     <Button
                         type="submit"
-                        loading={loading}
+                        loading={create.isPending}
                         className="flex-[2] py-4 h-auto"
                     >
                         <span>Add Employee</span>
-                        {!loading && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
+                        {!create.isPending && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
                     </Button>
                 </div>
             </form>

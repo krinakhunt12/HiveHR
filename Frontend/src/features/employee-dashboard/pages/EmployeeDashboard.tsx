@@ -22,39 +22,34 @@ type View = 'dashboard' | 'leaves' | 'tasks' | 'messages' | 'performance';
 
 const EmployeeDashboard = () => {
     const [currentView, setCurrentView] = useState<View>('dashboard');
-    const [isSavingAttendance, setIsSavingAttendance] = useState(false);
     const { data: user, refetch: refetchMe } = useGetMe();
     const userName = user?.full_name?.split(' ')[0] || 'User';
 
     const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
 
     const { data: attendanceToday, isLoading: loadingAttendance, error: attendanceError } = useTodayAttendance();
-    const { data: policiesResponse, isLoading: loadingPolicies, error: policiesError } = useListPolicies({ company_id: companyId });
+    const { data: policies = [], isLoading: loadingPolicies, error: policiesError } = useListPolicies({ company_id: companyId });
     const { checkIn, checkOut } = useAttendanceMutations();
 
-    const policies = policiesResponse?.data || [];
 
     const isLoading = loadingAttendance || loadingPolicies;
     const error = (attendanceError as any)?.message ?? (policiesError as any)?.message ?? null;
 
     const onCheckIn = async () => {
-        setIsSavingAttendance(true);
         try {
             await checkIn.mutateAsync();
-        } catch (err: any) { } finally {
-            setIsSavingAttendance(false);
-        }
+        } catch (err: any) { }
     };
 
     const onCheckOut = async () => {
         if (!attendanceToday?.id) return;
-        setIsSavingAttendance(true);
         try {
             await checkOut.mutateAsync(attendanceToday.id);
-        } catch (err: any) { } finally {
-            setIsSavingAttendance(false);
-        }
+        } catch (err: any) { }
     };
+
+    const isSavingAttendance = checkIn.isPending || checkOut.isPending;
+
 
     const hasAttendance = attendanceToday && 'id' in attendanceToday;
     const canCheckIn = !hasAttendance;

@@ -7,29 +7,9 @@
  * verify_jwt = false (public endpoint)
  */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { corsHeaders } from "../_shared/cors.ts";
+import { jsonRes, normalizePath, corsHeaders, errorRes } from "../_shared/responses.ts";
 
-function jsonRes(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-/** Strip leading /functions/v1/auth prefix from the pathname */
-function normalizePath(pathname: string): string {
-  const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
-  // Remove "functions", "v1", and the function name "auth"
-  while (
-    segments.length > 0 &&
-    ["functions", "v1", "auth"].includes(segments[0])
-  ) {
-    segments.shift();
-  }
-  return segments.length > 0 ? `/${segments.join("/")}` : "/";
-}
-
-Deno.serve(async (req) => {
+Deno.serve(async (req: any) => {
   if (req.method === "OPTIONS")
     return new Response("ok", { headers: corsHeaders });
 
@@ -41,13 +21,18 @@ Deno.serve(async (req) => {
   const adminClient = createClient(supabaseUrl, serviceKey);
 
   const url = new URL(req.url);
-  const path = normalizePath(url.pathname);
+  const path = normalizePath(url.pathname, "auth");
+  const method = req.method;
+
+  const segments = path.replace(/^\//, "").split("/");
+  const resource = segments[0] || null;
+  const resourceId = segments[1] || null;
 
   try {
     const payload = await req.json().catch(() => ({}));
 
     /* ─────────────────────────── SIGNUP ─────────────────────────── */
-    if (req.method === "POST" && path === "/signup") {
+    if (method === "POST" && resource === "signup") {
       const { email, password, full_name, role, company_name, company_id } =
         payload as {
           email: string;
@@ -158,7 +143,7 @@ Deno.serve(async (req) => {
     }
 
     /* ─────────────────────────── LOGIN ──────────────────────────── */
-    if (req.method === "POST" && path === "/login") {
+    if (method === "POST" && resource === "login") {
       const { email, password, role: requestedRole } = payload as {
         email: string;
         password: string;
@@ -281,7 +266,7 @@ Deno.serve(async (req) => {
     }
 
     /* ──────────────────────── UPDATE PASSWORD ───────────────────── */
-    if (req.method === "POST" && path === "/update-password") {
+    if (method === "POST" && resource === "update-password") {
       const authHeader = req.headers.get("Authorization");
       if (!authHeader) return jsonRes(401, { error: "Missing authorization" });
       
@@ -313,6 +298,6 @@ Deno.serve(async (req) => {
 
     return jsonRes(404, { error: `Path not found: ${path}` });
   } catch (err: any) {
-    return jsonRes(400, { error: err.message ?? "Unexpected error" });
+    return errorRes(err, "auth");
   }
 });

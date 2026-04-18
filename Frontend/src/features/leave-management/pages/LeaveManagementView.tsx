@@ -29,12 +29,10 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
     // If admin, we don't pass employee_id to see all, but the API might need company_id
     const params = isAdmin ? { company_id: session?.user?.company_id } : {};
-    const { data: leavesResponse, isLoading, refetch } = useListLeaves(params);
-    const { data: configsRes } = useLeaveConfigurations();
-    const configs = configsRes?.data || [];
+    const { data: leaves = [], isLoading } = useListLeaves(params);
+    const { data: configs = [] } = useLeaveConfigurations();
     const { review } = useLeaveMutations();
 
-    const leaves = leavesResponse?.data || [];
 
     const handleAction = async (id: string, status: 'approved' | 'rejected') => {
         try {
@@ -44,7 +42,6 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 description: `The leave request has been ${status}.`,
                 type: status === 'approved' ? 'success' : 'error'
             });
-            refetch();
         } catch (err: any) {
             toast({ title: 'Update Failed', description: err.message || 'Could not update request', type: 'error' });
         }
@@ -265,7 +262,6 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             <LeaveRequestModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
             <LeaveSettingsModal isOpen={isSettingsModalOpen} onClose={() => {
                 setIsSettingsModalOpen(false);
-                refetch();
             }} />
         </div>
     );

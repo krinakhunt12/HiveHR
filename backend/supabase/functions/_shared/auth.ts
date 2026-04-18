@@ -89,28 +89,3 @@ export async function logAction(
   }
 }
 
-/** Convenience: return JSON responses */
-export function jsonResponse(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers":
-        "Authorization, authorization, x-client-info, apikey, x-api-key, content-type",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-    },
-  });
-}
-
-export function unauthorized(): Response {
-  return jsonResponse(401, { error: "Unauthorized" });
-}
-
-export function forbidden(): Response {
-  return jsonResponse(403, { error: "Forbidden" });
-}
-
-export function badRequest(error: string): Response {
-  return jsonResponse(400, { error });
-}

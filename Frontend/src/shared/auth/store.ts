@@ -11,8 +11,10 @@ export interface UserSession {
     role: AppRole;
     company_id: string | null;
     company_name: string | null;
-    employee_id: string | null;
+    employee_id?: string | null;
+    force_password_reset?: boolean;
   };
+
   access_token: string;
   refresh_token: string;
   expires_at: number;

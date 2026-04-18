@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useToast } from '@/shared/ui/toast/useToast';
-import { companyAdminApi } from '@/shared/api/companyAdminApi';
+import { useLeaveConfigurations, useLeaveConfigMutations } from '@/shared/api/hooks/hrHooks';
 import { Save, Plus, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
@@ -17,29 +17,18 @@ interface Configuration {
 
 export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps) => {
     const { toast } = useToast();
-    const [loading, setLoading] = useState(false);
+    const { data: initialConfigs, isFetching: loading } = useLeaveConfigurations();
+    const { update } = useLeaveConfigMutations();
     const [configs, setConfigs] = useState<Configuration[]>([]);
 
     useEffect(() => {
-        if (isOpen) {
-            fetchConfigs();
-        }
-    }, [isOpen]);
-
-    const fetchConfigs = async () => {
-        setLoading(true);
-        try {
-            const res = await companyAdminApi.getLeaveConfigurations();
-            setConfigs(res.data.map(c => ({ 
+        if (initialConfigs) {
+            setConfigs(initialConfigs.map(c => ({ 
                 leave_type: c.leave_type, 
                 annual_allowance: c.annual_allowance 
             })));
-        } catch (err: any) {
-            toast({ title: 'Error', description: 'Failed to load leave settings', type: 'error' });
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [initialConfigs, isOpen]);
 
     const handleAdd = () => {
         setConfigs([...configs, { leave_type: '', annual_allowance: 10 }]);
@@ -63,15 +52,12 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
             return toast({ title: 'Validation Error', description: 'All leave types must have a name', type: 'error' });
         }
 
-        setLoading(true);
         try {
-            await companyAdminApi.updateLeaveConfigurations(configs);
+            await update.mutateAsync(configs);
             toast({ title: 'Settings Updated', description: 'Leave allowances have been updated successfully.', type: 'success' });
             onClose();
         } catch (err: any) {
             toast({ title: 'Update Failed', description: err.message || 'Failed to save settings', type: 'error' });
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -160,12 +146,12 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                         </Button>
                         <Button
                             type="submit"
-                            loading={loading}
+                            loading={update.isPending}
                             className="px-8 h-12 rounded-xl shadow-lg shadow-primary/20 gap-2"
                         >
                             <Save size={18} />
-                            {loading ? 'Saving...' : 'Save Policies'}
-                            {!loading && <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />}
+                            {update.isPending ? 'Saving...' : 'Save Policies'}
+                            {!update.isPending && <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />}
                         </Button>
                     </div>
                 </div>
@@ -173,3 +159,4 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
         </Dialog>
     );
 };
+

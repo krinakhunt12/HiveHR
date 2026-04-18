@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/shared/auth/store'
 import { useToast } from '@/shared/ui/toast/useToast'
@@ -9,8 +9,10 @@ export function useLogin() {
   const navigate = useNavigate()
   const { setSession } = useAuthStore()
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   return useMutation({
+    mutationKey: ['login'],
     mutationFn: (payload: any) => authApi.login(payload),
     onSuccess: async (res) => {
       // 1. Unified session storing in ONE place (Zustand + LocalStorage)
@@ -26,6 +28,9 @@ export function useLogin() {
         access_token: res.session.access_token,
         refresh_token: res.session.refresh_token,
       })
+
+      // Invalidate all queries to ensure fresh data for the new user
+      queryClient.invalidateQueries()
 
       toast({ title: 'Signed in', description: `Welcome back, ${res.user.full_name}!`, type: 'success' })
       
@@ -56,6 +61,7 @@ export function useSignup() {
   const { toast } = useToast()
 
   return useMutation({
+    mutationKey: ['signup'],
     mutationFn: (payload: any) => authApi.signup(payload),
     onSuccess: (res) => {
       toast({ title: 'Account created', description: 'Please login with your credentials.', type: 'success' })
@@ -70,12 +76,18 @@ export function useSignup() {
 export function useLogout() {
   const navigate = useNavigate()
   const { logout } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  const handleLogout = async () => {
+    logout()
+    await supabase.auth.signOut()
+    queryClient.clear() // Clear cache on logout
+    navigate('/login')
+  }
 
   return {
-    mutate: () => {
-      logout()
-      supabase.auth.signOut()
-      navigate('/login')
-    }
+    mutate: handleLogout,
+    isPending: false // Mock pending for consistency if used in Buttons
   }
 }
+

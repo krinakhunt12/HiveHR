@@ -37,13 +37,11 @@ const CompanyDashboard = () => {
     const { toast } = useToast();
     const companyId = session?.user?.company_id ?? undefined;
 
-    const { data: employeesResponse, isLoading: loadingEmployees, error: employeesError } = useListEmployees({ company_id: companyId });
-    const { data: policiesResponse } = useListPolicies({ company_id: companyId });
+    const { data: employees = [], isLoading: loadingEmployees } = useListEmployees({ company_id: companyId });
+    const { data: policiesResponse = [] } = useListPolicies({ company_id: companyId });
     const { remove: removeEmployee } = useEmployeeMutations();
 
-    const employees = employeesResponse?.data || [];
     const isLoading = loadingEmployees;
-    const error = (employeesError as any)?.message ?? null;
 
     const filteredEmployees = useMemo(() => {
         const normalized = query.trim().toLowerCase();
@@ -130,7 +128,7 @@ const CompanyDashboard = () => {
                 <div className="card-premium p-6 border border-border shadow-none bg-surface text-left">
                     <h4 className="text-sm font-medium mb-6 font-sans uppercase tracking-widest text-textSecondary">New Policies</h4>
                     <div className="space-y-4">
-                        {(policiesResponse?.data || []).slice(0, 3).map((p: any) => (
+                        {(policiesResponse).slice(0, 3).map((p: any) => (
                             <div key={p.id} className="p-3 rounded-md border border-border bg-background/50 hover:bg-primary/5 transition-all group cursor-pointer">
                                 <p className="text-sm font-medium text-textPrimary group-hover:text-primary">{p.title}</p>
                                 <p className="text-sm uppercase tracking-widest text-textSecondary font-medium mt-1">{p.type}</p>
@@ -292,7 +290,6 @@ const CompanyDashboard = () => {
 
 const ManagerStat = ({ title, value, icon, theme }: any) => {
     const isPrimary = theme === 'primary';
-    const isWarning = theme === 'warning';
 
     return (
         <div className="card-premium p-6 group border border-border relative overflow-hidden bg-surface text-left">

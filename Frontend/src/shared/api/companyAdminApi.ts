@@ -19,6 +19,11 @@ export const companyAdminApi = {
     return data as { data: Employee[] };
   },
 
+  getEmployee: async (id: string) => {
+    const data = await invokeApi(`employee/${id}`, { method: 'GET' });
+    return data as { data: Employee };
+  },
+
   createEmployee: async (payload: any) => {
     const data = await invokeApi('employee', { method: 'POST', body: payload });
     return data;
@@ -76,6 +81,28 @@ export const companyAdminApi = {
 
   updateLeaveConfigurations: async (configurations: { leave_type: string; annual_allowance: number }[]) => {
     const data = await invokeApi('company/leave-configurations', { method: 'PUT', body: { configurations } });
+    return data;
+  },
+
+  // --- Tasks ---
+  listTasks: async (params: { status?: string; employee_id?: string } = {}) => {
+    const query = new URLSearchParams(params as any).toString();
+    const data = await invokeApi(`tasks?${query}`, { method: 'GET' });
+    return data as { data: TaskDirective[] };
+  },
+
+  createTask: async (payload: Partial<TaskDirective>) => {
+    const data = await invokeApi('tasks', { method: 'POST', body: payload });
+    return data;
+  },
+
+  updateTask: async (id: string, payload: Partial<TaskDirective>) => {
+    const data = await invokeApi(`tasks/${id}`, { method: 'PATCH', body: payload });
+    return data;
+  },
+
+  deleteTask: async (id: string) => {
+    const data = await invokeApi(`tasks/${id}`, { method: 'DELETE' });
     return data;
   },
 };

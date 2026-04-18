@@ -48,9 +48,29 @@ export const employeeApi = {
     return data;
   },
 
+  getLeaveSummary: async (year?: number) => {
+    const query = year ? `?year=${year}` : '';
+    const data = await invokeApi(`leave/summary${query}`, { method: 'GET' });
+    return data;
+  },
+
+
   getLeaveConfigurations: async () => {
     const data = await invokeApi('company/leave-configurations', { method: 'GET' });
     return data as { data: { id: string; leave_type: string; annual_allowance: number }[] };
   },
+
+  // --- Tasks ---
+  listTasks: async (params: { status?: string } = {}) => {
+    const query = new URLSearchParams(params as any).toString();
+    const data = await invokeApi(`tasks?${query}`, { method: 'GET' });
+    return data as { data: import("./baseApi").TaskDirective[] };
+  },
+
+  updateTaskStatus: async (id: string, status: string) => {
+    const data = await invokeApi(`tasks/${id}`, { method: 'PATCH', body: { status } });
+    return data;
+  },
 };
+
 

@@ -1,29 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { corsHeaders } from "../_shared/cors.ts";
-import {
-  getUserContext,
-  logAction,
-} from "../_shared/auth.ts";
+import { getUserContext, logAction } from "../_shared/auth.ts";
+import { jsonRes, normalizePath, corsHeaders, errorRes } from "../_shared/responses.ts";
 
-function jsonRes(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-function normalizePath(pathname: string): string {
-  const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
-  while (
-    segments.length > 0 &&
-    ["functions", "v1", "employee"].includes(segments[0])
-  ) {
-    segments.shift();
-  }
-  return segments.length > 0 ? `/${segments.join("/")}` : "/";
-}
-
-Deno.serve(async (req) => {
+Deno.serve(async (req: any) => {
   if (req.method === "OPTIONS")
     return new Response("ok", { headers: corsHeaders });
 
@@ -44,15 +23,16 @@ Deno.serve(async (req) => {
   if (!companyId) return jsonRes(400, { error: "Context: No company ID found" });
 
   const url = new URL(req.url);
-  const path = normalizePath(url.pathname);
+  const path = normalizePath(url.pathname, "employee");
   const method = req.method;
 
   const segments = path.replace(/^\//, "").split("/");
-  const resourceId = (segments[0] && segments[0] !== "") ? segments[0] : null;
+  const resource = segments[0] || null;
+  const resourceId = segments[1] || null;
 
   try {
     // GET /employee -> List all employees in company
-    if (method === "GET" && !resourceId) {
+    if (method === "GET" && !resource) {
       const { data, error } = await adminClient
         .from("employees")
         .select("*, profiles(full_name, role)")
@@ -63,7 +43,7 @@ Deno.serve(async (req) => {
     }
 
     // POST /employee -> Create employee (Auth + Profile + Employee)
-    if (method === "POST" && !resourceId) {
+    if (method === "POST" && !resource) {
       const body = await req.json();
       const { email, password, full_name, role = "employee", ...rest } = body;
 
@@ -106,35 +86,35 @@ Deno.serve(async (req) => {
     }
 
     // PATCH /employee/:id -> Update employee
-    if (method === "PATCH" && resourceId) {
+    if (method === "PATCH" && resource) {
       const body = await req.json();
       // Ensure the employee belongs to this company
-      const { data: existing } = await adminClient.from("employees").select("company_id").eq("id", resourceId).single();
+      const { data: existing } = await adminClient.from("employees").select("company_id").eq("id", resource).single();
       if (!existing || existing.company_id !== companyId) return jsonRes(403, { error: "Forbidden" });
 
-      const { data, error } = await adminClient.from("employees").update(body).eq("id", resourceId).select().single();
+      const { data, error } = await adminClient.from("employees").update(body).eq("id", resource).select().single();
       if (error) throw error;
       
-      await logAction(adminClient, ctx, "UPDATE_EMPLOYEE", "employees", resourceId, body);
+      await logAction(adminClient, ctx, "UPDATE_EMPLOYEE", "employees", resource, body);
       return jsonRes(200, { data });
     }
 
     // DELETE /employee/:id -> Delete employee (and Auth?)
-    if (method === "DELETE" && resourceId) {
-       const { data: existing } = await adminClient.from("employees").select("user_id, company_id").eq("id", resourceId).single();
+    if (method === "DELETE" && resource) {
+       const { data: existing } = await adminClient.from("employees").select("user_id, company_id").eq("id", resource).single();
        if (!existing || existing.company_id !== companyId) return jsonRes(403, { error: "Forbidden" });
 
        // We might NOT want to delete the Auth user, but deactivate them. 
        // For this task, we'll just delete the employee record or mark inactive.
-       const { error } = await adminClient.from("employees").delete().eq("id", resourceId);
+       const { error } = await adminClient.from("employees").delete().eq("id", resource);
        if (error) throw error;
 
-       await logAction(adminClient, ctx, "DELETE_EMPLOYEE", "employees", resourceId);
+       await logAction(adminClient, ctx, "DELETE_EMPLOYEE", "employees", resource);
        return jsonRes(200, { message: "Employee removed from company" });
     }
 
     return jsonRes(404, { error: "Resource not found" });
   } catch (err: any) {
-    return jsonRes(400, { error: err.message });
+    return errorRes(err, "employee");
   }
 });

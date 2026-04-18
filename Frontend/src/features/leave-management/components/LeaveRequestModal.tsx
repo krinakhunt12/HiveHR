@@ -12,10 +12,8 @@ interface LeaveRequestModalProps {
 
 export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) => {
     const { submit } = useLeaveMutations();
-    const { data: configsRes } = useLeaveConfigurations();
-    const configs = configsRes?.data || [];
+    const { data: configs = [] } = useLeaveConfigurations();
     const { toast } = useToast();
-    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         leave_type: 'paid',
@@ -26,17 +24,15 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         try {
             await submit.mutateAsync(formData);
             toast({ title: 'Request Sent', description: 'Your leave request has been sent for approval.', type: 'success' });
             onClose();
         } catch (err: any) {
             toast({ title: 'Request Failed', description: err.message || 'Could not send request', type: 'error' });
-        } finally {
-            setLoading(false);
         }
     };
+
 
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Request Leave">
@@ -126,11 +122,11 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                     </Button>
                     <Button
                         type="submit"
-                        loading={loading}
+                        loading={submit.isPending}
                         className="flex-[2] py-4 h-auto"
                     >
                         <span>Send Request</span>
-                        {!loading && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
+                        {!submit.isPending && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
                     </Button>
                 </div>
             </form>

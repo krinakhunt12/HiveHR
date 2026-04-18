@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { 
-    FileText, 
-    Plus, 
-    Edit3, 
-    Trash2, 
+import {
+    FileText,
+    Plus,
+    Edit3,
+    Trash2,
     Calendar,
     ChevronRight,
     Search
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
-import { 
-    useListPolicies, 
-    usePolicyMutations 
+import {
+    useListPolicies,
+    usePolicyMutations
 } from '@/shared/api/hooks/hrHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
@@ -112,9 +112,9 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
                         <Button type="button" variant="outline" onClick={onClose} className="flex-1">
                             Cancel
                         </Button>
-                        <Button 
-                            type="submit" 
-                            loading={create.isPending || update.isPending} 
+                        <Button
+                            type="submit"
+                            loading={create.isPending || update.isPending}
                             className="flex-1"
                         >
                             {initialData ? 'Update Policy' : 'Create Policy'}
@@ -129,18 +129,16 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
 export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
     const { session } = useAuthStore();
     const companyId = session?.user?.company_id ?? undefined;
-    const { data: response, isLoading, refetch } = useListPolicies({ company_id: companyId });
+    const { data: response, isLoading } = useListPolicies({ company_id: companyId });
     const { remove } = usePolicyMutations();
     const { toast } = useToast();
-    
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPolicy, setEditingPolicy] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const policies = response?.data || [];
-    
-    const filteredPolicies = policies.filter((p: any) => 
-        p.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const filteredPolicies = (response || []).filter((p: any) =>
+        p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.type?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -149,7 +147,6 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
         try {
             await remove.mutateAsync(id);
             toast({ title: 'Policy Deleted', description: 'The policy has been removed from the handbook.', type: 'success' });
-            refetch();
         } catch (err: any) {
             toast({ title: 'Deletion Failed', description: err.message || 'Failed to delete policy', type: 'error' });
         }
@@ -180,7 +177,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                     <p className="text-sm font-medium text-textSecondary mt-0.5">Manage and view corporate policies and guidelines.</p>
                 </div>
                 {isAdmin && (
-                    <Button 
+                    <Button
                         onClick={() => { setEditingPolicy(null); setIsModalOpen(true); }}
                     >
                         <Plus size={18} />
@@ -210,7 +207,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                                 </div>
                                 {isAdmin && (
                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                        <Button 
+                                        <Button
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => { setEditingPolicy(p); setIsModalOpen(true); }}
@@ -218,7 +215,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                                         >
                                             <Edit3 size={16} />
                                         </Button>
-                                        <Button 
+                                        <Button
                                             variant="ghost"
                                             size="icon"
                                             loading={remove.isPending && remove.variables === p.id}
@@ -263,11 +260,11 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                 )}
             </div>
 
-            <PolicyModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
+            <PolicyModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
                 initialData={editingPolicy}
-                onSuccess={refetch}
+                onSuccess={() => { }}
             />
         </div>
     );

@@ -14,7 +14,6 @@ interface EditEmployeeModalProps {
 export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeModalProps) => {
     const { update } = useEmployeeMutations();
     const { toast } = useToast();
-    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -37,17 +36,15 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!employee) return;
-        setLoading(true);
         try {
             await update.mutateAsync({ id: employee.id, payload: formData });
             toast({ title: 'Profile Updated', description: `Changes for ${formData.full_name} have been saved.`, type: 'success' });
             onClose();
         } catch (err: any) {
             toast({ title: 'Save Failed', description: err.message || 'Could not update employee', type: 'error' });
-        } finally {
-            setLoading(false);
         }
     };
+
 
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Edit Employee">
@@ -130,7 +127,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                     </Button>
                     <Button
                         type="submit"
-                        loading={loading}
+                        loading={update.isPending}
                         className="flex-[2] py-4 h-auto"
                     >
                         <Save size={16} />

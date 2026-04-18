@@ -1,29 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { corsHeaders } from "../_shared/cors.ts";
-import {
-  getUserContext,
-  logAction,
-} from "../_shared/auth.ts";
+import { getUserContext, logAction } from "../_shared/auth.ts";
+import { jsonRes, normalizePath, corsHeaders, errorRes } from "../_shared/responses.ts";
 
-function jsonRes(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-function normalizePath(pathname: string): string {
-  const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
-  while (
-    segments.length > 0 &&
-    ["functions", "v1", "leave"].includes(segments[0])
-  ) {
-    segments.shift();
-  }
-  return segments.length > 0 ? `/${segments.join("/")}` : "/";
-}
-
-Deno.serve(async (req) => {
+Deno.serve(async (req: any) => {
   if (req.method === "OPTIONS")
     return new Response("ok", { headers: corsHeaders });
 
@@ -37,9 +16,13 @@ Deno.serve(async (req) => {
   const ctx = await getUserContext(req);
   if (!ctx) return jsonRes(401, { error: "Unauthorized" });
   
-  const url = new URL(req.url);
-  const path = normalizePath(url.pathname);
+  const url    = new URL(req.url);
+  const path   = normalizePath(url.pathname, "leave");
   const method = req.method;
+
+  const segments   = path.replace(/^\//, "").split("/");
+  const resource   = segments[0] || null;
+  const resourceId = segments[1] || null;
 
   try {
     /* =========================================================================
@@ -88,8 +71,7 @@ Deno.serve(async (req) => {
        PATCH /leave/:id -> Update status (Approve/Reject/Cancel)
        ========================================================================= */
     if (method === "PATCH") {
-      const segments = path.replace(/^\//, "").split("/");
-      const resourceId = segments[0] || null;
+      const resourceId = resource;
       if (!resourceId) return jsonRes(400, { error: "Missing leave id" });
 
       const body = await req.json();
@@ -117,6 +99,6 @@ Deno.serve(async (req) => {
 
     return jsonRes(404, { error: "Resource not found" });
   } catch (err: any) {
-    return jsonRes(400, { error: err.message });
+    return errorRes(err, "leave");
   }
 });

@@ -24,10 +24,12 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
     const params = isAdmin ? {} : {};
-    const { data: tasksResponse, isLoading } = useListTasks(params, isAdmin);
+    const { data: rawTasks = [], isLoading } = useListTasks(params, isAdmin);
     const { update } = useTaskMutations(isAdmin);
 
-    const tasks = tasksResponse?.data || [];
+    const tasks = rawTasks;
+
+
 
     const handleStatusUpdate = async (id: string, newStatus: string) => {
         try {
