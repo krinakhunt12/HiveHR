@@ -60,7 +60,35 @@ const EmployeeDashboard = () => {
     const hasAttendance = attendanceToday && 'id' in attendanceToday;
     const canCheckIn = !hasAttendance;
     const canCheckOut = hasAttendance && !attendanceToday.check_out_at;
-    const todaysMinutes = (hasAttendance ? attendanceToday.work_minutes : 0) ?? 0;
+    
+    // Logic: 8h work + 1h break = 9h total stay requirement
+    const checkInTime = hasAttendance ? new Date(attendanceToday.check_in_at!).getTime() : null;
+    const [elapsedMinutes, setElapsedMinutes] = useState(0);
+
+    React.useEffect(() => {
+        if (!checkInTime || attendanceToday?.check_out_at) return;
+        
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            setElapsedMinutes(Math.floor((now - checkInTime) / (1000 * 60)));
+        }, 60000); // Update every minute
+        
+        // Initial calculation
+        setElapsedMinutes(Math.floor((new Date().getTime() - checkInTime) / (1000 * 60)));
+        
+        return () => clearInterval(interval);
+    }, [checkInTime, attendanceToday?.check_out_at]);
+
+    const displayMinutes = attendanceToday?.check_out_at 
+        ? attendanceToday.work_minutes 
+        : (elapsedMinutes > 60 ? elapsedMinutes - 60 : 0); // Assume 1h break for real-time display
+
+    const totalStayMinutes = attendanceToday?.check_out_at
+        ? Math.floor((new Date(attendanceToday.check_out_at).getTime() - checkInTime!) / 60000)
+        : elapsedMinutes;
+
+    const workProgress = Math.min(100, (Number(displayMinutes) / 480) * 100);
+    const estimatedPunchOut = checkInTime ? new Date(checkInTime + (9 * 60 * 60 * 1000)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
 
     const navItems = [
         { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: 'dashboard' },
@@ -82,27 +110,35 @@ const EmployeeDashboard = () => {
                     <h1 className="text-xl font-medium text-slate-900 tracking-tight font-sans">Welcome, {userName}</h1>
                     <p className="text-sm font-medium text-slate-400 mt-0.5">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => setCurrentView('leaves')}
-                        className="px-5 py-2 text-sm font-medium uppercase tracking-wider text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all border border-border bg-surface"
-                    >
-                        Request Leave
-                    </button>
-                    <button
-                        className={cn(
-                            "px-6 py-2 rounded-md font-medium text-sm uppercase tracking-wider transition-all active:scale-[0.98]",
-                            canCheckIn
-                                ? "bg-primary text-white"
-                                : canCheckOut
-                                    ? "bg-warning text-white"
-                                    : "bg-background text-textSecondary cursor-not-allowed"
-                        )}
-                        onClick={canCheckIn ? onCheckIn : onCheckOut}
-                        disabled={isSavingAttendance || (!canCheckIn && !canCheckOut)}
-                    >
-                        {isSavingAttendance ? 'Saving...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Done'}
-                    </button>
+                <div className="flex flex-col md:flex-row gap-4 items-center">
+                    {hasAttendance && !attendanceToday.check_out_at && (
+                        <div className="text-right mr-4">
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Target Punch Out (9h)</p>
+                            <p className="text-lg font-medium text-primary tracking-tight">{estimatedPunchOut}</p>
+                        </div>
+                    )}
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setCurrentView('leaves')}
+                            className="px-5 py-2 text-sm font-medium uppercase tracking-wider text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all border border-border bg-surface"
+                        >
+                            Request Leave
+                        </button>
+                        <button
+                            className={cn(
+                                "px-6 py-2 rounded-md font-medium text-sm uppercase tracking-wider transition-all active:scale-[0.98]",
+                                canCheckIn
+                                    ? "bg-primary text-white"
+                                    : canCheckOut
+                                        ? "bg-warning text-white"
+                                        : "bg-background text-textSecondary cursor-not-allowed"
+                            )}
+                            onClick={canCheckIn ? onCheckIn : onCheckOut}
+                            disabled={isSavingAttendance || (!canCheckIn && !canCheckOut)}
+                        >
+                            {isSavingAttendance ? 'Saving...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Done'}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -114,18 +150,19 @@ const EmployeeDashboard = () => {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <StatCard title="Performance" value="98.4%" trend="+1.2%" icon={<Clock />} theme="primary" />
-                <div className="card-premium p-6 border border-border flex flex-col justify-center bg-surface shadow-none">
-                    <p className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-4">Leaves Left</p>
+                <div className="card-premium p-6 border border-border flex flex-col justify-center bg-surface shadow-none overflow-hidden relative">
+                    <p className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-4">Work Progress (8h)</p>
                     <div className="flex items-center gap-4">
                         <div className="flex-1 h-2 bg-background rounded-full overflow-hidden">
-                            <div className="h-full bg-primary w-[60%] rounded-full"></div>
+                            <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${workProgress}%` }}></div>
                         </div>
-                        <span className="text-sm font-medium text-textPrimary">14/24 <span className="text-sm text-textSecondary">Days</span></span>
+                        <span className="text-sm font-medium text-textPrimary">{Math.round(workProgress)}%</span>
                     </div>
+                    {workProgress >= 100 && <div className="absolute top-2 right-2 text-[10px] text-success font-bold uppercase tracking-tighter">Requirement Met</div>}
                 </div>
+                <StatCard title="Total Stay" value={`${Math.floor(totalStayMinutes / 60)}h ${totalStayMinutes % 60}m`} icon={<Clock />} theme={totalStayMinutes >= 540 ? "primary" : "warning"} />
+                <StatCard title="Work Minutes" value={String(displayMinutes)} icon={<Award />} theme="primary" />
                 <StatCard title="Active Tasks" value="08" icon={<CheckSquare />} theme="warning" />
-                <StatCard title="Total Minutes" value={String(todaysMinutes)} icon={<Award />} theme="primary" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

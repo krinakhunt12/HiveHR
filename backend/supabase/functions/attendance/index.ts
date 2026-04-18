@@ -114,17 +114,30 @@ Deno.serve(async (req) => {
       // If employee IS punching out, we allow it
       if (ctx.role === "employee") {
         // Enforce safety: Employee can only update their own record and only the check_out_at field (usually)
-        const { data: existing } = await adminClient.from("attendance").select("employee_id, company_id, check_in_at").eq("id", resourceId).single();
+        const { data: existing } = await adminClient.from("attendance").select("employee_id, company_id, check_in_at, break_minutes").eq("id", resourceId).single();
         if (!existing || existing.employee_id !== ctx.employeeId) return jsonRes(403, { error: "Forbidden" });
         
         // Auto-set check_out_at if not provided in body (standard punch out)
         if (!body.check_out_at) body.check_out_at = new Date().toISOString();
         
-        // Calculate work minutes if possible
+        // Calculate work minutes logic (8h work + variable break)
         if (existing.check_in_at) {
           const start = new Date(existing.check_in_at).getTime();
           const end = new Date(body.check_out_at).getTime();
-          body.work_minutes = Math.round((end - start) / (1000 * 60));
+          const totalMinutes = Math.round((end - start) / (1000 * 60));
+          
+          // Use provided break_minutes or existing or default to 60
+          const breakMin = body.break_minutes ?? existing.break_minutes ?? 60;
+          
+          // Work Minutes = Total Stay - Break Time
+          body.work_minutes = totalMinutes - breakMin;
+          
+          // Optional: Auto-adjust status if below 8 hours
+          if (body.work_minutes < 480) {
+            body.status = "short_shift"; // or keep as is if admin handles it
+          } else {
+            body.status = "present";
+          }
         }
       } else if (ctx.role === "company_admin") {
          const { data: existing } = await adminClient.from("attendance").select("company_id").eq("id", resourceId).single();

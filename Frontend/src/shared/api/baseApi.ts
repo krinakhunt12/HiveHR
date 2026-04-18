@@ -35,6 +35,7 @@ export interface AttendanceLog {
   check_in_at: string | null;
   check_out_at: string | null;
   work_minutes: number | null;
+  break_minutes: number | null;
   status: string;
   created_at: string;
 }
@@ -93,28 +94,37 @@ function getAccessTokenFromStore(): string | null {
 
 /**
  * Universal invoker using standard Fetch to ensure full control over headers.
+ * Centralized to match the backend standardization logic.
  */
-export async function invokeApi(path: string, options: any = {}) {
+export async function invokeApi<T = any>(path: string, options: { 
+  method?: string; 
+  body?: any; 
+  headers?: Record<string, string>;
+  isPublic?: boolean;
+} = {}): Promise<T> {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  let token = getAccessTokenFromStore();
-  if (!token) {
-    const { data: { session } } = await supabase.auth.getSession();
-    token = session?.access_token ?? null;
+  if (!supabaseUrl || !anonKey) {
+    throw new Error('Supabase configuration missing (VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY)');
   }
 
-  if (!token) {
-    throw new Error('No authentication session found. Please log in.');
+  let token = anonKey;
+  if (!options.isPublic) {
+    token = getAccessTokenFromStore() || '';
+    if (!token) {
+      const { data: { session } } = await supabase.auth.getSession();
+      token = session?.access_token || anonKey;
+    }
   }
 
-  // Build final URL manually to avoid SDK mapping issues
-  const [funcName, ...queryParts] = path.split('?');
+  // Build final URL
+  const [funcPath, ...queryParts] = path.split('?');
   const queryString = queryParts.join('?');
-  const url = `${supabaseUrl}/functions/v1/${funcName}${queryString ? '?' + queryString : ''}`;
+  const url = `${supabaseUrl}/functions/v1/${funcPath}${queryString ? '?' + queryString : ''}`;
 
   const fetchOptions: RequestInit = {
-    method: options.method || 'POST',
+    method: options.method || (options.body ? 'POST' : 'GET'),
     headers: {
       'Content-Type': 'application/json',
       'apikey': anonKey,
@@ -129,11 +139,16 @@ export async function invokeApi(path: string, options: any = {}) {
 
   const response = await fetch(url, fetchOptions);
 
+  // Centralized Error Parsing (Matches backend jsonRes format)
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     console.error(`[api] Error ${response.status} calling ${path}:`, errorData);
     
-    throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    // Support backend error format { error: "msg", message: "fallback" }
+    const errorMsg = errorData.error || errorData.message || `Request failed with status ${response.status}`;
+    const error = new Error(errorMsg);
+    if (errorData.errors) (error as any).errors = errorData.errors; // Attach validation errors
+    throw error;
   }
 
   return response.json();
