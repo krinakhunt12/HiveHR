@@ -2,12 +2,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders } from "../_shared/cors.ts";
 import {
   getUserContext,
-  jsonResponse,
-  unauthorized,
   logAction,
-  badRequest,
-  forbidden,
 } from "../_shared/auth.ts";
+
+function jsonRes(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 function normalizePath(pathname: string): string {
   const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
@@ -25,11 +28,14 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
+
+  const publicClient = createClient(supabaseUrl, anonKey);
+  const adminClient = createClient(supabaseUrl, serviceKey);
 
   const ctx = await getUserContext(req);
-  if (!ctx) return unauthorized();
+  if (!ctx) return jsonRes(401, { error: "Unauthorized" });
   
   const url = new URL(req.url);
   const path = normalizePath(url.pathname);
@@ -40,10 +46,10 @@ Deno.serve(async (req) => {
        GET /attendance -> List records
        ========================================================================= */
     if (method === "GET") {
-      let query = supabase.from("attendance").select("*, employees(full_name)");
+      let query = adminClient.from("attendance").select("*, employees(full_name)");
 
       if (ctx.role === "employee") {
-        if (!ctx.employeeId) return badRequest("No employee record found");
+        if (!ctx.employeeId) return jsonRes(400, { error: "No employee record found" });
         query = query.eq("employee_id", ctx.employeeId);
       } else if (ctx.role === "company_admin") {
         query = query.eq("company_id", ctx.companyId);
@@ -52,7 +58,7 @@ Deno.serve(async (req) => {
 
       const { data, error } = await query.order("date", { ascending: false });
       if (error) throw error;
-      return jsonResponse(200, { data });
+      return jsonRes(200, { data });
     }
 
     /* =========================================================================
@@ -64,7 +70,7 @@ Deno.serve(async (req) => {
       
       // If employee, enforce own employee_id and company_id
       if (ctx.role === "employee") {
-        if (!ctx.employeeId) return badRequest("No employee record found");
+        if (!ctx.employeeId) return jsonRes(400, { error: "No employee record found" });
         body.employee_id = ctx.employeeId;
         body.company_id = ctx.companyId;
       }
@@ -74,25 +80,25 @@ Deno.serve(async (req) => {
       body.check_in_at = new Date().toISOString();
 
       if (!body.employee_id || !body.company_id) {
-        return badRequest("Missing employee_id or company_id");
+        return jsonRes(400, { error: "Missing employee_id or company_id" });
       }
 
       // Check if already checked in for today
-      const { data: existing } = await supabase.from("attendance")
+      const { data: existing } = await adminClient.from("attendance")
         .select("id")
         .eq("employee_id", body.employee_id)
         .eq("date", body.date)
         .single();
 
       if (existing) {
-        return jsonResponse(200, { data: existing, message: "Already checked in" });
+        return jsonRes(200, { data: existing, message: "Already checked in" });
       }
 
-      const { data, error } = await supabase.from("attendance").insert(body).select().single();
+      const { data, error } = await adminClient.from("attendance").insert(body).select().single();
       if (error) throw error;
 
-      await logAction(supabase, ctx, "MARK_ATTENDANCE", "attendance", data.id, body);
-      return jsonResponse(201, { data });
+      await logAction(adminClient, ctx, "MARK_ATTENDANCE", "attendance", data.id, body);
+      return jsonRes(201, { data });
     }
 
     /* =========================================================================
@@ -101,15 +107,15 @@ Deno.serve(async (req) => {
     if (method === "PATCH") {
       const segments = path.replace(/^\//, "").split("/");
       const resourceId = segments[0] || null;
-      if (!resourceId) return badRequest("Missing attendance id");
+      if (!resourceId) return jsonRes(400, { error: "Missing attendance id" });
 
       const body = await req.json();
 
       // If employee IS punching out, we allow it
       if (ctx.role === "employee") {
         // Enforce safety: Employee can only update their own record and only the check_out_at field (usually)
-        const { data: existing } = await supabase.from("attendance").select("employee_id, company_id, check_in_at").eq("id", resourceId).single();
-        if (!existing || existing.employee_id !== ctx.employeeId) return forbidden();
+        const { data: existing } = await adminClient.from("attendance").select("employee_id, company_id, check_in_at").eq("id", resourceId).single();
+        if (!existing || existing.employee_id !== ctx.employeeId) return jsonRes(403, { error: "Forbidden" });
         
         // Auto-set check_out_at if not provided in body (standard punch out)
         if (!body.check_out_at) body.check_out_at = new Date().toISOString();
@@ -121,20 +127,20 @@ Deno.serve(async (req) => {
           body.work_minutes = Math.round((end - start) / (1000 * 60));
         }
       } else if (ctx.role === "company_admin") {
-         const { data: existing } = await supabase.from("attendance").select("company_id").eq("id", resourceId).single();
-         if (!existing || existing.company_id !== ctx.companyId) return forbidden();
+         const { data: existing } = await adminClient.from("attendance").select("company_id").eq("id", resourceId).single();
+         if (!existing || existing.company_id !== ctx.companyId) return jsonRes(403, { error: "Forbidden" });
       }
 
-      const { data, error } = await supabase.from("attendance").update(body).eq("id", resourceId).select().single();
+      const { data, error } = await adminClient.from("attendance").update(body).eq("id", resourceId).select().single();
       if (error) throw error;
 
-      await logAction(supabase, ctx, "UPDATE_ATTENDANCE", "attendance", resourceId, body);
-      return jsonResponse(200, { data });
+      await logAction(adminClient, ctx, "UPDATE_ATTENDANCE", "attendance", resourceId, body);
+      return jsonRes(200, { data });
     }
 
-    return jsonResponse(404, { error: "Resource not found" });
+    return jsonRes(404, { error: "Resource not found" });
   } catch (err: any) {
     console.error("[attendance] Error:", err);
-    return badRequest(err.message);
+    return jsonRes(400, { error: err.message });
   }
 });

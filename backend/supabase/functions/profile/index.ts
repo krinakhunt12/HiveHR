@@ -2,11 +2,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders } from "../_shared/cors.ts";
 import {
   getUserContext,
-  jsonResponse,
-  unauthorized,
   logAction,
-  badRequest,
 } from "../_shared/auth.ts";
+
+function jsonRes(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 function normalizePath(pathname: string): string {
   const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
@@ -24,11 +28,14 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
+
+  const publicClient = createClient(supabaseUrl, anonKey);
+  const adminClient = createClient(supabaseUrl, serviceKey);
 
   const ctx = await getUserContext(req);
-  if (!ctx) return unauthorized();
+  if (!ctx) return jsonRes(401, { error: "Unauthorized" });
   
   const url = new URL(req.url);
   const path = normalizePath(url.pathname);
@@ -39,18 +46,18 @@ Deno.serve(async (req) => {
 
   // Security: Only self or Admin can view/update
   if (targetUserId !== ctx.userId && ctx.role !== "admin") {
-     return jsonResponse(403, { error: "Forbidden: Cannot access other user profile" });
+     return jsonRes(403, { error: "Forbidden: Cannot access other user profile" });
   }
 
   try {
     if (method === "GET") {
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from("profiles")
         .select("*, companies(name), employees(*)")
         .eq("user_id", targetUserId)
         .single();
       if (error) throw error;
-      return jsonResponse(200, { data });
+      return jsonRes(200, { data });
     }
 
     if (method === "PATCH") {
@@ -62,7 +69,7 @@ Deno.serve(async (req) => {
           delete body.company_id;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from("profiles")
         .update(body)
         .eq("user_id", targetUserId)
@@ -70,12 +77,12 @@ Deno.serve(async (req) => {
         .single();
       if (error) throw error;
 
-      await logAction(supabase, ctx, "UPDATE_PROFILE", "profiles", targetUserId, body);
-      return jsonResponse(200, { data });
+      await logAction(adminClient, ctx, "UPDATE_PROFILE", "profiles", targetUserId, body);
+      return jsonRes(200, { data });
     }
 
-    return jsonResponse(404, { error: "Resource not found" });
+    return jsonRes(404, { error: "Resource not found" });
   } catch (err: any) {
-    return badRequest(err.message);
+    return jsonRes(400, { error: err.message });
   }
 });

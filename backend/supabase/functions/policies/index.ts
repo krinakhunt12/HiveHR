@@ -2,12 +2,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders } from "../_shared/cors.ts";
 import {
   getUserContext,
-  jsonResponse,
-  unauthorized,
   logAction,
-  badRequest,
-  forbidden,
 } from "../_shared/auth.ts";
+
+function jsonRes(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 function normalizePath(pathname: string): string {
   const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
@@ -25,11 +28,14 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey);
+
+  const publicClient = createClient(supabaseUrl, anonKey);
+  const adminClient = createClient(supabaseUrl, serviceKey);
 
   const ctx = await getUserContext(req);
-  if (!ctx) return unauthorized();
+  if (!ctx) return jsonRes(401, { error: "Unauthorized" });
 
   const url = new URL(req.url);
   const path = normalizePath(url.pathname);
@@ -40,38 +46,38 @@ Deno.serve(async (req) => {
        GET /policies -> List policies
        ========================================================================= */
     if (method === "GET") {
-      let query = supabase.from("policies").select("*");
+      let query = adminClient.from("policies").select("*");
 
       if (ctx.role === "employee" || ctx.role === "company_admin") {
-        if (!ctx.companyId) return badRequest("Context: No company ID found");
+        if (!ctx.companyId) return jsonRes(400, { error: "Context: No company ID found" });
         query = query.eq("company_id", ctx.companyId);
       }
 
       const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
-      return jsonResponse(200, { data });
+      return jsonRes(200, { data });
     }
 
     /* =========================================================================
        POST /policies -> Create policy (Admin/CompanyAdmin only)
        ========================================================================= */
     if (method === "POST") {
-      if (ctx.role === "employee") return forbidden();
+      if (ctx.role === "employee") return jsonRes(403, { error: "Forbidden" });
 
       const body = await req.json();
       if (ctx.role === "company_admin") {
         body.company_id = ctx.companyId;
       }
 
-      if (!body.company_id) return badRequest("Missing company_id: Ensure your profile is associated with a company.");
-      if (!body.type) return badRequest("Missing 'type' field in request body.");
-      if (!body.rules) return badRequest("Missing 'rules' field in request body.");
+      if (!body.company_id) return jsonRes(400, { error: "Missing company_id: Ensure your profile is associated with a company." });
+      if (!body.type) return jsonRes(400, { error: "Missing 'type' field in request body." });
+      if (!body.rules) return jsonRes(400, { error: "Missing 'rules' field in request body." });
 
-      const { data, error } = await supabase.from("policies").insert(body).select().single();
+      const { data, error } = await adminClient.from("policies").insert(body).select().single();
       if (error) throw error;
 
-      await logAction(supabase, ctx, "CREATE_POLICY", "policies", data.id, body);
-      return jsonResponse(201, { data });
+      await logAction(adminClient, ctx, "CREATE_POLICY", "policies", data.id, body);
+      return jsonRes(201, { data });
     }
 
     /* =========================================================================
@@ -80,23 +86,23 @@ Deno.serve(async (req) => {
     if (method === "PATCH") {
       const segments = path.replace(/^\//, "").split("/");
       const resourceId = segments[0] || null;
-      if (!resourceId) return badRequest("Missing policy id");
+      if (!resourceId) return jsonRes(400, { error: "Missing policy id" });
 
-      if (ctx.role === "employee") return forbidden();
+      if (ctx.role === "employee") return jsonRes(403, { error: "Forbidden" });
 
       const body = await req.json();
 
       if (ctx.role === "company_admin") {
-        const { data: existing } = await supabase.from("policies").select("company_id").eq("id", resourceId).single();
-        if (!existing || existing.company_id !== ctx.companyId) return forbidden();
+        const { data: existing } = await adminClient.from("policies").select("company_id").eq("id", resourceId).single();
+        if (!existing || existing.company_id !== ctx.companyId) return jsonRes(403, { error: "Forbidden" });
         delete body.company_id; // Prevent changing ownership
       }
 
-      const { data, error } = await supabase.from("policies").update(body).eq("id", resourceId).select().single();
+      const { data, error } = await adminClient.from("policies").update(body).eq("id", resourceId).select().single();
       if (error) throw error;
 
-      await logAction(supabase, ctx, "UPDATE_POLICY", "policies", resourceId, body);
-      return jsonResponse(200, { data });
+      await logAction(adminClient, ctx, "UPDATE_POLICY", "policies", resourceId, body);
+      return jsonRes(200, { data });
     }
 
     /* =========================================================================
@@ -105,24 +111,24 @@ Deno.serve(async (req) => {
     if (method === "DELETE") {
       const segments = path.replace(/^\//, "").split("/");
       const resourceId = segments[0] || null;
-      if (!resourceId) return badRequest("Missing policy id");
+      if (!resourceId) return jsonRes(400, { error: "Missing policy id" });
 
-      if (ctx.role === "employee") return forbidden();
+      if (ctx.role === "employee") return jsonRes(403, { error: "Forbidden" });
 
       if (ctx.role === "company_admin") {
-        const { data: existing } = await supabase.from("policies").select("company_id").eq("id", resourceId).single();
-        if (!existing || existing.company_id !== ctx.companyId) return forbidden();
+        const { data: existing } = await adminClient.from("policies").select("company_id").eq("id", resourceId).single();
+        if (!existing || existing.company_id !== ctx.companyId) return jsonRes(403, { error: "Forbidden" });
       }
 
-      const { error } = await supabase.from("policies").delete().eq("id", resourceId);
+      const { error } = await adminClient.from("policies").delete().eq("id", resourceId);
       if (error) throw error;
 
-      await logAction(supabase, ctx, "DELETE_POLICY", "policies", resourceId);
-      return jsonResponse(200, { message: "Policy deleted" });
+      await logAction(adminClient, ctx, "DELETE_POLICY", "policies", resourceId);
+      return jsonRes(200, { message: "Policy deleted" });
     }
 
-    return jsonResponse(404, { error: "Resource not found" });
+    return jsonRes(404, { error: "Resource not found" });
   } catch (err: any) {
-    return badRequest(err.message);
+    return jsonRes(400, { error: err.message });
   }
 });
