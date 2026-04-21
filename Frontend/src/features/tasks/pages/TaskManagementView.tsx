@@ -14,6 +14,8 @@ import { cn } from '@/shared/utils/cn';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { EmptyState } from '@/shared/ui/EmptyState';
+import { ErrorState } from '@/shared/ui/ErrorState';
 
 interface TaskManagementViewProps {
     isAdmin: boolean;
@@ -24,12 +26,10 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
     const params = isAdmin ? {} : {};
-    const { data: rawTasks = [], isLoading } = useListTasks(params, isAdmin);
+    const { data: rawTasks = [], isLoading, error, refetch } = useListTasks(params, isAdmin);
     const { update } = useTaskMutations(isAdmin);
 
-    const tasks = rawTasks;
-
-
+    const tasks = Array.isArray(rawTasks) ? rawTasks : [];
 
     const handleStatusUpdate = async (id: string, newStatus: string) => {
         try {
@@ -62,6 +62,19 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
         }
     };
 
+    const filteredTasks = tasks.filter(task => filterStatus === 'all' || task.status === filterStatus);
+
+    if (error) {
+        return (
+            <div className="min-h-[500px] flex items-center justify-center">
+                <ErrorState 
+                    error={error as Error} 
+                    onRetry={() => refetch()} 
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -86,7 +99,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                 <div className="lg:col-span-1 space-y-6">
                     <Card className="card-premium p-6 border-none shadow-none bg-white">
                         <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 px-1">Filter</h4>
-                        <div className="space-y-2">
+                        <div className="space-y-2 text-left">
                             {['all', 'pending', 'in_progress', 'completed', 'blocked'].map((status) => (
                                 <button
                                     key={status}
@@ -98,13 +111,13 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                             : "text-textSecondary hover:text-textPrimary hover:bg-background"
                                     )}
                                 >
-                                    {status.replace('-', ' ')}
+                                    {status.replace('_', ' ')}
                                 </button>
                             ))}
                         </div>
                     </Card>
 
-                    <div className="card-premium p-6 bg-primary/10 border border-primary/10 shadow-none overflow-hidden relative group">
+                    <div className="card-premium p-6 bg-primary/10 border border-primary/10 shadow-none overflow-hidden relative group text-left">
                         <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
                             <Target size={120} className="text-primary" />
                         </div>
@@ -122,7 +135,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                             <input
                                 type="text"
                                 placeholder="Search Tasks..."
-                                className="bg-transparent border-none outline-none text-sm font-medium w-full placeholder:text-textSecondary"
+                                className="bg-transparent border-none outline-none text-sm font-medium w-full placeholder:text-textSecondary text-left"
                             />
                         </div>
                         <button className="p-2 hover:bg-background rounded-md transition-all text-textSecondary border border-transparent hover:border-border">
@@ -130,26 +143,30 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[400px]">
                         {isLoading ? (
                             Array(4).fill(0).map((_, i) => (
                                 <Skeleton key={i} className="h-48 rounded-[2rem]" />
                             ))
-                        ) : tasks.length === 0 ? (
-                            <div className="col-span-full py-20 text-center">
-                                <div className="w-16 h-16 bg-background rounded-lg flex items-center justify-center mx-auto mb-4 text-border border border-border">
-                                    <CheckSquare size={32} />
-                                </div>
-                                <p className="text-sm font-medium text-textSecondary uppercase tracking-widest">No tasks found.</p>
+                        ) : filteredTasks.length === 0 ? (
+                            <div className="col-span-full flex items-center justify-center">
+                                <EmptyState 
+                                    title={filterStatus === 'all' ? "No Tasks Assigned" : `No ${filterStatus.replace('_', ' ')} tasks`}
+                                    description={filterStatus === 'all' 
+                                        ? "There are currently no tasks in the enterprise registry." 
+                                        : `No tasks match the selected status filter.`
+                                    }
+                                    icon={CheckSquare}
+                                />
                             </div>
-                        ) : tasks.map((task: any) => (
-                            <Card key={task.id} className="card-premium group border border-border shadow-none hover:border-primary/40 transition-all duration-300 bg-surface">
+                        ) : filteredTasks.map((task: any) => (
+                            <Card key={task.id} className="card-premium group border border-border shadow-none hover:border-primary/40 transition-all duration-300 bg-surface text-left">
                                 <CardContent className="p-6">
                                     <div className="flex justify-between items-start mb-6">
                                         <div className={cn("w-1.5 h-10 rounded-full", getPriorityColor(task.priority))} />
                                         <div className="flex gap-2">
                                             <span className={cn(
-                                                "px-2.5 py-1 rounded-md text-sm font-medium uppercase tracking-widest",
+                                                "px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest",
                                                 getStatusInfo(task.status).color
                                             )}>
                                                 {getStatusInfo(task.status).label}
@@ -160,31 +177,31 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                         </div>
                                     </div>
 
-                                    <h3 className="text-md font-medium text-textPrimary mb-1 truncate group-hover:text-primary transition-colors tracking-tight">{task.title}</h3>
-                                    <p className="text-sm text-textSecondary font-medium line-clamp-2 leading-relaxed mb-4">
+                                    <h3 className="text-base font-bold text-textPrimary mb-1 truncate group-hover:text-primary transition-colors tracking-tight">{task.title}</h3>
+                                    <p className="text-sm text-textSecondary font-medium line-clamp-2 leading-relaxed mb-4 opacity-70">
                                         {task.description}
                                     </p>
 
                                     <div className="flex items-center justify-between pt-6 border-t border-border">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-md bg-background border border-border flex items-center justify-center text-sm font-medium text-textSecondary">
+                                            <div className="w-8 h-8 rounded-md bg-background border border-border flex items-center justify-center text-xs font-bold text-textSecondary shadow-sm">
                                                 {task.employees?.full_name?.charAt(0) || 'G'}
                                             </div>
-                                            <p className="text-sm font-medium text-textSecondary uppercase tracking-wide truncate max-w-[100px]">
+                                            <p className="text-[10px] font-black text-textSecondary uppercase tracking-widest truncate max-w-[100px] opacity-60">
                                                 {task.employees?.full_name || 'Global'}
                                             </p>
                                         </div>
 
                                         <div className="flex items-center gap-4">
-                                            <div className="flex items-center gap-1.5 text-textSecondary">
+                                            <div className="flex items-center gap-1.5 text-textSecondary font-bold text-[10px] opacity-50 uppercase tracking-widest">
                                                 <Clock size={12} />
-                                                <span className="text-sm font-medium uppercase">{task.due_date || 'Ongoing'}</span>
+                                                <span>{task.due_date || 'Ongoing'}</span>
                                             </div>
 
                                             {!isAdmin && task.status !== 'completed' && (
                                                 <button
                                                     onClick={() => handleStatusUpdate(task.id, 'completed')}
-                                                    className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all border border-primary/20"
+                                                    className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all border border-primary/20 shadow-sm"
                                                     title="Complete Task"
                                                 >
                                                     <CheckSquare size={14} />
@@ -201,3 +218,4 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
         </div>
     );
 };
+

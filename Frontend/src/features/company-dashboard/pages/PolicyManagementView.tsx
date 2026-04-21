@@ -17,6 +17,8 @@ import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { Button } from '@/shared/ui/button';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { EmptyState } from '@/shared/ui/EmptyState';
+import { ErrorState } from '@/shared/ui/ErrorState';
 
 interface PolicyModalProps {
     isOpen: boolean;
@@ -129,7 +131,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
 export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
     const { session } = useAuthStore();
     const companyId = session?.user?.company_id ?? undefined;
-    const { data: response, isLoading } = useListPolicies({ company_id: companyId });
+    const { data: response = [], isLoading, error, refetch } = useListPolicies({ company_id: companyId });
     const { remove } = usePolicyMutations();
     const { toast } = useToast();
 
@@ -137,7 +139,9 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
     const [editingPolicy, setEditingPolicy] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredPolicies = (response || []).filter((p: any) =>
+    const policies = Array.isArray(response) ? response : [];
+
+    const filteredPolicies = policies.filter((p: any) =>
         p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.type?.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -151,6 +155,17 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
             toast({ title: 'Deletion Failed', description: err.message || 'Failed to delete policy', type: 'error' });
         }
     };
+
+    if (error) {
+        return (
+            <div className="min-h-[500px] flex items-center justify-center">
+                <ErrorState 
+                    error={error as Error} 
+                    onRetry={() => refetch()} 
+                />
+            </div>
+        );
+    }
 
     if (isLoading) {
         return (
@@ -197,68 +212,71 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredPolicies.map((p: any) => (
-                    <Card key={p.id} className="card-premium group border border-border shadow-none bg-surface transition-all hover:border-primary/20">
-                        <CardHeader className="pb-4">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform border border-primary/10">
-                                    <FileText size={18} />
-                                </div>
-                                {isAdmin && (
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => { setEditingPolicy(p); setIsModalOpen(true); }}
-                                            className="h-8 w-8 text-textSecondary hover:text-primary hover:bg-primary/10"
-                                        >
-                                            <Edit3 size={16} />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            loading={remove.isPending && remove.variables === p.id}
-                                            onClick={() => handleDelete(p.id, p.title)}
-                                            className="h-8 w-8 text-textSecondary hover:text-error hover:bg-error/10"
-                                        >
-                                            <Trash2 size={16} />
-                                        </Button>
+            {filteredPolicies.length === 0 ? (
+                <div className="min-h-[400px] flex items-center justify-center">
+                    <EmptyState 
+                        title={searchQuery ? "No search results" : "Handbook empty"} 
+                        description={searchQuery ? `No policies match "${searchQuery}".` : "The corporate handbook has no active policies yet."}
+                        icon={FileText}
+                        action={isAdmin && !searchQuery && (
+                            <Button onClick={() => setIsModalOpen(true)}>
+                                Create First Policy
+                            </Button>
+                        )}
+                    />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredPolicies.map((p: any) => (
+                        <Card key={p.id} className="card-premium group border border-border shadow-none bg-surface transition-all hover:border-primary/20">
+                            <CardHeader className="pb-4">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform border border-primary/10">
+                                        <FileText size={18} />
                                     </div>
-                                )}
-                            </div>
-                            <div className="space-y-1">
-                                <CardTitle className="text-base font-medium text-textPrimary leading-tight">{p.title}</CardTitle>
-                                <p className="text-xs font-bold uppercase tracking-widest text-textSecondary opacity-80">{p.type}</p>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="pt-2">
-                            <p className="text-sm text-textSecondary leading-relaxed line-clamp-4 font-medium mb-6">{p.rules}</p>
-                            <div className="pt-4 border-t border-border flex items-center justify-between">
-                                <span className="text-xs font-medium text-textSecondary flex items-center gap-1.5">
-                                    <Calendar size={12} />
-                                    {new Date(p.created_at).toLocaleDateString()}
-                                </span>
-                                <button className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-1.5 group/btn hover:text-primaryLight transition-all">
-                                    Read Full <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                                </button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-
-                {filteredPolicies.length === 0 && (
-                    <div className="col-span-full py-20 card-premium border-dashed border-2 flex flex-col items-center justify-center text-center space-y-4">
-                        <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center text-textSecondary">
-                            <FileText size={24} />
-                        </div>
-                        <div>
-                            <p className="text-base font-medium text-textPrimary">No policies found</p>
-                            <p className="text-sm text-textSecondary">Try adjusting your search or create a new policy.</p>
-                        </div>
-                    </div>
-                )}
-            </div>
+                                    {isAdmin && (
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => { setEditingPolicy(p); setIsModalOpen(true); }}
+                                                className="h-8 w-8 text-textSecondary hover:text-primary hover:bg-primary/10"
+                                            >
+                                                <Edit3 size={16} />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                loading={remove.isPending && remove.variables === p.id}
+                                                onClick={() => handleDelete(p.id, p.title)}
+                                                className="h-8 w-8 text-textSecondary hover:text-error hover:bg-error/10"
+                                            >
+                                                <Trash2 size={16} />
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-1">
+                                    <CardTitle className="text-base font-medium text-textPrimary leading-tight">{p.title}</CardTitle>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-textSecondary opacity-80">{p.type}</p>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-2">
+                                <p className="text-sm text-textSecondary leading-relaxed line-clamp-4 font-medium mb-6">{p.rules}</p>
+                                <div className="pt-4 border-t border-border flex items-center justify-between">
+                                    <span className="text-xs font-medium text-textSecondary flex items-center gap-1.5">
+                                        <Calendar size={12} />
+                                        {new Date(p.created_at).toLocaleDateString()}
+                                    </span>
+                                    <button className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-1.5 group/btn hover:text-primaryLight transition-all">
+                                        Read Full <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+                                    </button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
 
             <PolicyModal
                 isOpen={isModalOpen}
@@ -269,3 +287,4 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
         </div>
     );
 };
+

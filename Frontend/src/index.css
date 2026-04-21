@@ -45,8 +45,15 @@
   --shadow-premium: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-2px); }
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-2px);
+    }
   }
 
   --animate-float: float 5s ease-in-out infinite;

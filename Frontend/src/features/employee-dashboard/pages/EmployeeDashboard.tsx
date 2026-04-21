@@ -2,38 +2,29 @@ import React, { useState } from 'react';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import {
     Clock,
-    CheckSquare,
-    ArrowUpRight,
-    MessageSquare,
     Award,
     AlertCircle,
     LayoutDashboard,
-    Wind,
-    Target
+    Wind
 } from 'lucide-react';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
-import { useTodayAttendance, useListPolicies, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
+import { useTodayAttendance, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
-import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
 import { ForcePasswordChangeModal } from '@/features/auth/components/ForcePasswordChangeModal';
 
-type View = 'dashboard' | 'leaves' | 'tasks' | 'messages' | 'performance';
+type View = 'dashboard' | 'leaves';
 
 const EmployeeDashboard = () => {
     const [currentView, setCurrentView] = useState<View>('dashboard');
     const { data: user, refetch: refetchMe } = useGetMe();
     const userName = user?.full_name?.split(' ')[0] || 'User';
 
-    const companyId = (import.meta.env.VITE_HR_COMPANY_ID as string | undefined)?.trim();
-
     const { data: attendanceToday, isLoading: loadingAttendance, error: attendanceError } = useTodayAttendance();
-    const { data: policies = [], isLoading: loadingPolicies, error: policiesError } = useListPolicies({ company_id: companyId });
     const { checkIn, checkOut } = useAttendanceMutations();
 
-
-    const isLoading = loadingAttendance || loadingPolicies;
-    const error = (attendanceError as any)?.message ?? (policiesError as any)?.message ?? null;
+    const isLoading = loadingAttendance;
+    const error = (attendanceError as any)?.message ?? null;
 
     const onCheckIn = async () => {
         try {
@@ -50,12 +41,10 @@ const EmployeeDashboard = () => {
 
     const isSavingAttendance = checkIn.isPending || checkOut.isPending;
 
-
     const hasAttendance = attendanceToday && 'id' in attendanceToday;
     const canCheckIn = !hasAttendance;
     const canCheckOut = hasAttendance && !attendanceToday.check_out_at;
     
-    // Logic: 8h work + 1h break = 9h total stay requirement
     const checkInTime = hasAttendance ? new Date(attendanceToday.check_in_at!).getTime() : null;
     const [elapsedMinutes, setElapsedMinutes] = useState(0);
 
@@ -65,9 +54,8 @@ const EmployeeDashboard = () => {
         const interval = setInterval(() => {
             const now = new Date().getTime();
             setElapsedMinutes(Math.floor((now - checkInTime) / (1000 * 60)));
-        }, 60000); // Update every minute
+        }, 60000); 
         
-        // Initial calculation
         setElapsedMinutes(Math.floor((new Date().getTime() - checkInTime) / (1000 * 60)));
         
         return () => clearInterval(interval);
@@ -75,7 +63,7 @@ const EmployeeDashboard = () => {
 
     const displayMinutes = attendanceToday?.check_out_at 
         ? attendanceToday.work_minutes 
-        : (elapsedMinutes > 60 ? elapsedMinutes - 60 : 0); // Assume 1h break for real-time display
+        : (elapsedMinutes > 60 ? elapsedMinutes - 60 : 0); 
 
     const totalStayMinutes = attendanceToday?.check_out_at
         ? Math.floor((new Date(attendanceToday.check_out_at).getTime() - checkInTime!) / 60000)
@@ -86,10 +74,7 @@ const EmployeeDashboard = () => {
 
     const navItems = [
         { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: 'dashboard' },
-        { icon: <Target size={18} />, label: 'Tasks', path: 'tasks' },
         { icon: <Wind size={18} />, label: 'Leaves', path: 'leaves' },
-        { icon: <MessageSquare size={18} />, label: 'Messages', path: 'messages' },
-        { icon: <Award size={18} />, label: 'Performance', path: 'performance' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -143,7 +128,7 @@ const EmployeeDashboard = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div className="card-premium p-6 border border-border flex flex-col justify-center bg-surface shadow-none overflow-hidden relative">
                     <p className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-4">Work Progress (8h)</p>
                     <div className="flex items-center gap-4">
@@ -156,39 +141,42 @@ const EmployeeDashboard = () => {
                 </div>
                 <StatCard title="Total Stay" value={`${Math.floor(totalStayMinutes / 60)}h ${totalStayMinutes % 60}m`} icon={<Clock />} theme={totalStayMinutes >= 540 ? "primary" : "warning"} />
                 <StatCard title="Work Minutes" value={String(displayMinutes)} icon={<Award />} theme="primary" />
-                <StatCard title="Active Tasks" value="08" icon={<CheckSquare />} theme="warning" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 card-premium p-0 overflow-hidden border border-border shadow-none">
-                    <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-background/50">
-                        <h3 className="text-md font-medium text-textPrimary font-sans">Recent Tasks</h3>
-                        <button
-                            onClick={() => setCurrentView('tasks')}
-                            className="text-sm font-medium text-primary hover:text-primaryLight uppercase tracking-wider"
-                        >
-                            View All
-                        </button>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="card-premium p-8 bg-gradient-to-br from-primary to-primaryDark text-white flex flex-col justify-between shadow-xl shadow-primary/20 text-left border-none">
+                    <div>
+                        <div className="p-3 bg-white/10 w-fit rounded-xl mb-6">
+                            <Wind size={24} />
+                        </div>
+                        <h4 className="text-xl font-bold tracking-tight mb-2">Leave Registry</h4>
+                        <p className="text-sm font-medium text-white/70 leading-relaxed">View your leave balance and track your request status in real-time within the enterprise cloud.</p>
                     </div>
-                    <div className="p-0">
-                        <TaskItem title="Harvest Capacity Audit" category="Operations" due="Today" priority="high" />
-                        <TaskItem title="Protocol Update Review" category="Compliance" due="Tomorrow" priority="medium" />
-                        <TaskItem title="System Calibration Feedback" category="Maintenance" due="Mar 20" priority="low" />
-                    </div>
+                    <button 
+                        onClick={() => setCurrentView('leaves')}
+                        className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs uppercase tracking-widest hover:bg-white/90 transition-colors"
+                    >
+                        Check Balance
+                    </button>
                 </div>
 
-                <div className="card-premium p-6 border border-border shadow-none h-fit text-left">
-                    <h4 className="text-sm font-medium text-textSecondary mb-4 font-sans uppercase tracking-widest">Company Policies</h4>
-                    <div className="space-y-2">
-                        {policies.slice(0, 3).map((policy) => (
-                            <div key={policy.id} className="p-3 rounded-md border border-border bg-surface hover:border-primary/30 transition-all group cursor-pointer text-left">
-                                <p className="text-sm font-medium text-textPrimary group-hover:text-primary transition-colors">{policy.title}</p>
-                                <p className="text-sm uppercase tracking-wider text-textSecondary font-medium mt-1">{policy.type}</p>
+                <div className="card-premium p-8 bg-surface border border-border text-left">
+                    <h4 className="text-sm font-medium text-textSecondary mb-6 font-sans uppercase tracking-[0.2em] opacity-50">Operational Updates</h4>
+                    <div className="space-y-6">
+                        <div className="flex gap-4">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                            <div>
+                                <p className="text-sm font-bold text-textPrimary">Attendance Synchronization</p>
+                                <p className="text-xs text-textSecondary mt-1 leading-relaxed">Global attendance logs are being synchronized with the payroll cluster.</p>
                             </div>
-                        ))}
-                        {policies.length === 0 && (
-                            <p className="text-sm font-medium text-textSecondary uppercase tracking-widest text-center py-4">No policies found.</p>
-                        )}
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="w-1.5 h-1.5 rounded-full bg-success mt-2 shrink-0"></div>
+                            <div>
+                                <p className="text-sm font-bold text-textPrimary">System Stability</p>
+                                <p className="text-xs text-textSecondary mt-1 leading-relaxed">Infrastructure reporting 100% uptime for the current operational cycle.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -216,13 +204,9 @@ const EmployeeDashboard = () => {
         <DashboardLayout navItems={customNavItems as any}>
             <main className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                 {currentView === 'dashboard' && renderDashboard()}
-                {currentView === 'tasks' && <TaskManagementView isAdmin={false} />}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={false} />}
-                {currentView === 'messages' && <PlaceholderBox title="Messages" />}
-                {currentView === 'performance' && <PlaceholderBox title="Performance" />}
             </main>
 
-            {/* Mandatory First Login Flow */}
             <ForcePasswordChangeModal 
                 isOpen={!!(user?.role === 'employee' && user?.is_first_login)} 
                 onSuccess={() => refetchMe()}
@@ -255,37 +239,5 @@ const StatCard = ({ title, value, icon, trend, theme }: any) => {
         </div>
     );
 };
-
-const TaskItem = ({ title, category, due, priority }: any) => (
-    <div className="flex items-center justify-between px-6 py-4 border-b border-border last:border-0 hover:bg-background transition-all cursor-pointer text-left">
-        <div className="flex items-center gap-4 text-left">
-            <div className={cn(
-                "w-1 h-6 rounded-full",
-                priority === 'high' ? 'bg-error' : priority === 'medium' ? 'bg-warning' : 'bg-border'
-            )}></div>
-            <div>
-                <p className="text-base font-medium text-textPrimary hover:text-primary transition-colors text-left">{title}</p>
-                <div className="flex items-center gap-3 mt-1">
-                    <span className="text-sm text-textSecondary font-medium uppercase tracking-wider">{category}</span>
-                    <span className="w-1 h-1 bg-border rounded-full"></span>
-                    <span className="text-sm text-textSecondary font-medium uppercase tracking-wider">{due}</span>
-                </div>
-            </div>
-        </div>
-        <ArrowUpRight size={14} className="text-textSecondary group-hover:text-primary transition-all" />
-    </div>
-);
-
-const PlaceholderBox = ({ title }: { title: string }) => (
-    <div className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-6 animate-in zoom-in-95 duration-500">
-        <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
-            <LayoutDashboard size={24} />
-        </div>
-        <div className="space-y-2">
-            <h2 className="text-lg font-medium text-textPrimary font-sans">{title}</h2>
-            <p className="text-sm font-medium text-textSecondary max-w-xs mx-auto leading-relaxed">This section will be ready soon.</p>
-        </div>
-    </div>
-);
 
 export default EmployeeDashboard;
