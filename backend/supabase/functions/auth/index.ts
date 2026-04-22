@@ -1,15 +1,23 @@
 /**
- * Auth Edge Function — /functions/v1/auth
+ * /functions/v1/auth
  *
- * POST /signup  — register a new company_admin (creates company) or employee
- * POST /login   — authenticate and return session + user info
+ * POST /signup           — register company_admin (creates company) or employee
+ * POST /login            — authenticate → session + user info
+ * POST /update-password  — change own password (bearer required)
  *
- * verify_jwt = false (public endpoint)
+ * verify_jwt = false  (public endpoint; auth is done inside the function)
  */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { jsonRes, normalizePath, corsHeaders, errorRes } from "../_shared/responses.ts";
+import {
+  jsonRes,
+  successRes,
+  createdRes,
+  errorRes,
+  normalizePath,
+  corsHeaders,
+} from "../_shared/responses.ts";
 
-Deno.serve(async (req: any) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS")
     return new Response("ok", { headers: corsHeaders });
 
@@ -18,114 +26,139 @@ Deno.serve(async (req: any) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
   const publicClient = createClient(supabaseUrl, anonKey);
-  const adminClient = createClient(supabaseUrl, serviceKey);
+  const svcClient = createClient(supabaseUrl, serviceKey);
 
   const url = new URL(req.url);
   const path = normalizePath(url.pathname, "auth");
   const method = req.method;
 
-  const segments = path.replace(/^\//, "").split("/");
-  const resource = segments[0] || null;
-  const resourceId = segments[1] || null;
-
   try {
     const payload = await req.json().catch(() => ({}));
 
-    /* ─────────────────────────── SIGNUP ─────────────────────────── */
-    if (method === "POST" && resource === "signup") {
-      const { email, password, full_name, role, company_name, company_id } =
-        payload as {
-          email: string;
-          password: string;
-          full_name: string;
-          role: "company_admin" | "employee";
-          company_name?: string;
-          company_id?: string;
-        };
+    // ═══════════════════════════════════════════════════════
+    // POST /signup
+    // ═══════════════════════════════════════════════════════
+    if (method === "POST" && path === "/signup") {
+      const {
+        email,
+        password,
+        full_name,
+        role,
+        company_name,
+        company_id,
+      } = payload as {
+        email: string;
+        password: string;
+        full_name: string;
+        role: "company_admin" | "employee";
+        company_name?: string;
+        company_id?: string;
+      };
 
-      const validationErrors: string[] = [];
-      if (!email) validationErrors.push("Email is required");
-      if (!password) validationErrors.push("Password is required");
-      else if (password.length < 6) validationErrors.push("Password must be at least 6 characters");
-      if (!full_name) validationErrors.push("Full name is required");
-      if (!role) validationErrors.push("Role is required");
-      
-      if (role === "company_admin" && !company_id && !company_name) {
-        validationErrors.push("Company name is required for company registration");
-      }
+      const errors: string[] = [];
+      if (!email) errors.push("Email is required");
+      if (!password) errors.push("Password is required");
+      else if (password.length < 8)
+        errors.push("Password must be at least 8 characters");
+      if (!full_name) errors.push("Full name is required");
+      if (!role || !["company_admin", "employee"].includes(role))
+        errors.push("Role must be company_admin or employee");
+      if (role === "company_admin" && !company_id && !company_name)
+        errors.push("company_name is required when registering as company_admin");
 
-      if (validationErrors.length > 0) {
-        return jsonRes(400, { 
-          message: "Validation failed", 
-          errors: validationErrors,
-          error: validationErrors[0] // Fallback for single-error handlers
-        });
-      }
+      if (errors.length > 0)
+        return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: errors[0], errors });
 
       let finalCompanyId = company_id ?? null;
 
-      // Auto-create company when registering as company_admin
+      // Auto-create company for new company_admin registrations
       if (role === "company_admin" && !finalCompanyId && company_name) {
-        const { data: comp, error: compErr } = await adminClient
+        // Find the Starter plan
+        const { data: starterPlan } = await svcClient
+          .from("plans")
+          .select("id")
+          .eq("name", "Starter")
+          .single();
+
+        const { data: comp, error: compErr } = await svcClient
           .from("companies")
-          .insert({ name: company_name })
+          .insert({
+            name: company_name,
+            email: email,
+            plan_id: starterPlan?.id ?? null,
+            plan_status: "active",
+            plan_start_date: new Date().toISOString().slice(0, 10),
+            plan_end_date: new Date(
+              Date.now() + 30 * 24 * 60 * 60 * 1000
+            ).toISOString().slice(0, 10),
+          })
           .select()
           .single();
+
         if (compErr) throw compErr;
         finalCompanyId = comp.id;
 
-        // Seed default leave policies (12 paid + 6 sick = 18 total)
-        await adminClient.from("leave_configurations").insert([
-          { company_id: finalCompanyId, leave_type: 'paid', annual_allowance: 12 },
-          { company_id: finalCompanyId, leave_type: 'sick', annual_allowance: 6 }
+        // Seed default leave types
+        await svcClient.from("leave_types").insert([
+          { company_id: finalCompanyId, name: "Casual Leave", is_paid: true, annual_quota: 12 },
+          { company_id: finalCompanyId, name: "Sick Leave", is_paid: true, annual_quota: 10 },
+          { company_id: finalCompanyId, name: "Unpaid Leave", is_paid: false, annual_quota: 999 },
         ]);
+
+        // Seed default work policy
+        await svcClient.from("work_policies").insert({
+          company_id: finalCompanyId,
+          policy_name: "Standard Office Policy",
+          shift_start: "09:00",
+          shift_end: "18:00",
+          total_hours_required: 9,
+          break_duration_minutes: 60,
+          net_work_hours_required: 8,
+          grace_period_minutes: 15,
+          overtime_threshold_minutes: 480,
+          half_day_threshold_hours: 4,
+          applicable_days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          is_default: true,
+          is_flexible: false,
+        });
       }
-      
-      // ... (rest of signup logic)
+
+      // Create Auth user
       const { data: authData, error: authError } =
-        await adminClient.auth.admin.createUser({
+        await svcClient.auth.admin.createUser({
           email,
           password,
           email_confirm: true,
           user_metadata: { full_name, role, company_id: finalCompanyId },
           app_metadata: { role },
         });
-      if (authError || !authData.user) {
-        return jsonRes(400, { error: authError?.message ?? "Auth creation failed" });
-      }
+
+      if (authError || !authData.user)
+        return jsonRes(400, {
+          success: false,
+          code: "AUTH_ERROR",
+          message: authError?.message ?? "User creation failed",
+        });
 
       const userId = authData.user.id;
-      
-      // ... (rest of signup logic continues)
-      // (Abbreviated for brevity in this replacement chunk, but I'll ensure it stays consistent)
-      // Actually I should probably provide the full block to be safe.
-      
-      // Upsert profile
-      const { error: profileError } = await adminClient
-        .from("profiles")
-        .upsert(
-          {
-            user_id: userId,
-            full_name,
-            role,
-            company_id: finalCompanyId,
-          },
-          { onConflict: "user_id" }
-        );
-      if (profileError) throw profileError;
 
+      // Upsert profile
+      const { error: profileErr } = await svcClient.from("profiles").upsert(
+        { user_id: userId, full_name, role, company_id: finalCompanyId },
+        { onConflict: "user_id" }
+      );
+      if (profileErr) throw profileErr;
+
+      // Create company membership
       if (finalCompanyId) {
-        await adminClient.from("company_memberships").upsert(
-          {
-            company_id: finalCompanyId,
-            user_id: userId,
-            role,
-          },
+        await svcClient.from("company_memberships").upsert(
+          { company_id: finalCompanyId, user_id: userId, role },
           { onConflict: "company_id,user_id" }
         );
       }
 
-      await adminClient.from("auth_activity_logs").insert({
+      // Audit log
+      await svcClient.from("auth_activity_logs").insert({
         user_id: userId,
         email,
         action: "signup",
@@ -134,92 +167,80 @@ Deno.serve(async (req: any) => {
         metadata: { company_id: finalCompanyId },
       });
 
-      return jsonRes(201, {
-        message: "Signup successful",
+      return createdRes("Signup successful", {
         user_id: userId,
         company_id: finalCompanyId,
         redirect_to: "/login",
       });
     }
 
-    /* ─────────────────────────── LOGIN ──────────────────────────── */
-    if (method === "POST" && resource === "login") {
+    // ═══════════════════════════════════════════════════════
+    // POST /login
+    // ═══════════════════════════════════════════════════════
+    if (method === "POST" && path === "/login") {
       const { email, password, role: requestedRole } = payload as {
         email: string;
         password: string;
         role?: string;
       };
 
-      const validationErrors: string[] = [];
-      if (!email) validationErrors.push("Work email is required");
-      if (!password) validationErrors.push("Password is required");
-
-      if (validationErrors.length > 0) {
-        return jsonRes(400, { 
-          message: "Validation failed", 
-          errors: validationErrors,
-          error: validationErrors[0]
-        });
-      }
+      const errors: string[] = [];
+      if (!email) errors.push("Email is required");
+      if (!password) errors.push("Password is required");
+      if (errors.length > 0)
+        return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: errors[0], errors });
 
       const { data: loginData, error: loginError } =
         await publicClient.auth.signInWithPassword({ email, password });
 
-      if (loginError || !loginData.user || !loginData.session) {
-        // Log failed attempt
-        await adminClient.from("auth_activity_logs").insert({
+      if (loginError || !loginData?.user || !loginData?.session) {
+        await svcClient.from("auth_activity_logs").insert({
           email,
           action: "login",
           status: "failed",
-          error_message: loginError?.message ?? "Unknown error",
+          error_message: loginError?.message ?? "Unknown",
           metadata: { requested_role: requestedRole },
         });
-        
-        let errorMsg = loginError?.message ?? "Login failed";
-        if (errorMsg === "Invalid login credentials") {
-          errorMsg = "The email or password you entered is incorrect.";
-        }
-        
-        return jsonRes(401, { error: errorMsg, message: errorMsg });
+        const msg =
+          loginError?.message === "Invalid login credentials"
+            ? "The email or password you entered is incorrect."
+            : loginError?.message ?? "Login failed";
+        return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: msg });
       }
 
       const userId = loginData.user.id;
 
-      // Fetch profile + company name in one join
-      const { data: profile, error: profErr } = await adminClient
+      const { data: profile, error: profErr } = await svcClient
         .from("profiles")
         .select("*, companies(id, name)")
         .eq("user_id", userId)
         .single();
 
-      if (profErr) throw profErr;
+      if (profErr || !profile) throw profErr ?? new Error("Profile not found");
 
-      // ROLE VERIFICATION: Ensure the user actually has the role they selected to login as
+      // Role verification — if the login form specified a role, validate it
       if (requestedRole && profile.role !== requestedRole) {
-        // Log unauthorized role attempt
-        await adminClient.from("auth_activity_logs").insert({
+        await svcClient.from("auth_activity_logs").insert({
           user_id: userId,
           email,
           action: "login",
           status: "denied",
-          error_message: `Role mismatch: Requested ${requestedRole}, Actual ${profile.role}`,
+          error_message: `Role mismatch: requested ${requestedRole}, actual ${profile.role}`,
           metadata: { requested_role: requestedRole, actual_role: profile.role },
         });
-
-        // Sign out since sessions are created by signInWithPassword even if we reject it here
         await publicClient.auth.signOut();
-        
-        return jsonRes(403, { 
-          error: `Access Denied: Your account does not have ${requestedRole} permissions.`,
-          message: `Access Denied: Your account does not have ${requestedRole} permissions.`
+        return jsonRes(403, {
+          success: false,
+          code: "FORBIDDEN",
+          message: `Access denied: Your account does not have ${requestedRole} permissions.`,
         });
       }
 
-      const companyName = (profile as any)?.companies?.name ?? null;
-      const companyId = profile?.company_id ?? null;
+      const companyName = (profile as Record<string, unknown> & { companies?: { name: string } })?.companies?.name ?? null;
+      const companyId = profile.company_id ?? null;
 
-      // Persist role + company into JWT metadata for downstream use
-      await adminClient.auth.admin.updateUserById(userId, {
+      // Sync role into JWT metadata
+      await svcClient.auth.admin.updateUserById(userId, {
         user_metadata: {
           ...loginData.user.user_metadata,
           role: profile.role,
@@ -229,8 +250,7 @@ Deno.serve(async (req: any) => {
         app_metadata: { role: profile.role },
       });
 
-      // Log success
-      await adminClient.from("auth_activity_logs").insert({
+      await svcClient.from("auth_activity_logs").insert({
         user_id: userId,
         email,
         action: "login",
@@ -239,65 +259,64 @@ Deno.serve(async (req: any) => {
         metadata: { company_id: companyId },
       });
 
-      const roleRedirects: Record<string, string> = {
-        admin: "/dashboard/admin",
+      const redirectMap: Record<string, string> = {
+        super_admin: "/dashboard/super-admin",
         company_admin: "/dashboard/company",
         employee: "/dashboard/employee",
       };
 
-      return jsonRes(200, {
-        message: "Login successful",
+      return successRes("Login successful", {
         user: {
           id: userId,
           email,
-          full_name: profile?.full_name ?? "User",
-          role: profile?.role ?? "employee",
+          full_name: profile.full_name ?? "",
+          role: profile.role,
           company_id: companyId,
           company_name: companyName,
-          force_password_reset: loginData.user.user_metadata?.force_password_reset === true,
+          force_password_reset:
+            loginData.user.user_metadata?.force_password_reset === true,
         },
         session: {
           access_token: loginData.session.access_token,
           refresh_token: loginData.session.refresh_token,
           expires_at: loginData.session.expires_at,
         },
-        redirect_to: roleRedirects[profile?.role] ?? "/dashboard/employee",
+        redirect_to: redirectMap[profile.role] ?? "/dashboard/employee",
       });
     }
 
-    /* ──────────────────────── UPDATE PASSWORD ───────────────────── */
-    if (method === "POST" && resource === "update-password") {
+    // ═══════════════════════════════════════════════════════
+    // POST /update-password
+    // ═══════════════════════════════════════════════════════
+    if (method === "POST" && path === "/update-password") {
       const authHeader = req.headers.get("Authorization");
-      if (!authHeader) return jsonRes(401, { error: "Missing authorization" });
-      
+      if (!authHeader)
+        return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Missing authorization header" });
+
       const { new_password } = payload as { new_password: string };
-      if (!new_password || new_password.length < 6) {
-        return jsonRes(400, { error: "New password must be at least 6 characters" });
-      }
+      if (!new_password || new_password.length < 8)
+        return jsonRes(400, {
+          success: false,
+          code: "VALIDATION_ERROR",
+          message: "New password must be at least 8 characters",
+        });
 
       const token = authHeader.replace("Bearer ", "");
-      const { data: { user }, error: userError } = await publicClient.auth.getUser(token);
-      
-      if (userError || !user) {
-        return jsonRes(401, { error: "Unauthorized or invalid session" });
-      }
+      const { data: { user }, error: userErr } = await publicClient.auth.getUser(token);
+      if (userErr || !user)
+        return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Invalid session" });
 
-      // Update password and clear the reset flag
-      const { error: updateError } = await adminClient.auth.admin.updateUserById(user.id, {
+      const { error: updateErr } = await svcClient.auth.admin.updateUserById(user.id, {
         password: new_password,
-        user_metadata: {
-          ...user.user_metadata,
-          force_password_reset: false
-        }
+        user_metadata: { ...user.user_metadata, force_password_reset: false },
       });
+      if (updateErr) throw updateErr;
 
-      if (updateError) throw updateError;
-
-      return jsonRes(200, { message: "Password updated successfully" });
+      return successRes("Password updated successfully");
     }
 
-    return jsonRes(404, { error: `Path not found: ${path}` });
-  } catch (err: any) {
+    return jsonRes(404, { success: false, code: "NOT_FOUND", message: `Path not found: ${path}` });
+  } catch (err: unknown) {
     return errorRes(err, "auth");
   }
 });

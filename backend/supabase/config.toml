@@ -28,13 +28,15 @@ port = 55437
 enabled = true
 file_size_limit = "50MiB"
 
-# ─── Edge Functions ───────────────────────────────────────────────
+# ─── Edge Functions ────────────────────────────────────────────────────────────
 # verify_jwt = false for ALL functions.
-# Gateway-level JWT verification only supports HS256, but this project
-# uses ES256 (asymmetric keys). All auth is handled inside the functions
-# via supabase.auth.getUser() which contacts the auth server directly.
+# All auth is handled inside each function via supabase.auth.getUser()
+# which contacts the auth server directly (supports ES256 asymmetric keys).
 
 [functions.auth]
+verify_jwt = false
+
+[functions.admin]
 verify_jwt = false
 
 [functions.profile]
@@ -43,10 +45,10 @@ verify_jwt = false
 [functions.employee]
 verify_jwt = false
 
-[functions.leave]
+[functions.attendance]
 verify_jwt = false
 
-[functions.attendance]
+[functions.leave]
 verify_jwt = false
 
 [functions.policies]
@@ -55,5 +57,8 @@ verify_jwt = false
 [functions.company]
 verify_jwt = false
 
-[functions.admin]
+[functions.departments]
+verify_jwt = false
+
+[functions.dashboard]
 verify_jwt = false

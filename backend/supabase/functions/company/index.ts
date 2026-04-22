@@ -1,91 +1,289 @@
+/**
+ * /functions/v1/company
+ *
+ * Company-level management for Company Admin.
+ *
+ * GET    /info                — company details
+ * PATCH  /info                — update company info
+ * GET    /dashboard           — dashboard stats
+ * GET    /departments         — list departments
+ * POST   /departments         — create department
+ * PUT    /departments/:id     — update department
+ * DELETE /departments/:id     — delete department
+ * GET    /designations        — list designations
+ * POST   /designations        — create designation
+ * DELETE /designations/:id    — delete designation
+ * GET    /holidays            — list holidays
+ * POST   /holidays            — add holiday
+ * DELETE /holidays/:id        — remove holiday
+ */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { getUserContext, logAction } from "../_shared/auth.ts";
-import { jsonRes, normalizePath, corsHeaders, errorRes } from "../_shared/responses.ts";
+import {
+  jsonRes,
+  successRes,
+  createdRes,
+  errorRes,
+  normalizePath,
+  corsHeaders,
+} from "../_shared/responses.ts";
 
-Deno.serve(async (req: any) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS")
     return new Response("ok", { headers: corsHeaders });
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-  const publicClient = createClient(supabaseUrl, anonKey);
-  const adminClient = createClient(supabaseUrl, serviceKey);
+  const svcClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
 
   const ctx = await getUserContext(req);
-  if (!ctx) return jsonRes(401, { error: "Unauthorized" });
-  
-  // RBAC: company_admin or admin
-  // RBAC: GET is allowed for all company members, other methods need admin/company_admin
-  if (req.method !== "GET" && ctx.role !== "company_admin" && ctx.role !== "admin") {
-    return jsonRes(403, { error: "Forbidden" });
-  }
-  
+  if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
+  if (ctx.role === "employee")
+    return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Company Admin access required" });
+
   const companyId = ctx.companyId;
-  if (!companyId) return jsonRes(400, { error: "User is not associated with a company" });
+  if (!companyId)
+    return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No company associated with your account" });
 
   const url = new URL(req.url);
   const path = normalizePath(url.pathname, "company");
   const method = req.method;
-
   const segments = path.replace(/^\//, "").split("/");
   const resource = segments[0] || null;
   const resourceId = segments[1] || null;
-  
+
   try {
-    if (resource === "info" || path === "/") {
+    // ═══════════════════════════════════════════════════════
+    // COMPANY INFO
+    // ═══════════════════════════════════════════════════════
+    if (!resource || resource === "info") {
       if (method === "GET") {
-        const { data, error } = await adminClient.from("companies").select("*").eq("id", companyId).single();
+        const { data, error } = await svcClient
+          .from("companies")
+          .select("*, plans(*)")
+          .eq("id", companyId)
+          .single();
         if (error) throw error;
-        return jsonRes(200, { data });
+        return successRes("Company info fetched", data);
       }
-      
+
       if (method === "PATCH") {
         const body = await req.json();
-        // Prevent changing id
+        // Protect fields only Super Admin can change
         delete body.id;
-        const { data, error } = await adminClient.from("companies").update(body).eq("id", companyId).select().single();
+        delete body.plan_id;
+        delete body.plan_status;
+        delete body.plan_start_date;
+        delete body.plan_end_date;
+        delete body.created_by;
+
+        const { data, error } = await svcClient
+          .from("companies")
+          .update(body)
+          .eq("id", companyId)
+          .select()
+          .single();
         if (error) throw error;
-        await logAction(adminClient, ctx, "UPDATE_COMPANY", "companies", companyId, body);
-        return jsonRes(200, { data });
+        await logAction(svcClient, ctx, "UPDATE_COMPANY", "companies", companyId, body);
+        return successRes("Company info updated", data);
       }
     }
 
-    if (resource === "leave-configurations") {
+    // ═══════════════════════════════════════════════════════
+    // DASHBOARD
+    // ═══════════════════════════════════════════════════════
+    if (resource === "dashboard" && method === "GET") {
+      const today = new Date().toISOString().slice(0, 10);
+
+      const [
+        { count: totalEmployees },
+        { data: todayAttendance },
+        { count: pendingLeaves },
+      ] = await Promise.all([
+        svcClient.from("employees").select("*", { count: "exact", head: true }).eq("company_id", companyId).eq("status", "active"),
+        svcClient.from("attendance").select("status, employee_id").eq("company_id", companyId).eq("date", today),
+        svcClient.from("leave_requests").select("*", { count: "exact", head: true }).eq("company_id", companyId).eq("status", "pending"),
+      ]);
+
+      const stats = {
+        total_employees: totalEmployees ?? 0,
+        present_today: (todayAttendance ?? []).filter((a) => ["present", "late", "wfh"].includes(a.status)).length,
+        absent_today: (todayAttendance ?? []).filter((a) => a.status === "absent").length,
+        on_leave_today: (todayAttendance ?? []).filter((a) => a.status === "on_leave").length,
+        late_arrivals_today: (todayAttendance ?? []).filter((a) => a.status === "late").length,
+        pending_leave_requests: pendingLeaves ?? 0,
+      };
+
+      return successRes("Dashboard stats fetched", stats);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // DEPARTMENTS
+    // ═══════════════════════════════════════════════════════
+    if (resource === "departments") {
       if (method === "GET") {
-        const { data, error } = await adminClient
-          .from("leave_configurations")
+        const { data, error } = await svcClient
+          .from("departments")
+          .select("*, employees!head_id(id, full_name)")
+          .eq("company_id", companyId)
+          .order("name");
+        if (error) throw error;
+
+        // Add employee count per department
+        const enriched = await Promise.all(
+          (data ?? []).map(async (dept: Record<string, unknown>) => {
+            const { count } = await svcClient
+              .from("employees")
+              .select("*", { count: "exact", head: true })
+              .eq("department_id", dept.id as string)
+              .eq("status", "active");
+            return { ...dept, employee_count: count ?? 0 };
+          })
+        );
+        return successRes("Departments fetched", enriched);
+      }
+
+      if (method === "POST") {
+        const body = await req.json();
+        if (!body.name)
+          return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: "Department name is required" });
+
+        // Check plan department limit
+        const { data: company } = await svcClient
+          .from("companies")
+          .select("plan_id, plans(max_departments)")
+          .eq("id", companyId)
+          .single();
+        const maxDepts = (company?.plans as Record<string, unknown> & { max_departments: number } | null)?.max_departments ?? 2;
+        if (maxDepts !== -1) {
+          const { count } = await svcClient
+            .from("departments")
+            .select("*", { count: "exact", head: true })
+            .eq("company_id", companyId);
+          if ((count ?? 0) >= maxDepts)
+            return jsonRes(403, {
+              success: false,
+              code: "PLAN_LIMIT_EXCEEDED",
+              message: `Department limit of ${maxDepts} reached for your current plan. Please upgrade.`,
+            });
+        }
+
+        const { data, error } = await svcClient
+          .from("departments")
+          .insert({ company_id: companyId, name: body.name, head_id: body.head_id ?? null })
+          .select()
+          .single();
+        if (error) throw error;
+        await logAction(svcClient, ctx, "CREATE_DEPARTMENT", "departments", data.id, body);
+        return createdRes("Department created", data);
+      }
+
+      if (method === "PUT" && resourceId) {
+        const body = await req.json();
+        delete body.id; delete body.company_id;
+        const { data, error } = await svcClient
+          .from("departments")
+          .update(body)
+          .eq("id", resourceId)
+          .eq("company_id", companyId)
+          .select()
+          .single();
+        if (error) throw error;
+        await logAction(svcClient, ctx, "UPDATE_DEPARTMENT", "departments", resourceId, body);
+        return successRes("Department updated", data);
+      }
+
+      if (method === "DELETE" && resourceId) {
+        const { error } = await svcClient
+          .from("departments")
+          .delete()
+          .eq("id", resourceId)
+          .eq("company_id", companyId);
+        if (error) throw error;
+        await logAction(svcClient, ctx, "DELETE_DEPARTMENT", "departments", resourceId);
+        return successRes("Department deleted");
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // DESIGNATIONS
+    // ═══════════════════════════════════════════════════════
+    if (resource === "designations") {
+      if (method === "GET") {
+        const { data, error } = await svcClient
+          .from("designations")
           .select("*")
           .eq("company_id", companyId)
-          .order("leave_type");
+          .order("name");
         if (error) throw error;
-        return jsonRes(200, { data });
+        return successRes("Designations fetched", data);
       }
 
-      if (method === "PUT") {
-        const { configurations } = await req.json();
-        if (!Array.isArray(configurations)) return jsonRes(400, { error: "configurations must be an array" });
-
-        const rows = configurations.map((c: any) => ({
-          company_id: companyId,
-          leave_type: c.leave_type,
-          annual_allowance: c.annual_allowance
-        }));
-
-        const { data, error } = await adminClient
-          .from("leave_configurations")
-          .upsert(rows, { onConflict: "company_id,leave_type" })
-          .select();
-        
+      if (method === "POST") {
+        const body = await req.json();
+        if (!body.name)
+          return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: "Designation name is required" });
+        const { data, error } = await svcClient
+          .from("designations")
+          .insert({ company_id: companyId, name: body.name })
+          .select()
+          .single();
         if (error) throw error;
-        await logAction(adminClient, ctx, "UPDATE_LEAVE_CONFIG", "leave_configurations", companyId, configurations);
-        return jsonRes(200, { data });
+        return createdRes("Designation created", data);
+      }
+
+      if (method === "DELETE" && resourceId) {
+        const { error } = await svcClient
+          .from("designations")
+          .delete()
+          .eq("id", resourceId)
+          .eq("company_id", companyId);
+        if (error) throw error;
+        return successRes("Designation deleted");
       }
     }
 
-    return jsonRes(404, { error: "Resource not found" });
-  } catch (err: any) {
+    // ═══════════════════════════════════════════════════════
+    // HOLIDAYS
+    // ═══════════════════════════════════════════════════════
+    if (resource === "holidays") {
+      if (method === "GET") {
+        const { data, error } = await svcClient
+          .from("holidays")
+          .select("*")
+          .eq("company_id", companyId)
+          .order("date");
+        if (error) throw error;
+        return successRes("Holidays fetched", data);
+      }
+
+      if (method === "POST") {
+        const body = await req.json();
+        if (!body.name || !body.date)
+          return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: "name and date are required" });
+        const { data, error } = await svcClient
+          .from("holidays")
+          .insert({ company_id: companyId, name: body.name, date: body.date })
+          .select()
+          .single();
+        if (error) throw error;
+        return createdRes("Holiday added", data);
+      }
+
+      if (method === "DELETE" && resourceId) {
+        const { error } = await svcClient
+          .from("holidays")
+          .delete()
+          .eq("id", resourceId)
+          .eq("company_id", companyId);
+        if (error) throw error;
+        return successRes("Holiday removed");
+      }
+    }
+
+    return jsonRes(404, { success: false, code: "NOT_FOUND", message: "Resource not found" });
+  } catch (err: unknown) {
     return errorRes(err, "company");
   }
 });

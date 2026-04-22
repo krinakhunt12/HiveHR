@@ -1,8 +1,9 @@
 export { corsHeaders } from "./cors.ts";
 
 /**
- * Standardized JSON Response pattern.
- * Ensures consistent headers and status codes across all Edge Functions.
+ * Standardized JSON response — consistent headers + body shape.
+ * Success shape:  { success: true,  message, data, meta, timestamp }
+ * Error shape:    { success: false, code, message, errors, timestamp }
  */
 export function jsonRes(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -11,44 +12,83 @@ export function jsonRes(status: number, body: unknown): Response {
   });
 }
 
+export function successRes<T>(
+  message: string,
+  data?: T,
+  meta?: Record<string, unknown>
+): Response {
+  return jsonRes(200, {
+    success: true,
+    message,
+    data: data ?? null,
+    meta: meta ?? null,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function createdRes<T>(message: string, data: T): Response {
+  return jsonRes(201, {
+    success: true,
+    message,
+    data,
+    meta: null,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function errorRes(err: unknown, prefix = "Service"): Response {
+  console.error(`[${prefix}]`, err);
+  const e = err as Record<string, unknown>;
+  const message =
+    (e?.message as string) ?? "An unexpected error occurred";
+  const status =
+    typeof e?.status === "number" ? e.status : 500;
+
+  return jsonRes(status, {
+    success: false,
+    code: (e?.code as string) ?? "INTERNAL_ERROR",
+    message,
+    errors: (e?.errors as unknown[]) ?? null,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function validationErrorRes(
+  errors: { field: string; message: string }[]
+): Response {
+  return jsonRes(422, {
+    success: false,
+    code: "VALIDATION_ERROR",
+    message: "Validation failed. Please check the highlighted fields.",
+    errors,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 /**
- * Robust Path Normalization.
- * Strips the Supabase Edge Function prefix to allow clean internal routing.
- * @param pathname The raw URL pathname from the request.
- * @param functionName The name of the function (e.g., 'auth', 'employee').
+ * Strips the Supabase gateway prefix so internal routing sees clean paths.
+ * /functions/v1/employee/123  →  /123
  */
-export function normalizePath(pathname: string, functionName: string): string {
+export function normalizePath(
+  pathname: string,
+  functionName: string
+): string {
   const segments = pathname.replace(/^\/+|\/+$/g, "").split("/");
-  
-  // Shift out standard Supabase and function-specific segments
   while (
     segments.length > 0 &&
     ["functions", "v1", functionName].includes(segments[0])
   ) {
     segments.shift();
   }
-  
-  const finalPath = segments.length > 0 ? `/${segments.join("/")}` : "/";
-  return finalPath;
+  return segments.length > 0 ? `/${segments.join("/")}` : "/";
 }
 
-/**
- * Standardized Error Response handler.
- * Logs the error and returns a consistent JSON error response.
- * @param err The error object.
- * @param prefix Optional prefix for the console log (usually the function name).
- */
-export function errorRes(err: any, prefix = "Service"): Response {
-  console.error(`[${prefix}]`, err);
-  const message = err.message || "An unexpected error occurred";
-  
-  // Attempt to extract status from various error formats (Postgrest, Auth, etc)
-  const status = typeof err.status === 'number' ? err.status : 400;
-  
-  return jsonRes(status, { 
-    error: message, 
-    message, // Fallback for various frontend parsers
-    details: err.details || null,
-    code: err.code || null
+/** Parse query string into a plain object */
+export function parseQuery(url: URL): Record<string, string> {
+  const obj: Record<string, string> = {};
+  url.searchParams.forEach((v, k) => {
+    obj[k] = v;
   });
+  return obj;
 }
+
