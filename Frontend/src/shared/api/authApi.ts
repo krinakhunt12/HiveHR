@@ -1,72 +1,70 @@
-import { supabase } from "./supabase";
-import { invokeApi } from "./baseApi";
+/**
+ * authApi.ts — Direct auth API functions (non-hook usage).
+ * Updated to match the rebuilt Supabase backend response format.
+ * For React components, prefer the hooks in authHooks.ts.
+ */
 
-export type AppRole = 'admin' | 'company_admin' | 'employee';
+import { invokeApi } from './baseApi';
+import type { AppRole } from '../auth/roles';
+
+export type { AppRole };
 
 export interface LoginResponse {
+  success: boolean;
   message: string;
-  user: {
-    id: string;
-    email: string;
-    full_name: string;
-    role: AppRole;
-    company_id: string | null;
-    company_name: string | null;
-    force_password_reset?: boolean;
+  data: {
+    user: {
+      id: string;
+      email: string;
+      full_name: string;
+      role: AppRole;
+      company_id: string | null;
+      company_name: string | null;
+      employee_id?: string | null;
+      force_password_reset?: boolean;
+      is_first_login?: boolean;
+    };
+    session: {
+      access_token: string;
+      refresh_token: string;
+      expires_at: number;
+    };
+    redirect_to: string;
   };
-  session: {
-    access_token: string;
-    refresh_token: string;
-    expires_at: number;
-  };
-  redirect_to: string;
 }
 
 export interface SignupResponse {
+  success: boolean;
   message: string;
-  user_id: string;
-  role: AppRole;
-  company_id: string | null;
-  redirect_to: string;
+  data: {
+    user_id: string;
+    role: AppRole;
+    company_id: string | null;
+    redirect_to: string;
+  };
 }
 
 export const authApi = {
-  /**
-   * Proper Login using your custom auth Edge Function
-   */
-  login: async ({ email, password, role }: { email: string; password: string; role: string }): Promise<LoginResponse> => {
-    const data = await invokeApi<LoginResponse>("auth/login", { 
-      method: "POST", 
-      body: { email, password, role },
-      isPublic: true 
-    });
-
-    // Sync session with the Supabase client
-    if (data.session) {
-      await supabase.auth.setSession({
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-      });
-    }
-
-    return data;
-  },
-
-  /**
-   * Proper Signup using your custom auth Edge Function
-   */
-  signup: async (payload: any): Promise<SignupResponse> => {
-    return await invokeApi<SignupResponse>("auth/signup", {
-      method: "POST",
+  login: (payload: { email: string; password: string; role: string }) =>
+    invokeApi<LoginResponse>('auth/login', {
+      method: 'POST',
       body: payload,
-      isPublic: true
-    });
-  },
+      isPublic: true,
+    }),
 
-  updatePassword: async (newPassword: string): Promise<{ message: string }> => {
-    return await invokeApi<{ message: string }>("auth/update-password", {
-      method: "POST",
-      body: { new_password: newPassword }
-    });
-  }
+  signup: (payload: any) =>
+    invokeApi<SignupResponse>('auth/signup', {
+      method: 'POST',
+      body: payload,
+      isPublic: true,
+    }),
+
+  updatePassword: (newPassword: string) =>
+    invokeApi<{ success: boolean; message: string }>('auth/update-password', {
+      method: 'POST',
+      body: { new_password: newPassword },
+    }),
+
+  logout: () =>
+    invokeApi('auth/logout', { method: 'POST' }).catch(() => null),
 };

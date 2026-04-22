@@ -1,15 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import {
-    Building2,
-    Users,
-    Activity,
-    Search,
-    Filter,
-    Shield,
-    Zap,
-    Wind,
-    Clock
+    Building2, Users, Activity, Search, Filter,
+    Shield, Zap, Wind, Clock, TrendingUp, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
@@ -17,71 +10,62 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
-import { useHealth, useListEmployees } from '@/shared/api/hooks/hrHooks';
-
-import { AddEmployeeModal } from '../../company-dashboard/components/AddEmployeeModal';
+import { useAdminDashboard, useListCompanies, useCompanyAdminMutations } from '@/shared/api/hooks/hrHooks';
+import { useToast } from '@/shared/ui/toast/useToast';
 
 type AdminTab = 'pulse' | 'directory';
 
 const AdminDashboard = () => {
     const [currentTab, setCurrentTab] = useState<AdminTab>('pulse');
     const [query, setQuery] = React.useState('');
-    const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
-    
-    const { 
-        data: health, 
-        isLoading: loadingHealth, 
-        error: healthError,
-        refetch: refetchHealth 
-    } = useHealth();
-    
-    const { 
-        data: employeesResponse, 
-        isLoading: loadingEmployees, 
-        error: employeesError,
-        refetch: refetchEmployees 
-    } = useListEmployees();
+    const { toast } = useToast();
 
-    const employees = employeesResponse?.data || [];
+    const { data: stats, isLoading: loadingStats, error: statsError, refetch: refetchStats } = useAdminDashboard();
+    const { data: companiesRes, isLoading: loadingCompanies, error: companiesError, refetch: refetchCompanies } = useListCompanies();
+    const { suspend, activate } = useCompanyAdminMutations();
 
-    const isLoading = loadingHealth || loadingEmployees;
-    const error = healthError || employeesError;
+    const companies = companiesRes?.data ?? [];
+    const isLoading = loadingStats || loadingCompanies;
+    const error = statsError || companiesError;
 
-    const filteredEmployees = useMemo(() => {
+    const filteredCompanies = useMemo(() => {
         const normalized = query.trim().toLowerCase();
-        if (!normalized) return employees;
+        if (!normalized) return companies;
+        return companies.filter((c: any) =>
+            c.name?.toLowerCase().includes(normalized) ||
+            c.email?.toLowerCase().includes(normalized)
+        );
+    }, [companies, query]);
 
-        return employees.filter((emp) => {
-            return (
-                emp.full_name.toLowerCase().includes(normalized)
-                || emp.designation.toLowerCase().includes(normalized)
-                || (emp.employee_code ?? '').toLowerCase().includes(normalized)
-                || (emp.company_id ?? '').toLowerCase().includes(normalized)
-            );
-        });
-    }, [employees, query]);
+    const handleSuspend = async (id: string, name: string) => {
+        if (!window.confirm(`Suspend ${name}? Their employees will lose access.`)) return;
+        try {
+            await suspend.mutateAsync(id);
+            toast({ title: 'Company Suspended', description: `${name} has been suspended.`, type: 'success' });
+        } catch (err: any) {
+            toast({ title: 'Action Failed', description: err.message, type: 'error' });
+        }
+    };
+
+    const handleActivate = async (id: string, name: string) => {
+        try {
+            await activate.mutateAsync(id);
+            toast({ title: 'Company Activated', description: `${name} is now active.`, type: 'success' });
+        } catch (err: any) {
+            toast({ title: 'Action Failed', description: err.message, type: 'error' });
+        }
+    };
 
     const navItems = [
         { icon: <Activity />, label: 'Pulse', path: 'pulse' },
-        { icon: <Users />, label: 'Global Registry', path: 'directory' },
-    ];
-
-    const customNavItems = navItems.map(item => ({
-        ...item,
-        onClick: () => setCurrentTab(item.path as AdminTab)
-    }));
+        { icon: <Users />, label: 'Companies', path: 'directory' },
+    ].map(item => ({ ...item, onClick: () => setCurrentTab(item.path as AdminTab) }));
 
     const renderPulse = () => {
         if (error) {
             return (
                 <div className="min-h-[600px] flex items-center justify-center">
-                    <ErrorState 
-                        error={error as Error} 
-                        onRetry={() => {
-                            refetchHealth();
-                            refetchEmployees();
-                        }}
-                    />
+                    <ErrorState error={error as Error} onRetry={() => { refetchStats(); refetchCompanies(); }} />
                 </div>
             );
         }
@@ -90,84 +74,108 @@ const AdminDashboard = () => {
             <div className="space-y-10 text-left animate-in fade-in duration-700">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Enterprise Collective Pulse</h1>
-                        <p className="text-sm font-semibold text-textSecondary mt-1 opacity-70">Cross-tenant personnel and lifecycle telemetry.</p>
+                        <h1 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Platform Overview</h1>
+                        <p className="text-sm font-semibold text-textSecondary mt-1 opacity-70">Cross-tenant performance and subscription telemetry.</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatBox title="Active Personnel" value={String(employees.length)} icon={<Users />} trend="+12% YoY" color="primary" />
-                    <StatBox title="Global Attendance" value="98.2%" icon={<Clock />} trend="Stable" color="accent" />
-                    <StatBox title="Leave Requests" value="142" icon={<Wind />} trend="Active" color="primary" />
-                    <StatBox title="Cluster Sync" value={health?.ok ? 'Live' : 'Syncing'} icon={<Zap />} trend="99.9% Latency" color="primary" />
+                    <StatBox title="Total Companies" value={String(stats?.total_companies ?? companies.length)} icon={<Building2 />} trend="Registered" color="primary" />
+                    <StatBox title="Active Subscriptions" value={String(stats?.active_subscriptions ?? companies.filter((c: any) => c.plan_status === 'active').length)} icon={<Zap />} trend="Live" color="primary" />
+                    <StatBox title="Total Employees" value={String(stats?.total_employees_platform ?? '—')} icon={<Users />} trend="Platform-wide" color="accent" />
+                    <StatBox title="Expiring Soon" value={String(stats?.expiring_soon ?? '—')} icon={<Clock />} trend="< 7 days" color="primary" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                         <Card className="overflow-hidden card-premium bg-white">
+                        <Card className="overflow-hidden card-premium bg-white">
                             <CardHeader className="flex flex-row items-center justify-between py-6 px-8 border-b border-primary/5 bg-primary/[0.02]">
                                 <CardTitle className="text-base font-bold text-textPrimary flex items-center gap-2">
-                                    <Building2 size={18} className="text-primary" /> Active Tenants Status
+                                    <Building2 size={18} className="text-primary" /> Active Tenants
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-8">
-                                <div className="space-y-6">
-                                    {[
-                                        { name: 'AgriCorp Global', role: 'Enterprise', status: 'Healthy', sync: '100%' },
-                                        { name: 'SeedLogic Ltd', role: 'Medium Business', status: 'Healthy', sync: '99.8%' },
-                                        { name: 'FarmFlow Systems', role: 'Regional', status: 'Maintenance', sync: '0%' }
-                                    ].map((tenant, i) => (
-                                        <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-primary/5 hover:bg-primary/[0.01] transition-all group">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-primary border border-primary/10">
-                                                    {tenant.name[0]}
+                                {companies.length === 0 ? (
+                                    <EmptyState title="No companies yet" description="Companies will appear here once they register." icon={Building2} />
+                                ) : (
+                                    <div className="space-y-4">
+                                        {companies.slice(0, 5).map((company: any) => (
+                                            <div key={company.id} className="flex items-center justify-between p-4 rounded-2xl border border-primary/5 hover:bg-primary/[0.01] transition-all group">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-primary border border-primary/10">
+                                                        {company.name[0]}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-textPrimary">{company.name}</p>
+                                                        <p className="text-[10px] uppercase tracking-widest text-textSecondary font-black opacity-40 mt-1">
+                                                            {company.plans?.name ?? 'No Plan'} · {company.employee_count ?? 0} employees
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{tenant.name}</p>
-                                                    <p className="text-[10px] uppercase tracking-widest text-textSecondary font-black opacity-40 mt-1">{tenant.role}</p>
+                                                <div className="flex items-center gap-3">
+                                                    <span className={cn(
+                                                        "text-xs font-bold px-2 py-1 rounded-lg border",
+                                                        company.plan_status === 'active' ? 'bg-success/5 text-success border-success/10' :
+                                                        company.plan_status === 'suspended' ? 'bg-error/5 text-error border-error/10' :
+                                                        'bg-warning/5 text-warning border-warning/10'
+                                                    )}>
+                                                        {company.plan_status}
+                                                    </span>
+                                                    {company.plan_status === 'active' ? (
+                                                        <Button variant="ghost" size="sm"
+                                                            onClick={() => handleSuspend(company.id, company.name)}
+                                                            className="text-[10px] text-error hover:bg-error/5 h-7">
+                                                            Suspend
+                                                        </Button>
+                                                    ) : (
+                                                        <Button variant="ghost" size="sm"
+                                                            onClick={() => handleActivate(company.id, company.name)}
+                                                            className="text-[10px] text-success hover:bg-success/5 h-7">
+                                                            Activate
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <p className={cn("text-xs font-bold", tenant.status === 'Healthy' ? 'text-success' : 'text-warning')}>{tenant.status}</p>
-                                                <p className="text-[10px] font-black text-textSecondary/40 uppercase tracking-widest mt-1">Sync: {tenant.sync}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
 
                     <div className="space-y-6">
                         <Card className="card-premium bg-gradient-to-br from-primary to-primaryDark text-white border-none shadow-xl shadow-primary/20 overflow-hidden relative">
-                             <div className="absolute -right-4 -bottom-4 opacity-10">
-                                <Shield size={120} />
-                            </div>
+                            <div className="absolute -right-4 -bottom-4 opacity-10"><Shield size={120} /></div>
                             <CardContent className="p-8 pb-10">
                                 <Zap size={24} className="mb-6 opacity-60" />
-                                <h3 className="text-xl font-bold tracking-tight mb-2">Registry Security</h3>
-                                <p className="text-sm font-medium text-white/70 leading-relaxed">System-wide encryption is active for all employee and attendance records (AES-256).</p>
-                                <Button variant="outline" className="w-full mt-8 border-white/20 text-white hover:bg-white/10 font-bold text-xs uppercase tracking-widest">
-                                    Review Encryption Logs
-                                </Button>
+                                <h3 className="text-xl font-bold tracking-tight mb-2">Platform Security</h3>
+                                <p className="text-sm font-medium text-white/70 leading-relaxed">Multi-tenant data isolation enforced via RLS on all 16 database tables.</p>
+                                <div className="mt-8 flex items-center gap-2 text-xs font-bold text-white/60">
+                                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                                    All systems operational
+                                </div>
                             </CardContent>
                         </Card>
 
                         <Card className="card-premium bg-white overflow-hidden">
                             <CardHeader className="py-6 px-8 border-b border-primary/5 bg-primary/[0.02]">
                                 <CardTitle className="text-base font-bold text-textPrimary flex items-center gap-2">
-                                    <Activity size={18} className="text-primary" /> Personnel Trends
+                                    <TrendingUp size={18} className="text-primary" /> Plan Distribution
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6">
-                                <div className="space-y-4">
-                                    <p className="text-xs font-bold text-textSecondary uppercase tracking-widest opacity-50 mb-6">Cross-Tenant Growth</p>
-                                    {[70, 45, 90, 60, 85].map((w, i) => (
-                                        <div key={i} className="h-2 bg-primary/5 rounded-full overflow-hidden">
-                                            <div className="h-full bg-primary" style={{ width: `${w}%` }} />
-                                        </div>
-                                    ))}
-                                </div>
+                                {stats?.plan_distribution ? (
+                                    <div className="space-y-3">
+                                        {Object.entries(stats.plan_distribution).map(([plan, count]: any) => (
+                                            <div key={plan} className="flex justify-between items-center">
+                                                <span className="text-xs font-bold text-textSecondary uppercase tracking-widest">{plan}</span>
+                                                <span className="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-lg">{count} companies</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-textSecondary opacity-50 text-center py-4">No plan data available</p>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
@@ -180,8 +188,8 @@ const AdminDashboard = () => {
         <div className="space-y-8 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
                 <div>
-                    <h2 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Global Personnel Registry</h2>
-                    <p className="text-sm font-semibold text-textSecondary mt-1 opacity-70">Auditing members across all enterprise tenants.</p>
+                    <h2 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Company Registry</h2>
+                    <p className="text-sm font-semibold text-textSecondary mt-1 opacity-70">{companies.length} registered tenants.</p>
                 </div>
                 <div className="flex gap-3">
                     <div className="relative">
@@ -190,21 +198,23 @@ const AdminDashboard = () => {
                             type="text"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search globally..."
+                            placeholder="Search companies..."
                             className="pl-10 pr-4 py-2.5 bg-white border border-primary/5 rounded-xl text-sm outline-none w-64 focus:w-80 transition-all font-bold text-textPrimary placeholder:text-textSecondary/30 shadow-sm"
                         />
                     </div>
-                    <Button variant="outline" size="icon" className="h-11 w-11 p-0 rounded-xl border-primary/5 text-textSecondary bg-white shadow-sm"><Filter size={18} /></Button>
+                    <Button variant="outline" size="icon" className="h-11 w-11 p-0 rounded-xl border-primary/5 text-textSecondary bg-white shadow-sm">
+                        <Filter size={18} />
+                    </Button>
                 </div>
             </div>
 
             <Card className="card-premium p-0 border border-primary/5 shadow-xl shadow-primary/[0.02] overflow-hidden bg-white">
                 <CardContent className="p-0 min-h-[500px]">
-                    {filteredEmployees.length === 0 ? (
-                        <EmptyState 
-                            title={query ? "No search results" : "Global Directory Empty"} 
-                            description={query ? `No members found matching "${query}".` : "The global registry doesn't have any members yet."}
-                            icon={Users}
+                    {filteredCompanies.length === 0 ? (
+                        <EmptyState
+                            title={query ? 'No results' : 'No companies yet'}
+                            description={query ? `No companies match "${query}".` : 'Companies will appear here once they register.'}
+                            icon={Building2}
                             className="h-[500px]"
                         />
                     ) : (
@@ -212,33 +222,67 @@ const AdminDashboard = () => {
                             <table className="w-full text-left">
                                 <thead className="bg-primary/[0.02] border-b border-primary/5">
                                     <tr>
-                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Member Info</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Tenant Association</th>
-                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em] text-right">Registry Status</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Company</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Plan</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Employees</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Status</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Expiry</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em] text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-primary/5">
-                                    {filteredEmployees.map((emp, i) => (
-                                        <tr key={emp.id} className="hover:bg-primary/[0.01] transition-colors cursor-pointer group">
-                                            <td className="px-8 py-6">
+                                    {filteredCompanies.map((company: any) => (
+                                        <tr key={company.id} className="hover:bg-primary/[0.01] transition-colors group">
+                                            <td className="px-8 py-5">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-11 h-11 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center font-black text-primary text-sm group-hover:scale-110 transition-all shadow-sm">
-                                                        {emp.full_name.charAt(0)}
+                                                    <div className="w-10 h-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center font-black text-primary text-sm">
+                                                        {company.name[0]}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors tracking-tight leading-none">{emp.full_name}</p>
-                                                        <p className="text-[10px] text-textSecondary mt-2 font-black uppercase tracking-widest opacity-50">{emp.designation}</p>
+                                                        <p className="text-sm font-bold text-textPrimary">{company.name}</p>
+                                                        <p className="text-[10px] text-textSecondary font-black uppercase tracking-widest mt-1 opacity-50">{company.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-5">
-                                                <code className="text-xs font-mono text-primary font-bold bg-primary/5 px-2.5 py-1.5 rounded-lg border border-primary/10">TENANT_{emp.company_id.slice(0, 8).toUpperCase()}</code>
+                                                <span className="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-lg">
+                                                    {company.plans?.name ?? 'No Plan'}
+                                                </span>
                                             </td>
-                                            <td className="px-8 py-5 text-right">
+                                            <td className="px-8 py-5">
+                                                <p className="text-sm font-bold text-textPrimary">{company.employee_count ?? 0}</p>
+                                            </td>
+                                            <td className="px-8 py-5">
                                                 <span className={cn(
                                                     "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] border shadow-sm",
-                                                    emp.status === 'active' ? 'bg-success/5 text-success border-success/10' : 'bg-error/5 text-error border-error/10'
-                                                )}>{emp.status}</span>
+                                                    company.plan_status === 'active' ? 'bg-success/5 text-success border-success/10' :
+                                                    company.plan_status === 'suspended' ? 'bg-error/5 text-error border-error/10' :
+                                                    'bg-warning/5 text-warning border-warning/10'
+                                                )}>
+                                                    {company.plan_status}
+                                                </span>
+                                            </td>
+                                            <td className="px-8 py-5">
+                                                <p className="text-sm font-bold text-textPrimary">
+                                                    {company.plan_end_date ? new Date(company.plan_end_date).toLocaleDateString() : '—'}
+                                                </p>
+                                            </td>
+                                            <td className="px-8 py-5 text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    {company.plan_status === 'active' ? (
+                                                        <Button variant="ghost" size="sm"
+                                                            onClick={() => handleSuspend(company.id, company.name)}
+                                                            className="text-[10px] text-error hover:bg-error/5 h-8">
+                                                            Suspend
+                                                        </Button>
+                                                    ) : (
+                                                        <Button variant="ghost" size="sm"
+                                                            onClick={() => handleActivate(company.id, company.name)}
+                                                            className="text-[10px] text-success hover:bg-success/5 h-8">
+                                                            Activate
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -253,33 +297,29 @@ const AdminDashboard = () => {
 
     if (isLoading) {
         return (
-            <DashboardLayout navItems={customNavItems as any}>
+            <DashboardLayout navItems={navItems as any}>
                 <div className="space-y-10">
-                    <div className="flex justify-between items-center text-left">
+                    <div className="flex justify-between items-center">
                         <div className="space-y-3">
                             <Skeleton className="h-10 w-80 rounded-2xl" />
                             <Skeleton className="h-5 w-64 rounded-xl" />
                         </div>
                     </div>
                     <div className="grid grid-cols-4 gap-6">
-                        <Skeleton className="h-32 rounded-2xl" />
-                        <Skeleton className="h-32 rounded-2xl" />
-                        <Skeleton className="h-32 rounded-2xl" />
-                        <Skeleton className="h-32 rounded-2xl" />
+                        {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
                     </div>
-                    <Skeleton className="h-[600px] rounded-[2rem]" />
+                    <Skeleton className="h-[500px] rounded-[2rem]" />
                 </div>
             </DashboardLayout>
         );
     }
 
     return (
-        <DashboardLayout navItems={customNavItems as any}>
+        <DashboardLayout navItems={navItems as any}>
             <main>
                 {currentTab === 'pulse' && renderPulse()}
                 {currentTab === 'directory' && renderDirectory()}
             </main>
-            <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
         </DashboardLayout>
     );
 };
@@ -288,22 +328,13 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
     const isAccent = color === 'accent';
     return (
         <Card className="hover:border-primary/20 transition-all duration-300 card-premium bg-white group relative overflow-hidden text-left shadow-none border border-primary/5">
-            <div className={cn(
-                "absolute -right-4 -top-4 w-24 h-24 blur-3xl opacity-5 transition-opacity duration-700 group-hover:opacity-20",
-                isAccent ? "bg-accent" : "bg-primary"
-            )} />
+            <div className={cn("absolute -right-4 -top-4 w-24 h-24 blur-3xl opacity-5 transition-opacity duration-700 group-hover:opacity-20", isAccent ? "bg-accent" : "bg-primary")} />
             <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-8">
-                    <div className={cn(
-                        "p-3 rounded-xl transition-all duration-300 shadow-sm",
-                        isAccent ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary"
-                    )}>
+                    <div className={cn("p-3 rounded-xl transition-all duration-300 shadow-sm", isAccent ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
                         {React.cloneElement(icon, { size: 20 })}
                     </div>
-                    <span className={cn(
-                        "text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg",
-                        isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary"
-                    )}>
+                    <span className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg", isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary")}>
                         {trend}
                     </span>
                 </div>
@@ -317,5 +348,3 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
 };
 
 export default AdminDashboard;
-
-
