@@ -45,28 +45,40 @@ const EmployeeDashboard = () => {
     const canCheckIn = !hasAttendance;
     const canCheckOut = hasAttendance && !attendanceToday.check_out_at;
     
-    const checkInTime = hasAttendance ? new Date(attendanceToday.check_in_at!).getTime() : null;
+    const checkInTime = hasAttendance && attendanceToday.check_in_at ? new Date(attendanceToday.check_in_at).getTime() : null;
     const [elapsedMinutes, setElapsedMinutes] = useState(0);
 
     React.useEffect(() => {
-        if (!checkInTime || attendanceToday?.check_out_at) return;
+        if (!checkInTime || attendanceToday?.check_out_at) {
+            setElapsedMinutes(0);
+            return;
+        }
         
-        const interval = setInterval(() => {
+        const updateElapsed = () => {
             const now = new Date().getTime();
-            setElapsedMinutes(Math.floor((now - checkInTime) / (1000 * 60)));
-        }, 60000); 
-        
-        setElapsedMinutes(Math.floor((new Date().getTime() - checkInTime) / (1000 * 60)));
+            setElapsedMinutes(Math.floor((now - checkInTime) / 60000));
+        };
+
+        updateElapsed();
+        const interval = setInterval(updateElapsed, 30000); // Update every 30s
         
         return () => clearInterval(interval);
     }, [checkInTime, attendanceToday?.check_out_at]);
 
+    // Break logic: Usually 60 mins. 
+    // We only deduct it if the user has been here for more than 4 hours (240 mins) or if they've checked out.
+    const breakMinutes = attendanceToday?.break_minutes ?? 60;
+    
     const displayMinutes = attendanceToday?.check_out_at 
-        ? attendanceToday.work_minutes 
-        : (elapsedMinutes > 60 ? elapsedMinutes - 60 : 0); 
+        ? (attendanceToday.work_minutes ?? 0)
+        : elapsedMinutes > 240 
+            ? Math.max(0, elapsedMinutes - breakMinutes) 
+            : elapsedMinutes; 
 
     const totalStayMinutes = attendanceToday?.check_out_at
-        ? Math.floor((new Date(attendanceToday.check_out_at).getTime() - checkInTime!) / 60000)
+        ? (attendanceToday.check_in_at && attendanceToday.check_out_at 
+            ? Math.floor((new Date(attendanceToday.check_out_at).getTime() - new Date(attendanceToday.check_in_at).getTime()) / 60000)
+            : 0)
         : elapsedMinutes;
 
     const workProgress = Math.min(100, (Number(displayMinutes) / 480) * 100);

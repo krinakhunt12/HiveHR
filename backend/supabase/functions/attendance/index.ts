@@ -346,9 +346,12 @@ Deno.serve(async (req: Request) => {
         body.is_manual_entry = true;
       }
 
+      // Sanitize body: remove 'action' which is used for internal routing/frontend logic but is not a DB column
+      const { action: _action, ...updatePayload } = body;
+
       const { data, error } = await svcClient
         .from("attendance")
-        .update(body)
+        .update(updatePayload)
         .eq("id", resourceId)
         .select()
         .single();

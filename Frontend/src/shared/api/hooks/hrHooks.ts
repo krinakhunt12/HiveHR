@@ -198,7 +198,18 @@ export function useListAttendance(params: AttendanceParams = {}) {
       const res = await invokeApi<ApiSuccessResponse<AttendanceRecord[]>>(
         `attendance${qs(params)}`
       );
-      return res.data ?? [];
+      const data = res.data ?? [];
+      const today = new Date().toISOString().split('T')[0];
+
+      // Normalize all records for UI consistency
+      data.forEach(record => {
+        const baseDate = record.date || today;
+        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}` : null;
+        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}` : null;
+        (record as any).work_minutes = record.net_work_minutes;
+      });
+      
+      return data;
     },
     staleTime: 2 * 60 * 1000,
   });
@@ -216,8 +227,10 @@ export function useTodayAttendance() {
       const record = records[0] ?? null;
       // Normalize legacy field aliases for EmployeeDashboard compat
       if (record) {
-        (record as any).check_in_at = record.check_in_time;
-        (record as any).check_out_at = record.check_out_time;
+        // Construct full ISO strings so new Date() works correctly in UI
+        const baseDate = record.date || today;
+        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}` : null;
+        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}` : null;
         (record as any).work_minutes = record.net_work_minutes;
       }
       return record;

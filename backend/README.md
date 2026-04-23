@@ -130,7 +130,7 @@ All base URLs: `https://<project>.supabase.co/functions/v1/<function>`
 | GET | `/info` | Company details |
 | PATCH | `/info` | Update company info |
 | GET | `/dashboard` | Company dashboard stats |
-| GET | `/departments` | List departments |
+| GET | `/departments` | List departments | 
 | POST | `/departments` | Create department |
 | PUT | `/departments/:id` | Update department |
 | DELETE | `/departments/:id` | Delete department |
