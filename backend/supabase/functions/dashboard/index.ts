@@ -14,25 +14,27 @@ import {
   jsonRes,
   successRes,
   errorRes,
-  corsHeaders,
+  handleOptions,
 } from "../_shared/responses.ts";
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS")
-    return new Response("ok", { headers: corsHeaders });
+  const optionsRes = handleOptions(req);
+  if (optionsRes) return optionsRes;
 
   if (req.method !== "GET")
     return jsonRes(405, { success: false, code: "METHOD_NOT_ALLOWED", message: "GET only" });
 
-  const svcClient = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
-
-  const ctx = await getUserContext(req);
-  if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
-
   try {
+
+    const svcClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const ctx = await getUserContext(req);
+    if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
+
+
     const today = new Date().toISOString().slice(0, 10);
     const currentMonth = today.slice(0, 7);
 

@@ -1,14 +1,14 @@
 /**
  * authHooks.ts — React Query mutation hooks for authentication.
  * Wired to: /auth/login, /auth/signup, /auth/update-password
- * Uses the rebuilt backend response format.
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { invokeApi } from '../baseApi';
-import { useAuthStore, type Session } from '../../auth/store';
+import { invokeApi, invokeAndUnwrap } from '../baseApi';
+import { useAuthStore } from '../../auth/store';
 import { type AppRole, roleDashboardPath } from '../../auth/roles';
+import { detectRole } from '../../utils/authUtils';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -18,28 +18,28 @@ export interface LoginPayload {
   role: string;
 }
 
+/**
+ * Actual API response shape (flat — no data wrapper):
+ * { message, user, session, redirect_to }
+ */
 export interface LoginResponse {
-  success: boolean;
-  message: string;
-  data: {
-    user: {
-      id: string;
-      email: string;
-      full_name: string;
-      role: AppRole;
-      company_id: string | null;
-      company_name: string | null;
-      employee_id?: string | null;
-      force_password_reset?: boolean;
-      is_first_login?: boolean;
-    };
-    session: {
-      access_token: string;
-      refresh_token: string;
-      expires_at: number;
-    };
-    redirect_to: string;
+  user: {
+    id: string;
+    email: string;
+    full_name: string;
+    role: AppRole;
+    company_id: string | null;
+    company_name: string | null;
+    employee_id?: string | null;
+    force_password_reset?: boolean;
+    is_first_login?: boolean;
   };
+  session: {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+  };
+  redirect_to: string;
 }
 
 export interface SignupPayload {
@@ -47,42 +47,40 @@ export interface SignupPayload {
   password: string;
   full_name: string;
   role: string;
-  company_name?: string;   // required if role = company_admin
-  company_id?: string;     // required if role = employee
-  employee_code?: string;  // required if role = employee
-  designation?: string;    // required if role = employee
+  company_name?: string;  // required if role = company_admin
+  company_id?: string;    // required if role = employee
+  employee_code?: string; // required if role = employee
+  designation?: string;   // required if role = employee
 }
 
 export interface SignupResponse {
-  success: boolean;
-  message: string;
-  data: {
-    user_id: string;
-    role: AppRole;
-    company_id: string | null;
-    redirect_to: string;
-  };
+  user_id: string;
+  role: AppRole;
+  company_id: string | null;
+  redirect_to: string;
 }
 
 // ─── useLogin ────────────────────────────────────────────────────────────────
 
 export function useLogin() {
-  const { setSession } = useAuthStore();
   const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (payload: LoginPayload) =>
-      invokeApi<LoginResponse>('auth/login', {
+      invokeAndUnwrap<LoginResponse>('auth/login', {
         method: 'POST',
         body: payload,
         isPublic: true,
       }),
 
     onSuccess: (res) => {
-      const { user, session } = res.data;
+      // res is the unwrapped data: { user, session, redirect_to }
+      const { user, session, redirect_to } = res;
 
-      // Build the unified session object and persist it
-      const appSession: Session = {
+      useAuthStore.getState().setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+        expires_at: session.expires_at,
         user: {
           id: user.id,
           email: user.email,
@@ -90,22 +88,14 @@ export function useLogin() {
           role: user.role,
           company_id: user.company_id,
           company_name: user.company_name,
-          employee_id: user.employee_id ?? null,
           force_password_reset: user.force_password_reset ?? false,
           is_first_login: user.is_first_login ?? false,
+          employee_id: user.employee_id ?? null,
         },
-        access_token: session.access_token,
-        refresh_token: session.refresh_token,
-        expires_at: session.expires_at,
-      };
+      });
 
-      setSession(appSession);
-
-      // Navigate to correct dashboard based on role
-      const normalizedRole: AppRole =
-        user.role === 'super_admin' ? 'admin' : user.role;
-      const target = roleDashboardPath[normalizedRole] ?? '/dashboard/employee';
-      navigate(target, { replace: true });
+      // Use redirect_to from backend, or fall back to role-based path
+      navigate(redirect_to ?? roleDashboardPath[detectRole(user.role)]);
     },
   });
 }
@@ -117,14 +107,13 @@ export function useSignup() {
 
   return useMutation({
     mutationFn: (payload: SignupPayload) =>
-      invokeApi<SignupResponse>('auth/signup', {
+      invokeAndUnwrap<SignupResponse>('auth/signup', {
         method: 'POST',
         body: payload,
         isPublic: true,
       }),
 
     onSuccess: () => {
-      // After signup, redirect to login so the user authenticates properly
       navigate('/login', { replace: true });
     },
   });
@@ -139,11 +128,10 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
-      // Best-effort server-side session invalidation (ignore errors)
       try {
         await invokeApi('auth/logout', { method: 'POST' });
       } catch {
-        // ignore — we always clear locally
+        // Always clear locally even if server call fails
       }
     },
 

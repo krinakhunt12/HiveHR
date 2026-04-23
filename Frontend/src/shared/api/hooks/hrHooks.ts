@@ -1,6 +1,9 @@
 /**
  * hrHooks.ts — All React Query hooks for the HR platform.
  *
+ * SECURITY RULE: Never pass company_id as a query param.
+ * The backend always reads company_id from the JWT token context.
+ *
  * Endpoint mapping (matches rebuilt Supabase edge functions):
  *   /dashboard      → role-scoped stats
  *   /employee       → employee CRUD (company_admin)
@@ -29,7 +32,6 @@ import {
   type Plan,
   type ApiSuccessResponse,
 } from '../baseApi';
-import { useAuthStore } from '../../auth/store';
 
 // ─── Re-export Employee type for consumers ───────────────────────────────────
 export type { Employee, WorkPolicy, AttendanceRecord, LeaveType, LeaveBalance, LeaveRequest };
@@ -80,7 +82,7 @@ export function useGetMyPolicy() {
 // ════════════════════════════════════════════════════════════════════════════
 
 interface ListEmployeesParams {
-  company_id?: string;
+  // ✅ NO company_id — backend reads it from JWT
   department_id?: string;
   status?: string;
   page?: number;
@@ -175,13 +177,14 @@ export function useEmployeeMutations() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  ATTENDANCE  (all roles, scoped)
+//  ATTENDANCE  (all roles, scoped by JWT)
 // ════════════════════════════════════════════════════════════════════════════
 
 interface AttendanceParams {
+  // ✅ NO company_id — backend reads it from JWT
   employee_id?: string;
   date?: string;
-  month?: string;   // "YYYY-MM" for summary
+  month?: string;
   status?: string;
   department_id?: string;
   page?: number;
@@ -206,7 +209,6 @@ export function useTodayAttendance() {
   return useQuery({
     queryKey: ['attendance', 'today', today],
     queryFn: async () => {
-      // GET /attendance?date=today → returns array, we take first record for current employee
       const res = await invokeApi<ApiSuccessResponse<AttendanceRecord[]>>(
         `attendance${qs({ date: today })}`
       );
@@ -214,13 +216,13 @@ export function useTodayAttendance() {
       const record = records[0] ?? null;
       // Normalize legacy field aliases for EmployeeDashboard compat
       if (record) {
-        record.check_in_at = record.check_in_time;
-        record.check_out_at = record.check_out_time;
-        record.work_minutes = record.net_work_minutes;
+        (record as any).check_in_at = record.check_in_time;
+        (record as any).check_out_at = record.check_out_time;
+        (record as any).work_minutes = record.net_work_minutes;
       }
       return record;
     },
-    staleTime: 60 * 1000, // 1 min — attendance changes frequently
+    staleTime: 60 * 1000,
   });
 }
 
@@ -242,7 +244,6 @@ export function useAttendanceMutations() {
     qc.invalidateQueries({ queryKey: ['dashboard'] });
   };
 
-  // Employee: check in
   const checkIn = useMutation({
     mutationFn: () =>
       invokeApi('attendance', {
@@ -252,7 +253,6 @@ export function useAttendanceMutations() {
     onSuccess: invalidate,
   });
 
-  // Employee: check out — PATCH /attendance/:id
   const checkOut = useMutation({
     mutationFn: (attendanceId: string) =>
       invokeApi(`attendance/${attendanceId}`, {
@@ -262,7 +262,6 @@ export function useAttendanceMutations() {
     onSuccess: invalidate,
   });
 
-  // Admin: manual entry
   const manualEntry = useMutation({
     mutationFn: (payload: {
       employee_id: string;
@@ -279,7 +278,6 @@ export function useAttendanceMutations() {
   return { checkIn, checkOut, manualEntry };
 }
 
-// Health check hook used by AdminDashboard
 export function useHealth() {
   return useQuery({
     queryKey: ['health'],
@@ -309,14 +307,13 @@ export function useLeaveTypes() {
 
 /**
  * Legacy alias used by LeaveManagementView and LeaveRequestModal.
- * Maps backend LeaveType to the old leave_configurations shape.
+ * Maps backend LeaveType → old leave_configurations shape.
  */
 export function useLeaveConfigurations() {
   return useQuery({
     queryKey: ['leave-types'],
     queryFn: async () => {
       const types = await invokeAndUnwrap<LeaveType[]>('leave/types');
-      // Map to legacy shape: { id, leave_type, annual_allowance }
       return types.map((t) => ({
         id: t.id,
         leave_type: t.name,
@@ -342,7 +339,6 @@ export interface CreateLeaveTypePayload {
 
 export function useLeaveConfigMutations() {
   const qc = useQueryClient();
-
   const invalidate = () => qc.invalidateQueries({ queryKey: ['leave-types'] });
 
   const create = useMutation({
@@ -351,10 +347,8 @@ export function useLeaveConfigMutations() {
     onSuccess: invalidate,
   });
 
-  // Legacy: "update" receives an array of configs and syncs them
   const update = useMutation({
     mutationFn: async (configs: { leave_type: string; annual_allowance: number }[]) => {
-      // Upsert each config as a PUT
       for (const c of configs) {
         await invokeApi('leave/types', {
           method: 'POST',
@@ -381,11 +375,11 @@ export function useLeaveConfigMutations() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  LEAVE REQUESTS  (all roles, scoped)
+//  LEAVE REQUESTS  (all roles, scoped by JWT)
 // ════════════════════════════════════════════════════════════════════════════
 
 interface ListLeavesParams {
-  company_id?: string;
+  // ✅ NO company_id — backend reads it from JWT
   employee_id?: string;
   status?: string;
   page?: number;
@@ -403,7 +397,7 @@ export function useListLeaves(params: ListLeavesParams = {}) {
       // Normalize legacy field aliases
       return leaves.map((l) => ({
         ...l,
-        leave_type: l.leave_types?.name ?? l.leave_type ?? 'Leave',
+        leave_type: (l as any).leave_types?.name ?? (l as any).leave_type ?? 'Leave',
         start_date: l.from_date,
         end_date: l.to_date,
         admin_comment: l.review_note,
@@ -423,11 +417,11 @@ export function useLeaveBalance() {
 
 export interface ApplyLeavePayload {
   leave_type_id?: string;
-  leave_type?: string;   // legacy — resolved to leave_type_id via types list
+  leave_type?: string;
   from_date?: string;
   to_date?: string;
-  start_date?: string;   // legacy alias
-  end_date?: string;     // legacy alias
+  start_date?: string;
+  end_date?: string;
   reason: string;
   document_url?: string;
 }
@@ -443,14 +437,11 @@ export function useLeaveMutations() {
     qc.invalidateQueries({ queryKey: ['dashboard'] });
   };
 
-  // Employee: apply for leave
   const submit = useMutation({
     mutationFn: (payload: ApplyLeavePayload) => {
-      // Resolve legacy field names → canonical API fields
       const from_date = payload.from_date ?? payload.start_date;
       const to_date = payload.to_date ?? payload.end_date;
 
-      // Resolve leave_type_id from name if not provided
       let leave_type_id = payload.leave_type_id;
       if (!leave_type_id && payload.leave_type) {
         const match = leaveTypes.find(
@@ -467,7 +458,6 @@ export function useLeaveMutations() {
     onSuccess: invalidate,
   });
 
-  // Admin: approve leave
   const review = useMutation({
     mutationFn: ({
       id,
@@ -487,7 +477,6 @@ export function useLeaveMutations() {
     onSuccess: invalidate,
   });
 
-  // Employee: cancel pending leave
   const cancel = useMutation({
     mutationFn: (id: string) =>
       invokeApi(`leave/${id}`, { method: 'DELETE' }),
@@ -501,17 +490,12 @@ export function useLeaveMutations() {
 //  WORK POLICIES  (company_admin — super_admin blocked on writes)
 // ════════════════════════════════════════════════════════════════════════════
 
-interface ListPoliciesParams {
-  company_id?: string;
-}
-
-export function useListPolicies(params: ListPoliciesParams = {}) {
+export function useListPolicies() {
+  // ✅ NO company_id param — backend scopes by JWT
   return useQuery({
-    queryKey: ['policies', params],
+    queryKey: ['policies'],
     queryFn: async () => {
-      const res = await invokeApi<ApiSuccessResponse<WorkPolicy[]>>(
-        `policies${qs(params)}`
-      );
+      const res = await invokeApi<ApiSuccessResponse<WorkPolicy[]>>('policies');
       return res.data ?? [];
     },
     staleTime: 10 * 60 * 1000,
@@ -656,7 +640,9 @@ export function useCompanyMutations() {
 //  ADMIN — COMPANIES  (super_admin only)
 // ════════════════════════════════════════════════════════════════════════════
 
-export function useListCompanies(params: { status?: string; plan_id?: string; page?: number; limit?: number } = {}) {
+export function useListCompanies(
+  params: { status?: string; plan_id?: string; page?: number; limit?: number } = {}
+) {
   return useQuery({
     queryKey: ['admin-companies', params],
     queryFn: async () => {

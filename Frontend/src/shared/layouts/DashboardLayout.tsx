@@ -155,7 +155,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       {/* Main Content Area */}
       <main className={cn(
         "flex-1 flex flex-col min-h-screen transition-all duration-300 bg-background",
-        isSidebarExpanded ? "lg:ml-64" : "lg:ml-20"
+        isSidebarExpanded ? "lg:ml-84" : "lg:ml-20"
       )}>
         {/* Top Header */}
         <header className="h-14 bg-surface border-b border-border flex items-center justify-between px-8 sticky top-0 z-20">

@@ -17,6 +17,7 @@ import {
   normalizePath,
   corsHeaders,
   parseQuery,
+  handleOptions,
 } from "../_shared/responses.ts";
 
 /** Minutes between two ISO timestamps */
@@ -39,26 +40,27 @@ function computeStatus(
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS")
-    return new Response("ok", { headers: corsHeaders });
-
-  const svcClient = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
-
-  const ctx = await getUserContext(req);
-  if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
-
-  const url = new URL(req.url);
-  const path = normalizePath(url.pathname, "attendance");
-  const method = req.method;
-  const segments = path.replace(/^\//, "").split("/");
-  const resourceId = segments[0] && !["summary", "manual"].includes(segments[0]) ? segments[0] : null;
-  const subPath = segments[0] || null;
-  const q = parseQuery(url);
+  const optionsRes = handleOptions(req);
+  if (optionsRes) return optionsRes;
 
   try {
+
+    const svcClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const ctx = await getUserContext(req);
+    if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
+
+    const url = new URL(req.url);
+    const path = normalizePath(url.pathname, "attendance");
+    const method = req.method;
+    const segments = path.replace(/^\//, "").split("/");
+    const resourceId = segments[0] && !["summary", "manual"].includes(segments[0]) ? segments[0] : null;
+    const subPath = segments[0] || null;
+    const q = parseQuery(url);
+
     // ═══════════════════════════════════════════════════════
     // GET /summary — employee monthly summary
     // ═══════════════════════════════════════════════════════

@@ -33,31 +33,33 @@ import {
   errorRes,
   normalizePath,
   corsHeaders,
+  handleOptions,
 } from "../_shared/responses.ts";
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS")
-    return new Response("ok", { headers: corsHeaders });
-
-  const svcClient = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
-
-  const ctx = await getUserContext(req);
-  if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
-  if (ctx.role !== "super_admin")
-    return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Super Admin access required" });
-
-  const url = new URL(req.url);
-  const path = normalizePath(url.pathname, "admin");
-  const method = req.method;
-  const segments = path.replace(/^\//, "").split("/");
-  const resource = segments[0] || null;
-  const resourceId = segments[1] || null;
-  const subAction = segments[2] || null;
+  const optionsRes = handleOptions(req);
+  if (optionsRes) return optionsRes;
 
   try {
+
+    const svcClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const ctx = await getUserContext(req);
+    if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
+    if (ctx.role !== "super_admin")
+      return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Super Admin access required" });
+
+    const url = new URL(req.url);
+    const path = normalizePath(url.pathname, "admin");
+    const method = req.method;
+    const segments = path.replace(/^\//, "").split("/");
+    const resource = segments[0] || null;
+    const resourceId = segments[1] || null;
+    const subAction = segments[2] || null;
+
     // ═══════════════════════════════════════════════════════
     // DASHBOARD
     // ═══════════════════════════════════════════════════════

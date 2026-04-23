@@ -19,7 +19,6 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
 import { useListLeaves, useLeaveMutations, useLeaveConfigurations } from '@/shared/api/hooks/hrHooks';
-import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { LeaveRequestModal } from '../components/LeaveRequestModal';
 import { LeaveSettingsModal } from '../components/LeaveSettingsModal';
@@ -29,18 +28,16 @@ interface LeaveManagementViewProps {
 }
 
 export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmin = false }) => {
-    const { session } = useAuthStore();
     const { toast } = useToast();
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-    const params = isAdmin ? { company_id: session?.user?.company_id } : {};
     const { 
         data: leaves = [], 
         isLoading, 
         error,
         refetch 
-    } = useListLeaves(params);
+    } = useListLeaves();
 
     const { data: configs = [] } = useLeaveConfigurations();
     const { review } = useLeaveMutations();

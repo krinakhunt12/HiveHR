@@ -1,4 +1,4 @@
-export { corsHeaders } from "./cors.ts";
+import { corsHeaders } from "./cors.ts";
 
 /**
  * Standardized JSON response — consistent headers + body shape.
@@ -90,5 +90,16 @@ export function parseQuery(url: URL): Record<string, string> {
     obj[k] = v;
   });
   return obj;
+}
+
+/** Robust OPTIONS handler for CORS preflight */
+export function handleOptions(req: Request): Response | null {
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders,
+    });
+  }
+  return null;
 }
 

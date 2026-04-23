@@ -14,26 +14,28 @@ import {
   createdRes,
   errorRes,
   normalizePath,
-  corsHeaders,
+  handleOptions,
 } from "../_shared/responses.ts";
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS")
-    return new Response("ok", { headers: corsHeaders });
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-  const publicClient = createClient(supabaseUrl, anonKey);
-  const svcClient = createClient(supabaseUrl, serviceKey);
-
-  const url = new URL(req.url);
-  const path = normalizePath(url.pathname, "auth");
-  const method = req.method;
+  const optionsRes = handleOptions(req);
+  if (optionsRes) return optionsRes;
 
   try {
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const publicClient = createClient(supabaseUrl, anonKey);
+    const svcClient = createClient(supabaseUrl, serviceKey);
+
+    const url = new URL(req.url);
+    const path = normalizePath(url.pathname, "auth");
+    const method = req.method;
+
     const payload = await req.json().catch(() => ({}));
+
 
     // ═══════════════════════════════════════════════════════
     // POST /signup
@@ -315,7 +317,29 @@ Deno.serve(async (req: Request) => {
       return successRes("Password updated successfully");
     }
 
+    // ═══════════════════════════════════════════════════════
+    // POST /logout
+    // ═══════════════════════════════════════════════════════
+    if (method === "POST" && path === "/logout") {
+      const authHeader = req.headers.get("Authorization");
+      if (authHeader) {
+        const token = authHeader.replace("Bearer ", "");
+        const { data: { user } } = await publicClient.auth.getUser(token);
+        if (user) {
+          await svcClient.from("auth_activity_logs").insert({
+            user_id: user.id,
+            email: user.email,
+            action: "logout",
+            status: "success",
+          });
+        }
+      }
+      await publicClient.auth.signOut();
+      return successRes("Logged out successfully");
+    }
+
     return jsonRes(404, { success: false, code: "NOT_FOUND", message: `Path not found: ${path}` });
+
   } catch (err: unknown) {
     return errorRes(err, "auth");
   }

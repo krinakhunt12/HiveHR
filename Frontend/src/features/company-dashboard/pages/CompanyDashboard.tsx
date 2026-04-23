@@ -35,14 +35,13 @@ const CompanyDashboard = () => {
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
     const { session } = useAuthStore();
     const { toast } = useToast();
-    const companyId = session?.user?.company_id ?? undefined;
 
     const { 
         data: employees = [], 
         isLoading: loadingEmployees, 
         error: employeesError,
         refetch: refetchEmployees 
-    } = useListEmployees({ company_id: companyId });
+    } = useListEmployees();
 
     const { remove: removeEmployee } = useEmployeeMutations();
 

@@ -17,32 +17,32 @@ import {
   createdRes,
   errorRes,
   normalizePath,
-  corsHeaders,
+  handleOptions,
 } from "../_shared/responses.ts";
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS")
-    return new Response("ok", { headers: corsHeaders });
-
-  const svcClient = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
-
-  const ctx = await getUserContext(req);
-  if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
-
-  const companyId = ctx.companyId;
-  if (!companyId)
-    return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No company associated with your account" });
-
-  const url = new URL(req.url);
-  const path = normalizePath(url.pathname, "departments");
-  const method = req.method;
-  const segments = path.replace(/^\//, "").split("/");
-  const resourceId = segments[0] && segments[0] !== "" ? segments[0] : null;
+  const optionsRes = handleOptions(req);
+  if (optionsRes) return optionsRes;
 
   try {
+    const svcClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const ctx = await getUserContext(req);
+    if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
+
+    const companyId = ctx.companyId;
+    if (!companyId)
+      return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No company associated with your account" });
+
+    const url = new URL(req.url);
+    const path = normalizePath(url.pathname, "departments");
+    const method = req.method;
+    const segments = path.replace(/^\//, "").split("/");
+    const resourceId = segments[0] && segments[0] !== "" ? segments[0] : null;
+
     // GET / — list all departments
     if (method === "GET" && !resourceId) {
       const { data, error } = await svcClient
