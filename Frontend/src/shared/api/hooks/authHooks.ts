@@ -148,7 +148,7 @@ export function useLogout() {
 export function useUpdatePassword() {
   return useMutation({
     mutationFn: (newPassword: string) =>
-      invokeApi('auth/update-password', {
+      invokeAndUnwrap<LoginResponse>('auth/update-password', {
         method: 'POST',
         body: { new_password: newPassword },
       }),

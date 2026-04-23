@@ -314,7 +314,35 @@ Deno.serve(async (req: Request) => {
       });
       if (updateErr) throw updateErr;
 
-      return successRes("Password updated successfully");
+      // ─────────────────────────────────────────────────────────────
+      // IMPORTANT: Password change often invalidates the current session.
+      // We re-sign in to get a fresh session and return it to the client.
+      // ─────────────────────────────────────────────────────────────
+      const { data: authData, error: authErr } = await publicClient.auth.signInWithPassword({
+        email: user.email!,
+        password: new_password,
+      });
+
+      if (authErr) {
+        // If re-auth fails (unlikely), we still succeeded in changing the password
+        return successRes("Password updated, please log in again.");
+      }
+
+      return successRes("Password updated successfully", {
+        user: {
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || "User",
+          role: user.app_metadata?.role || "employee",
+          company_id: user.user_metadata?.company_id || null,
+          force_password_reset: false,
+        },
+        session: {
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token,
+          expires_at: authData.session.expires_at,
+        },
+      });
     }
 
     // ═══════════════════════════════════════════════════════

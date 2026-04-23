@@ -196,15 +196,37 @@ CREATE TABLE IF NOT EXISTS public.employees (
 
 -- Ensure employees columns exist (for migration from old schema)
 DO $$ BEGIN
+    -- Ensure all employee columns exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'user_id') THEN
+        ALTER TABLE public.employees ADD COLUMN user_id uuid UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'company_id') THEN
+        ALTER TABLE public.employees ADD COLUMN company_id uuid REFERENCES public.companies(id) ON DELETE CASCADE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'email') THEN
+        ALTER TABLE public.employees ADD COLUMN email text;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'full_name') THEN
+        ALTER TABLE public.employees ADD COLUMN full_name text;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'employee_code') THEN
+        ALTER TABLE public.employees ADD COLUMN employee_code text;
+    END IF;
+    -- Handle date_of_joining / joined_on migration
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'date_of_joining') THEN
         ALTER TABLE public.employees ADD COLUMN date_of_joining date;
-        -- Assuming 'joined_on' was a previous column name if date_of_joining missing
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'joined_on') THEN
-            EXECUTE 'UPDATE public.employees SET date_of_joining = joined_on WHERE joined_on IS NOT NULL';
-        END IF;
+    END IF;
+
+    -- Migrate data and drop legacy joined_on if it still exists
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'joined_on') THEN
+        EXECUTE 'UPDATE public.employees SET date_of_joining = joined_on WHERE date_of_joining IS NULL AND joined_on IS NOT NULL';
+        ALTER TABLE public.employees DROP COLUMN joined_on;
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'designation_id') THEN
         ALTER TABLE public.employees ADD COLUMN designation_id uuid REFERENCES public.designations(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'department_id') THEN
+        ALTER TABLE public.employees ADD COLUMN department_id uuid REFERENCES public.departments(id);
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'policy_id') THEN
         ALTER TABLE public.employees ADD COLUMN policy_id uuid REFERENCES public.work_policies(id);
@@ -212,8 +234,26 @@ DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'manager_id') THEN
         ALTER TABLE public.employees ADD COLUMN manager_id uuid REFERENCES public.employees(id);
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'date_of_birth') THEN
+        ALTER TABLE public.employees ADD COLUMN date_of_birth date;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'gender') THEN
+        ALTER TABLE public.employees ADD COLUMN gender text;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'phone') THEN
+        ALTER TABLE public.employees ADD COLUMN phone text;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'emergency_contact') THEN
+        ALTER TABLE public.employees ADD COLUMN emergency_contact text;
+    END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'work_location') THEN
         ALTER TABLE public.employees ADD COLUMN work_location text DEFAULT 'office';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'employment_type') THEN
+        ALTER TABLE public.employees ADD COLUMN employment_type public.employment_type DEFAULT 'full_time';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'employees' AND column_name = 'status') THEN
+        ALTER TABLE public.employees ADD COLUMN status public.employee_status DEFAULT 'active';
     END IF;
 END $$;
 

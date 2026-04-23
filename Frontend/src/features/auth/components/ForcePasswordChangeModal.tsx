@@ -11,7 +11,6 @@ interface ForcePasswordChangeModalProps {
 
 export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordChangeModalProps) => {
     const { toast } = useToast();
-    const { session, setSession } = useAuthStore();
     const updatePassword = useUpdatePassword();
     const [formData, setFormData] = useState({ newPassword: '', confirmPassword: '' });
     const [error, setError] = useState<string | null>(null);
@@ -32,17 +31,20 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
         }
 
         try {
-            await updatePassword.mutateAsync(formData.newPassword);
+            const res = await updatePassword.mutateAsync(formData.newPassword);
 
-            // Clear the force_password_reset flag in local session
-            if (session) {
-                setSession({
-                    ...session,
-                    user: { ...session.user, force_password_reset: false, is_first_login: false },
+            if (res && res.session) {
+                // Update the global auth store with the fresh session returned by the server
+                useAuthStore.getState().setSession({
+                    user: res.user,
+                    ...res.session
                 });
+                toast({ title: 'Password Updated', description: 'Welcome! Your account is now secure.', type: 'success' });
+            } else {
+                // Fallback for older API versions or edge cases
+                toast({ title: 'Security Updated', description: 'Please log in again with your new password.', type: 'info' });
             }
 
-            toast({ title: 'Password Updated', description: 'Welcome! Your account is now secure.', type: 'success' });
             onSuccess();
         } catch (err: any) {
             setError(err.message || 'Could not update password');
@@ -55,7 +57,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                 <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
 
                 <div className="px-10 pt-12 pb-8 text-center">
-                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6">
+                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6 shadow-inner">
                         <ShieldCheck size={32} />
                     </div>
                     <h3 className="text-2xl font-bold text-textPrimary tracking-tight mb-2">Secure Your Account</h3>
@@ -64,39 +66,45 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
 
                 <div className="px-10 pb-12">
                     <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                        {/* New Password Field */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">New Password</label>
+                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">New Password</label>
                             <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                    <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                </div>
                                 <input
                                     required
                                     type="password"
                                     value={formData.newPassword}
                                     onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
-                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-sm font-medium"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                     placeholder="Min 8 characters"
                                 />
                             </div>
                         </div>
 
+                        {/* Confirm Password Field */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Confirm Password</label>
+                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Confirm Password</label>
                             <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                    <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                </div>
                                 <input
                                     required
                                     type="password"
                                     value={formData.confirmPassword}
                                     onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-sm font-medium"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                     placeholder="Repeat password"
                                 />
                             </div>
                         </div>
 
                         {error && (
-                            <div className="p-3 bg-error/10 border border-error/20 rounded-md text-error text-sm font-medium flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-error" />
+                            <div className="p-4 bg-error/5 border border-error/20 rounded-xl text-error text-xs font-semibold flex items-center gap-3 animate-in slide-in-from-top-2 duration-300">
+                                <div className="w-2 h-2 rounded-full bg-error shrink-0" />
                                 {error}
                             </div>
                         )}
@@ -104,18 +112,18 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                         <button
                             type="submit"
                             disabled={updatePassword.isPending}
-                            className="w-full btn-primary h-14 shadow-xl shadow-primary/10 group mt-4"
+                            className="w-full h-14 bg-primary text-white rounded-xl font-bold text-sm shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 group flex items-center justify-center gap-2 mt-4"
                         >
                             {updatePassword.isPending ? (
-                                <div className="flex items-center gap-2">
+                                <>
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>Updating...</span>
-                                </div>
+                                    <span>Securing Account...</span>
+                                </>
                             ) : (
-                                <div className="flex items-center gap-2">
+                                <>
                                     <span>Update Password</span>
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </div>
+                                </>
                             )}
                         </button>
                     </form>

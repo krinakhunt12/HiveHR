@@ -38,9 +38,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   const userName = user?.full_name || 'User';
   const rawRole = detectRole(user);
-  const userRoleDisplay = rawRole === 'company_admin' ? 'Company Admin' : rawRole === 'admin' ? 'System Admin' : 'Staff Member';
+  const userRoleDisplay = rawRole === 'company_admin' ? 'Company Admin' : rawRole === 'admin' ? 'System Admin' : 'Employee';
 
-  const userInitials = userName.split(' ').map((n: any[]) => n[0]).join('').slice(0, 2).toUpperCase();
+  const userInitials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
   const handleNavClick = (item: NavItem) => {
     if (item.onClick) {

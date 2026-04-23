@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
-import { useEmployeeMutations } from '@/shared/api/hooks/hrHooks';
+import { useEmployeeMutations, type CreateEmployeePayload } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { UserPlus, Mail, Briefcase, Hash, Shield, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -14,7 +14,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
     const { create } = useEmployeeMutations();
     const { toast } = useToast();
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<CreateEmployeePayload>({
         full_name: '',
         email: '',
         password: 'Password123!', // Default temporary password
@@ -40,114 +40,138 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Add Employee">
-            <div className="mb-8">
-                <p className="text-sm font-medium text-textSecondary">Add a new member to your company.</p>
+            <div className="mb-10">
+                <h3 className="text-xl font-semibold text-textPrimary mb-1">Onboard New Talent</h3>
+                <p className="text-sm text-textSecondary">Provide the basic information to create an employee account.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    {/* Name Field */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Name</label>
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Full Name</label>
                         <div className="relative group">
-                            <UserPlus className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                <UserPlus className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            </div>
                             <input
                                 required
                                 value={formData.full_name}
                                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
+                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                 placeholder="e.g. Samuel Green"
                             />
                         </div>
                     </div>
 
+                    {/* Email Field */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Email</label>
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Email Address</label>
                         <div className="relative group">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                <Mail className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            </div>
                             <input
                                 required
                                 type="email"
                                 value={formData.email}
                                 onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
+                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                 placeholder="samuel@farmgrid.io"
                             />
                         </div>
                     </div>
 
+                    {/* Role / Designation Field */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Role</label>
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Job Title</label>
                         <div className="relative group">
-                            <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                <Briefcase className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            </div>
                             <input
                                 required
                                 value={formData.designation}
                                 onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
+                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                 placeholder="Ecosystem Manager"
                             />
                         </div>
                     </div>
 
+                    {/* Employee ID Field */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Employee ID</label>
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Internal Code</label>
                         <div className="relative group">
-                            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                <Hash className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            </div>
                             <input
                                 required
                                 value={formData.employee_code}
                                 onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
+                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                 placeholder="AGRI-2024-XP"
                             />
                         </div>
                     </div>
 
+                    {/* Permissions / Role Select */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Permissions</label>
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">System Role</label>
                         <div className="relative group">
-                            <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                <Shield className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            </div>
                             <select
                                 value={formData.role}
-                                onChange={e => setFormData({ ...formData, role: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none"
+                                onChange={e => setFormData({ ...formData, role: e.target.value as CreateEmployeePayload['role'] })}
+                                className="w-full h-12 pl-12 pr-10 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none cursor-pointer"
                             >
-                                <option value="employee">Employee</option>
-                                <option value="company_admin">Admin</option>
+                                <option value="employee">Standard Employee</option>
+                                <option value="company_admin">Company Administrator</option>
                             </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary/50">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
+                    {/* Join Date Field */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Join Date</label>
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Joining Date</label>
                         <div className="relative group">
-                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            </div>
                             <input
                                 type="date"
+                                required
                                 value={formData.joined_on}
                                 onChange={e => setFormData({ ...formData, joined_on: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all"
+                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none"
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                    <Button
+                <div className="pt-8 flex items-center justify-end gap-4 border-t border-border/40">
+                    <button
                         type="button"
-                        variant="outline"
                         onClick={onClose}
-                        className="flex-1"
+                        className="px-6 h-11 text-sm font-medium text-textSecondary hover:text-textPrimary transition-colors"
                     >
                         Cancel
-                    </Button>
+                    </button>
                     <Button
                         type="submit"
                         loading={create.isPending}
-                        className="flex-[2] py-4 h-auto"
+                        className="px-8 h-11 rounded-xl shadow-lg shadow-primary/10"
                     >
-                        <span>Add Employee</span>
-                        {!create.isPending && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
+                        <span>Confirm Admission</span>
+                        {!create.isPending && <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />}
                     </Button>
                 </div>
             </form>

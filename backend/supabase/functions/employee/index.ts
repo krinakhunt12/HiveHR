@@ -16,7 +16,6 @@ import {
   createdRes,
   errorRes,
   normalizePath,
-  corsHeaders,
   parseQuery,
   handleOptions,
 } from "../_shared/responses.ts";
