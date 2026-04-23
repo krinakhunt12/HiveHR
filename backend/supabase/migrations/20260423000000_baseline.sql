@@ -365,24 +365,36 @@ CREATE TABLE IF NOT EXISTS public.attendance (
 DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'check_in_time') THEN
         ALTER TABLE public.attendance ADD COLUMN check_in_time time;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'check_in_at') THEN
-            EXECUTE 'UPDATE public.attendance SET check_in_time = check_in_at::time WHERE check_in_at IS NOT NULL';
-        END IF;
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'check_out_time') THEN
         ALTER TABLE public.attendance ADD COLUMN check_out_time time;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'check_out_at') THEN
-            EXECUTE 'UPDATE public.attendance SET check_out_time = check_out_at::time WHERE check_out_at IS NOT NULL';
-        END IF;
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'policy_id') THEN
         ALTER TABLE public.attendance ADD COLUMN policy_id uuid REFERENCES public.work_policies(id);
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'status') THEN
+        ALTER TABLE public.attendance ADD COLUMN status text DEFAULT 'present';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'late_minutes') THEN
+        ALTER TABLE public.attendance ADD COLUMN late_minutes int DEFAULT 0;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'break_minutes') THEN
+        ALTER TABLE public.attendance ADD COLUMN break_minutes int DEFAULT 60;
+    END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'net_work_minutes') THEN
         ALTER TABLE public.attendance ADD COLUMN net_work_minutes int DEFAULT 0;
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'work_minutes') THEN
-            EXECUTE 'UPDATE public.attendance SET net_work_minutes = work_minutes WHERE work_minutes IS NOT NULL';
-        END IF;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'overtime_minutes') THEN
+        ALTER TABLE public.attendance ADD COLUMN overtime_minutes int DEFAULT 0;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'raw_hours_minutes') THEN
+        ALTER TABLE public.attendance ADD COLUMN raw_hours_minutes int DEFAULT 0;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'is_manual_entry') THEN
+        ALTER TABLE public.attendance ADD COLUMN is_manual_entry boolean DEFAULT false;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'attendance' AND column_name = 'manual_reason') THEN
+        ALTER TABLE public.attendance ADD COLUMN manual_reason text;
     END IF;
 END $$;
 

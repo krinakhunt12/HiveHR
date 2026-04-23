@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUpdatePassword } from '@/shared/api/hooks/authHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
@@ -14,8 +14,14 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
     const updatePassword = useUpdatePassword();
     const [formData, setFormData] = useState({ newPassword: '', confirmPassword: '' });
     const [error, setError] = useState<string | null>(null);
+    const [isVisible, setIsVisible] = useState(true);
 
-    if (!isOpen) return null;
+    // Keep visibility in sync with the prop
+    useEffect(() => {
+        setIsVisible(isOpen);
+    }, [isOpen]);
+
+    if (!isOpen || !isVisible) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,7 +50,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                 // Fallback for older API versions or edge cases
                 toast({ title: 'Security Updated', description: 'Please log in again with your new password.', type: 'info' });
             }
-
+            setIsVisible(false);
             onSuccess();
         } catch (err: any) {
             setError(err.message || 'Could not update password');

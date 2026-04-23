@@ -24,12 +24,12 @@ export const Dialog = ({ isOpen, onClose, title, children, className }: DialogPr
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
-            <div 
-                className="absolute inset-0 bg-emerald-950/20 backdrop-blur-md" 
+            <div
+                className="absolute inset-0 bg-gray-900/50"
                 onClick={onClose}
             />
             <div className={cn(
-                "relative bg-background rounded-[2.5rem] border shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300",
+                "relative bg-background rounded-xl border shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300",
                 className
             )}>
                 <div className="flex items-center justify-between px-10 py-8 border-b border-border/50 bg-slate-50/50">

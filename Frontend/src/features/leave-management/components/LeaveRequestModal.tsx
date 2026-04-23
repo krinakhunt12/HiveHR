@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useLeaveMutations, useLeaveConfigurations } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
-import { Calendar, MessageSquare, ArrowRight, X } from 'lucide-react';
+import { Calendar, MessageSquare, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
 interface LeaveRequestModalProps {
@@ -36,97 +36,112 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
 
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Request Leave">
-            <div className="mb-8">
-                <p className="text-sm font-medium text-textSecondary font-sans">Request time off from work.</p>
+            <div className="mb-10">
+                <h3 className="text-xl font-semibold text-textPrimary mb-1">Schedule Absence</h3>
+                <p className="text-sm text-textSecondary">Submit a formal request for time off from active duty.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="space-y-6">
-                    <div className="space-y-2 text-left">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Leave Type</label>
-                        <select
-                            required
-                            value={formData.leave_type}
-                            onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
-                            className="input-premium bg-background border-border hover:border-primary/30 focus:bg-surface transition-all appearance-none text-sm font-medium"
-                        >
-                            {configs.length > 0 ? (
-                                configs.map(c => (
-                                    <option key={c.id} value={c.leave_type}>
-                                        {c.leave_type.charAt(0).toUpperCase() + c.leave_type.slice(1)} Leave
-                                    </option>
-                                ))
-                            ) : (
-                                <>
-                                    <option value="paid">Paid Leave</option>
-                                    <option value="sick">Sick Leave</option>
-                                    <option value="unpaid">Unpaid Leave</option>
-                                </>
-                            )}
-                        </select>
+                <div className="space-y-6 text-left">
+                    {/* Leave Type Select */}
+                    <div className="space-y-2">
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Absence Category</label>
+                        <div className="relative group">
+                            <select
+                                required
+                                value={formData.leave_type}
+                                onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
+                                className="w-full h-12 px-5 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none cursor-pointer"
+                            >
+                                {configs.length > 0 ? (
+                                    configs.map(c => (
+                                        <option key={c.id} value={c.leave_type}>
+                                            {c.leave_type.charAt(0).toUpperCase() + c.leave_type.slice(1)} Leave
+                                        </option>
+                                    ))
+                                ) : (
+                                    <>
+                                        <option value="paid">Paid Leave</option>
+                                        <option value="sick">Sick Leave</option>
+                                        <option value="unpaid">Unpaid Leave</option>
+                                    </>
+                                )}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary/50">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2 text-left">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Start Date</label>
+                    {/* Date Range Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Commencement Date</label>
                             <div className="relative group">
-                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                    <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                </div>
                                 <input
                                     required
                                     type="date"
                                     value={formData.start_date}
                                     onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-sm font-medium"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                 />
                             </div>
                         </div>
-                        <div className="space-y-2 text-left">
-                            <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">End Date</label>
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Conclusion Date</label>
                             <div className="relative group">
-                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                    <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                </div>
                                 <input
                                     required
                                     type="date"
                                     value={formData.end_date}
                                     onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                    className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all text-sm font-medium"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="space-y-2 text-left">
-                        <label className="text-sm font-medium uppercase tracking-widest text-primary ml-1">Reason</label>
+                    {/* Reason Textarea */}
+                    <div className="space-y-2">
+                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Rationale</label>
                         <div className="relative group">
-                            <MessageSquare className="absolute left-4 top-4 text-textSecondary w-4 h-4 group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-4 flex items-center justify-center pointer-events-none">
+                                <MessageSquare className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            </div>
                             <textarea
                                 required
                                 value={formData.reason}
                                 onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                className="input-premium pl-12 bg-background border-border hover:border-primary/30 focus:bg-surface transition-all min-h-[120px] pt-3 text-sm font-medium"
-                                placeholder="Why are you taking leave?"
+                                className="w-full min-h-[140px] pl-12 pr-4 py-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50 resize-none"
+                                placeholder="State the reason for your absence..."
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                    <Button
+                <div className="pt-8 flex items-center justify-end gap-4 border-t border-border/40">
+                    <button
                         type="button"
-                        variant="outline"
                         onClick={onClose}
-                        className="flex-1"
+                        className="px-6 h-11 text-sm font-medium text-textSecondary hover:text-textPrimary transition-colors"
                     >
-                        <X size={14} />
-                        Cancel
-                    </Button>
+                        Dismiss
+                    </button>
                     <Button
                         type="submit"
                         loading={submit.isPending}
-                        className="flex-[2] py-4 h-auto"
+                        className="px-8 h-11 rounded-xl shadow-lg shadow-primary/10 group"
                     >
-                        <span>Send Request</span>
-                        {!submit.isPending && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
+                        <span>Dispatch Request</span>
+                        {!submit.isPending && <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />}
                     </Button>
                 </div>
             </form>

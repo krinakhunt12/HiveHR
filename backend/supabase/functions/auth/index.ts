@@ -310,9 +310,19 @@ Deno.serve(async (req: Request) => {
 
       const { error: updateErr } = await svcClient.auth.admin.updateUserById(user.id, {
         password: new_password,
-        user_metadata: { ...user.user_metadata, force_password_reset: false },
+        user_metadata: { 
+          ...user.user_metadata, 
+          force_password_reset: false,
+          is_first_login: false 
+        },
       });
       if (updateErr) throw updateErr;
+
+      // Also update the profiles table so fresh fetches see the change
+      await svcClient
+        .from("profiles")
+        .update({ is_first_login: false })
+        .eq("user_id", user.id);
 
       // ─────────────────────────────────────────────────────────────
       // IMPORTANT: Password change often invalidates the current session.
