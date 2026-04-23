@@ -13,6 +13,7 @@ import {
   successRes,
   createdRes,
   errorRes,
+  validationErrorRes,
   normalizePath,
   handleOptions,
 } from "../_shared/responses.ts";
@@ -135,12 +136,16 @@ Deno.serve(async (req: Request) => {
           app_metadata: { role },
         });
 
-      if (authError || !authData.user)
+      if (authError || !authData.user) {
+        if (authError?.code === "email_exists") {
+          return validationErrorRes([{ field: "email", message: "A user with this email address has already been registered" }]);
+        }
         return jsonRes(400, {
           success: false,
           code: "AUTH_ERROR",
           message: authError?.message ?? "User creation failed",
         });
+      }
 
       const userId = authData.user.id;
 

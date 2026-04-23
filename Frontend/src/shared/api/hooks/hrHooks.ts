@@ -204,8 +204,8 @@ export function useListAttendance(params: AttendanceParams = {}) {
       // Normalize all records for UI consistency
       data.forEach(record => {
         const baseDate = record.date || today;
-        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}` : null;
-        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}` : null;
+        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}Z` : null;
+        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}Z` : null;
         (record as any).work_minutes = record.net_work_minutes;
       });
       
@@ -229,8 +229,8 @@ export function useTodayAttendance() {
       if (record) {
         // Construct full ISO strings so new Date() works correctly in UI
         const baseDate = record.date || today;
-        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}` : null;
-        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}` : null;
+        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}Z` : null;
+        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}Z` : null;
         (record as any).work_minutes = record.net_work_minutes;
       }
       return record;
@@ -258,33 +258,67 @@ export function useAttendanceMutations() {
   };
 
   const checkIn = useMutation({
-    mutationFn: () =>
-      invokeApi('attendance', {
+    mutationFn: async () => {
+      const res = await invokeApi<ApiSuccessResponse<AttendanceRecord>>('attendance', {
         method: 'POST',
         body: { action: 'check_in' },
-      }),
+      });
+      // Helper inline since centralized failed to apply
+      const record = res.data;
+      if (record) {
+        const today = new Date().toISOString().split('T')[0];
+        const baseDate = record.date || today;
+        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}Z` : null;
+        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}Z` : null;
+        (record as any).work_minutes = record.net_work_minutes;
+      }
+      return record;
+    },
     onSuccess: invalidate,
   });
 
   const checkOut = useMutation({
-    mutationFn: (attendanceId: string) =>
-      invokeApi(`attendance/${attendanceId}`, {
+    mutationFn: async (attendanceId: string) => {
+      const res = await invokeApi<ApiSuccessResponse<AttendanceRecord>>(`attendance/${attendanceId}`, {
         method: 'PATCH',
         body: { action: 'check_out' },
-      }),
+      });
+      const record = res.data;
+      if (record) {
+        const today = new Date().toISOString().split('T')[0];
+        const baseDate = record.date || today;
+        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}Z` : null;
+        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}Z` : null;
+        (record as any).work_minutes = record.net_work_minutes;
+      }
+      return record;
+    },
     onSuccess: invalidate,
   });
 
   const manualEntry = useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       employee_id: string;
       date: string;
       check_in_time: string;
       check_out_time?: string;
       status?: string;
       reason: string;
-    }) =>
-      invokeApi('attendance/manual', { method: 'POST', body: payload }),
+    }) => {
+      const res = await invokeApi<ApiSuccessResponse<AttendanceRecord>>('attendance/manual', { 
+        method: 'POST', 
+        body: payload 
+      });
+      const record = res.data;
+      if (record) {
+        const today = new Date().toISOString().split('T')[0];
+        const baseDate = record.date || today;
+        (record as any).check_in_at = record.check_in_time ? `${baseDate}T${record.check_in_time}Z` : null;
+        (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}Z` : null;
+        (record as any).work_minutes = record.net_work_minutes;
+      }
+      return record;
+    },
     onSuccess: invalidate,
   });
 

@@ -15,6 +15,7 @@ import {
   successRes,
   createdRes,
   errorRes,
+  validationErrorRes,
   normalizePath,
   parseQuery,
   handleOptions,
@@ -214,7 +215,13 @@ Deno.serve(async (req: Request) => {
         },
         app_metadata: { role: employeeRole },
       });
-      if (authErr) throw authErr;
+
+      if (authErr) {
+        if (authErr.code === "email_exists") {
+          return validationErrorRes([{ field: "email", message: "A user with this email address has already been registered" }]);
+        }
+        throw authErr;
+      }
       const userId = authData.user.id;
 
       // 2. Upsert profile
