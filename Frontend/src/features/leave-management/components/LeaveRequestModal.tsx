@@ -16,7 +16,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
     const { toast } = useToast();
 
     const [formData, setFormData] = useState({
-        leave_type: 'paid',
+        leave_type_id: '',
         start_date: '',
         end_date: '',
         reason: ''
@@ -24,8 +24,18 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!formData.leave_type_id) {
+            toast({ title: 'Validation Error', description: 'Please select an absence category.', type: 'error' });
+            return;
+        }
+
         try {
-            await submit.mutateAsync(formData);
+            await submit.mutateAsync({
+                leave_type_id: formData.leave_type_id,
+                from_date: formData.start_date,
+                to_date: formData.end_date,
+                reason: formData.reason
+            });
             toast({ title: 'Request Sent', description: 'Your leave request has been sent for approval.', type: 'success' });
             onClose();
         } catch (err: any) {
@@ -49,23 +59,17 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                         <div className="relative group">
                             <select
                                 required
-                                value={formData.leave_type}
-                                onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
-                                className="w-full h-12 px-5 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none cursor-pointer"
+                                disabled={submit.isPending}
+                                value={formData.leave_type_id}
+                                onChange={e => setFormData({ ...formData, leave_type_id: e.target.value })}
+                                className="w-full h-12 px-5 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {configs.length > 0 ? (
-                                    configs.map(c => (
-                                        <option key={c.id} value={c.leave_type}>
-                                            {c.leave_type.charAt(0).toUpperCase() + c.leave_type.slice(1)} Leave
-                                        </option>
-                                    ))
-                                ) : (
-                                    <>
-                                        <option value="paid">Paid Leave</option>
-                                        <option value="sick">Sick Leave</option>
-                                        <option value="unpaid">Unpaid Leave</option>
-                                    </>
-                                )}
+                                <option value="" disabled>Select Absence Type</option>
+                                {configs.map(c => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.leave_type.charAt(0).toUpperCase() + c.leave_type.slice(1)} Leave
+                                    </option>
+                                ))}
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary/50">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -85,10 +89,11 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                 </div>
                                 <input
                                     required
+                                    disabled={submit.isPending}
                                     type="date"
                                     value={formData.start_date}
                                     onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -100,10 +105,11 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                 </div>
                                 <input
                                     required
+                                    disabled={submit.isPending}
                                     type="date"
                                     value={formData.end_date}
                                     onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -118,9 +124,10 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                             </div>
                             <textarea
                                 required
+                                disabled={submit.isPending}
                                 value={formData.reason}
                                 onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                className="w-full min-h-[140px] pl-12 pr-4 py-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50 resize-none"
+                                className="w-full min-h-[140px] pl-12 pr-4 py-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                                 placeholder="State the reason for your absence..."
                             />
                         </div>

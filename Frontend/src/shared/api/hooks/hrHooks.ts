@@ -122,10 +122,14 @@ export interface CreateEmployeePayload {
   employment_type?: string;
   work_location?: string;
   joined_on?: string;
+  date_of_joining?: string;    // backend accepts both; prefer this
   department_id?: string;
+  designation_id?: string;
   phone?: string;
   date_of_birth?: string;
   gender?: string;
+  emergency_contact?: string;
+  policy_id?: string;
   is_first_login?: boolean;
 }
 

@@ -66,40 +66,52 @@ Deno.serve(async (req: Request) => {
     if (path === "/dashboard" && method === "GET") {
       const [
         { count: totalCompanies },
+        { count: activeCompanies },
         { count: totalEmployees },
         { data: planDist },
         { data: recentCompanies },
         { data: expiringCompanies },
       ] = await Promise.all([
         svcClient.from("companies").select("*", { count: "exact", head: true }),
-        svcClient.from("employees").select("*", { count: "exact", head: true }),
+        svcClient.from("companies").select("*", { count: "exact", head: true }).eq("plan_status", "active"),
+        svcClient.from("employees").select("*", { count: "exact", head: true }).eq("status", "active"),
         svcClient
           .from("companies")
           .select("plan_id, plans(name)")
           .eq("plan_status", "active"),
         svcClient
           .from("companies")
-          .select("id, name, plan_status, created_at")
+          .select("id, name, plan_status, created_at, plans(name)")
           .order("created_at", { ascending: false })
           .limit(10),
         svcClient
           .from("companies")
-          .select("id, name, plan_end_date, plan_status")
+          .select("id, name, plan_end_date, plan_status, plans(name)")
           .gte("plan_end_date", new Date().toISOString().slice(0, 10))
           .lte(
             "plan_end_date",
             new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
               .toISOString()
               .slice(0, 10)
-          ),
+          )
+          .eq("plan_status", "active"),
       ]);
+
+      // Aggregate plan distribution
+      const planCount: Record<string, number> = {};
+      for (const c of planDist ?? []) {
+        const planName = (c.plans as { name: string } | null)?.name ?? "No Plan";
+        planCount[planName] = (planCount[planName] ?? 0) + 1;
+      }
 
       return successRes("Dashboard stats fetched", {
         total_companies: totalCompanies ?? 0,
+        active_companies: activeCompanies ?? 0,
         total_employees: totalEmployees ?? 0,
-        plan_distribution: planDist ?? [],
+        plan_distribution: planCount,
         recent_signups: recentCompanies ?? [],
         expiring_subscriptions: expiringCompanies ?? [],
+        expiring_soon: (expiringCompanies ?? []).length,
       });
     }
 

@@ -14,11 +14,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { Skeleton, SkeletonButton, SkeletonCard, SkeletonTable } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
-import { useListLeaves, useLeaveMutations, useLeaveConfigurations } from '@/shared/api/hooks/hrHooks';
+import { useListLeaves, useLeaveMutations, useLeaveConfigurations, useLeaveBalance } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { LeaveRequestModal } from '../components/LeaveRequestModal';
 import { LeaveSettingsModal } from '../components/LeaveSettingsModal';
@@ -40,6 +40,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     } = useListLeaves();
 
     const { data: configs = [] } = useLeaveConfigurations();
+    const { data: balances = [] } = useLeaveBalance();
     const { review } = useLeaveMutations();
 
     const handleAction = async (id: string, status: 'approved' | 'rejected') => {
@@ -74,15 +75,28 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
         return (
             <div className="space-y-10 text-left">
                 <div className="flex justify-between items-center">
-                    <Skeleton className="h-10 w-64 rounded-xl" />
-                    <Skeleton className="h-10 w-48 rounded-xl" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-8 w-64 rounded-xl" />
+                        <Skeleton className="h-4 w-96 rounded-md" />
+                    </div>
+                    <div className="flex gap-3">
+                        <SkeletonButton className="h-11 w-48" />
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Skeleton className="h-32 rounded-2xl" />
-                    <Skeleton className="h-32 rounded-2xl" />
-                    <Skeleton className="h-32 rounded-2xl" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
+                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
+                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
                 </div>
-                <Skeleton className="h-[400px] rounded-[2rem]" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div className="lg:col-span-2">
+                        <SkeletonTable rows={6} columns={4} />
+                    </div>
+                    <div className="space-y-8">
+                        <Skeleton className="h-[400px] rounded-[2rem]" />
+                        <Skeleton className="h-48 rounded-[2rem]" />
+                    </div>
+                </div>
             </div>
         );
     }
@@ -121,22 +135,20 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {configs.length > 0 ? (
-                    configs.slice(0, 3).map((c: any) => (
+                {balances.length > 0 ? (
+                    balances.map((b: any) => (
                         <QuotaProgress 
-                            key={c.id} 
-                            label={c.leave_type} 
-                            current={0} 
-                            total={c.annual_allowance} 
-                            color={c.leave_type === 'sick' ? 'accent' : 'primary'} 
+                            key={b.id} 
+                            label={b.leave_types?.name || 'Leave'} 
+                            current={Number(b.taken) + Number(b.pending)} 
+                            total={Number(b.quota) + Number(b.carry_forward)} 
+                            color={b.leave_types?.name?.toLowerCase() === 'sick' ? 'accent' : 'primary'} 
                         />
                     ))
                 ) : (
-                    <>
-                        <QuotaProgress label="Annual Leave" current={18} total={24} color="primary" />
-                        <QuotaProgress label="Sick Leave" current={4} total={10} color="accent" />
-                        <QuotaProgress label="Personal" current={2} total={5} color="primary" />
-                    </>
+                    <div className="col-span-full py-10 bg-surface rounded-2xl border border-dashed border-border flex flex-col items-center justify-center">
+                         <p className="text-sm font-bold text-textSecondary opacity-40">No leave quotas assigned to your current policy.</p>
+                    </div>
                 )}
             </div>
 

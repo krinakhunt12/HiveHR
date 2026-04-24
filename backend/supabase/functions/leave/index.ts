@@ -111,11 +111,40 @@ Deno.serve(async (req: Request) => {
         const companyId = ctx.companyId;
         if (!companyId)
           return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No company associated" });
-        const { data, error } = await svcClient
-          .from("leave_types")
-          .select("*")
-          .eq("company_id", companyId)
-          .order("name");
+        
+        // 1. Get employee's assigned leave policy
+        let leavePolicyId = null;
+        if (ctx.employeeId) {
+          const { data: emp } = await svcClient
+            .from("employees")
+            .select("leave_policy_id")
+            .eq("id", ctx.employeeId)
+            .single();
+          leavePolicyId = emp?.leave_policy_id;
+        }
+
+        // 2. If no policy, try getting default policy for company
+        if (!leavePolicyId) {
+          const { data: defPolicy } = await svcClient
+            .from("leave_policies")
+            .select("id")
+            .eq("company_id", companyId)
+            .eq("is_default", true)
+            .maybeSingle();
+          leavePolicyId = defPolicy?.id;
+        }
+
+        // 3. Fetch types
+        let query = svcClient.from("leave_types").select("*").eq("company_id", companyId).eq("is_active", true);
+        
+        if (leavePolicyId) {
+          query = query.eq("leave_policy_id", leavePolicyId);
+        } else {
+          // Backward compatibility: if no policies exist yet, show all company types
+          query = query.is("leave_policy_id", null);
+        }
+
+        const { data, error } = await query.order("name");
         if (error) throw error;
         return successRes("Leave types fetched", data);
       }
@@ -130,7 +159,7 @@ Deno.serve(async (req: Request) => {
       if (method === "POST") {
         const body = await req.json();
         const { name, is_paid = true, annual_quota = 0, carry_forward = false,
-          max_carry_forward = 0, min_notice_days = 0, requires_document = false } = body;
+          max_carry_forward = 0, min_notice_days = 0, requires_document = false, leave_policy_id } = body;
 
         if (!name)
           return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: "name is required" });
@@ -158,7 +187,7 @@ Deno.serve(async (req: Request) => {
 
         const { data, error } = await svcClient
           .from("leave_types")
-          .insert({ company_id: companyId, name, is_paid, annual_quota, carry_forward, max_carry_forward, min_notice_days, requires_document })
+          .insert({ company_id: companyId, name, is_paid, annual_quota, carry_forward, max_carry_forward, min_notice_days, requires_document, leave_policy_id })
           .select()
           .single();
         if (error) throw error;
@@ -234,18 +263,31 @@ Deno.serve(async (req: Request) => {
       if (errors.length > 0)
         return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: errors[0], errors });
 
-      let employeeId = body.employee_id;
-      let targetCompanyId = body.company_id;
+      // SECURITY: company_id always comes from JWT context, never from request body
+      const targetCompanyId = ctx.companyId;
+      if (!targetCompanyId)
+        return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No company associated with your account" });
 
+      let employeeId: string | null = null;
       if (ctx.role === "employee") {
         if (!ctx.employeeId)
           return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No employee record found" });
         employeeId = ctx.employeeId;
-        targetCompanyId = ctx.companyId;
+      } else {
+        // company_admin applying on behalf of an employee
+        employeeId = body.employee_id ?? null;
+        if (!employeeId)
+          return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "employee_id is required" });
+        // Verify employee belongs to this company
+        const { data: empCheck } = await svcClient
+          .from("employees")
+          .select("id")
+          .eq("id", employeeId)
+          .eq("company_id", targetCompanyId)
+          .maybeSingle();
+        if (!empCheck)
+          return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Employee does not belong to your company" });
       }
-
-      if (!employeeId || !targetCompanyId)
-        return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "employee_id and company_id are required" });
 
       // Validate leave type belongs to this company
       const { data: leaveType } = await svcClient

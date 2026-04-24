@@ -12,7 +12,9 @@ import {
     BarChart3,
     ArrowUpRight,
     ArrowDownRight,
+    FileText
 } from 'lucide-react';
+import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
 import { Card } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
@@ -24,9 +26,9 @@ import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { AddEmployeeModal } from '../components/AddEmployeeModal';
 import { EditEmployeeModal } from '../components/EditEmployeeModal';
-import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
+import { PoliciesView } from '@/features/policies/pages/PoliciesView';
 
-type View = 'overview' | 'directory' | 'time' | 'leaves';
+type View = 'overview' | 'directory' | 'time' | 'leaves' | 'policies';
 
 const CompanyDashboard = () => {
     const [currentView, setCurrentView] = useState<View>('overview');
@@ -53,7 +55,7 @@ const CompanyDashboard = () => {
         if (!normalized) return employees;
         return employees.filter((emp: Employee) => (
             emp.full_name.toLowerCase().includes(normalized) ||
-            emp.designation.toLowerCase().includes(normalized)
+            ((emp as any).designation_name ?? emp.designation ?? '').toLowerCase().includes(normalized)
         ));
     }, [employees, query]);
 
@@ -76,6 +78,7 @@ const CompanyDashboard = () => {
         { icon: <Users />, label: 'Directory', path: 'directory' },
         { icon: <Clock />, label: 'Attendance', path: 'time' },
         { icon: <Wind />, label: 'Leaves', path: 'leaves' },
+        { icon: <FileText />, label: 'Policies', path: 'policies' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -240,7 +243,7 @@ const CompanyDashboard = () => {
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
-                                        <p className="text-sm font-bold text-textPrimary leading-none">{emp.designation}</p>
+                                        <p className="text-sm font-bold text-textPrimary leading-none">{(emp as any).designation_name ?? emp.designation ?? '—'}</p>
                                         <p className="text-[10px] text-textSecondary font-black uppercase tracking-widest mt-1.5 opacity-50">{emp.employment_type}</p>
                                     </td>
                                     <td className="px-8 py-5">
@@ -386,6 +389,7 @@ const CompanyDashboard = () => {
                 {currentView === 'directory' && renderDirectory()}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={true} />}
                 {currentView === 'time' && renderOperationsView()}
+                {currentView === 'policies' && <PoliciesView isAdmin={true} />}
             </main>
             <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
             <EditEmployeeModal

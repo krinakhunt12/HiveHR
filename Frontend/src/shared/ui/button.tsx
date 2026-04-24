@@ -44,15 +44,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          loading && "animate-pulse cursor-wait"
+        )}
         ref={ref}
         disabled={loading || props.disabled}
         {...props}
       >
-        {loading && (
-          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-        )}
-        {children}
+        <div className="flex items-center justify-center gap-2">
+          {loading && (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          )}
+          {children}
+        </div>
       </Comp>
     )
   }

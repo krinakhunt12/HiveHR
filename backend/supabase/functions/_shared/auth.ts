@@ -49,16 +49,17 @@ export async function getUserContext(
     return null;
   }
 
-  // Resolve employee record if the caller is an employee
+  // Resolve employee record for all non-super_admin roles
   let employeeId: string | null = null;
-  if (profile.role === "employee") {
+  if (profile.role !== "super_admin" && profile.company_id) {
     const { data: emp } = await adminClient
       .from("employees")
       .select("id")
       .eq("user_id", user.id)
+      .eq("company_id", profile.company_id)
       .maybeSingle();
 
-    if (!emp) {
+    if (!emp && profile.role === "employee") {
       console.error("[auth] employee record not found for user_id:", user.id);
     }
     employeeId = emp?.id ?? null;

@@ -40,15 +40,30 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
             const res = await updatePassword.mutateAsync(formData.newPassword);
 
             if (res && res.session) {
-                // Update the global auth store with the fresh session returned by the server
+                // Update the global auth store with fresh session, clearing force_password_reset
+                const currentSession = useAuthStore.getState().session;
                 useAuthStore.getState().setSession({
-                    user: res.user,
-                    ...res.session
+                    user: {
+                        ...(currentSession?.user ?? {}),
+                        ...res.user,
+                        force_password_reset: false,
+                        is_first_login: false,
+                    },
+                    access_token: res.session.access_token,
+                    refresh_token: res.session.refresh_token,
+                    expires_at: res.session.expires_at,
                 });
                 toast({ title: 'Password Updated', description: 'Welcome! Your account is now secure.', type: 'success' });
             } else {
-                // Fallback for older API versions or edge cases
-                toast({ title: 'Security Updated', description: 'Please log in again with your new password.', type: 'info' });
+                // If no new session returned, just clear the flags locally and re-prompt login
+                const currentSession = useAuthStore.getState().session;
+                if (currentSession) {
+                    useAuthStore.getState().setSession({
+                        ...currentSession,
+                        user: { ...currentSession.user, force_password_reset: false, is_first_login: false },
+                    });
+                }
+                toast({ title: 'Password Updated', description: 'Your password has been changed successfully.', type: 'success' });
             }
             setIsVisible(false);
             onSuccess();

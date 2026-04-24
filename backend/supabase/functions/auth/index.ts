@@ -246,6 +246,18 @@ Deno.serve(async (req: Request) => {
       const companyName = (profile as Record<string, unknown> & { companies?: { name: string } })?.companies?.name ?? null;
       const companyId = profile.company_id ?? null;
 
+      // Lookup employee record to get employee_id for the session
+      let employeeId: string | null = null;
+      if (companyId) {
+        const { data: empRecord } = await svcClient
+          .from("employees")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("company_id", companyId)
+          .maybeSingle();
+        employeeId = empRecord?.id ?? null;
+      }
+
       // Sync role into JWT metadata
       await svcClient.auth.admin.updateUserById(userId, {
         user_metadata: {
@@ -253,6 +265,7 @@ Deno.serve(async (req: Request) => {
           role: profile.role,
           company_id: companyId,
           company_name: companyName,
+          employee_id: employeeId,
         },
         app_metadata: { role: profile.role },
       });
@@ -267,7 +280,7 @@ Deno.serve(async (req: Request) => {
       });
 
       const redirectMap: Record<string, string> = {
-        super_admin: "/dashboard/super-admin",
+        super_admin: "/dashboard/admin",
         company_admin: "/dashboard/company",
         employee: "/dashboard/employee",
       };
@@ -280,6 +293,8 @@ Deno.serve(async (req: Request) => {
           role: profile.role,
           company_id: companyId,
           company_name: companyName,
+          employee_id: employeeId,
+          is_first_login: profile.is_first_login ?? false,
           force_password_reset:
             loginData.user.user_metadata?.force_password_reset === true,
         },

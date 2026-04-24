@@ -281,14 +281,15 @@ Deno.serve(async (req: Request) => {
         .eq("is_active", true);
 
       if (leaveTypes && leaveTypes.length > 0) {
-        await svcClient.from("leave_balances").insert(
+        await svcClient.from("leave_balances").upsert(
           leaveTypes.map((lt) => ({
             employee_id: empData.id,
             leave_type_id: lt.id,
             year: currentYear,
             quota: lt.annual_quota,
-          }))
-        ).on("conflict", "do_nothing");  // ignore if table doesn't exist yet
+          })),
+          { onConflict: "employee_id,leave_type_id,year", ignoreDuplicates: true }
+        );
       }
 
       await logAction(svcClient, ctx, "CREATE_EMPLOYEE", "employees", empData.id, {

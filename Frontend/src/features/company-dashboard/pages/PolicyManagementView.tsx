@@ -10,10 +10,9 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import {
-    useListPolicies,
+    usePolicies as useListPolicies,
     usePolicyMutations
-} from '@/shared/api/hooks/hrHooks';
-import { useAuthStore } from '@/shared/auth/store';
+} from '@/features/policies/hooks/usePolicies';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { Button } from '@/shared/ui/button';
 import { Skeleton } from '@/shared/ui/skeleton';
@@ -39,11 +38,18 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const payload = { 
+                title, 
+                category: type, 
+                content: rules,
+                is_mandatory: false // Default for now
+            };
+            
             if (initialData) {
-                await update.mutateAsync({ id: initialData.id, data: { title, type, rules } });
+                await update.mutateAsync({ id: initialData.id, payload });
                 toast({ title: 'Policy Updated', description: 'The corporate policy has been modified.', type: 'success' });
             } else {
-                await create.mutateAsync({ title, type, rules });
+                await create.mutateAsync(payload);
                 toast({ title: 'Policy Created', description: 'New policy has been added to the company handbook.', type: 'success' });
             }
             onSuccess();
@@ -129,9 +135,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
 };
 
 export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
-    const { session } = useAuthStore();
-    const companyId = session?.user?.company_id ?? undefined;
-    const { data: response = [], isLoading, error, refetch } = useListPolicies({ company_id: companyId });
+    const { data: response = [], isLoading, error, refetch } = useListPolicies();
     const { remove } = usePolicyMutations();
     const { toast } = useToast();
 
@@ -143,7 +147,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
 
     const filteredPolicies = policies.filter((p: any) =>
         p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.type?.toLowerCase().includes(searchQuery.toLowerCase())
+        p.category?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleDelete = async (id: string, title: string) => {
@@ -258,11 +262,11 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                                 </div>
                                 <div className="space-y-1">
                                     <CardTitle className="text-base font-medium text-textPrimary leading-tight">{p.title}</CardTitle>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-textSecondary opacity-80">{p.type}</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-textSecondary opacity-80">{p.category}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="pt-2">
-                                <p className="text-sm text-textSecondary leading-relaxed line-clamp-4 font-medium mb-6">{p.rules}</p>
+                                <p className="text-sm text-textSecondary leading-relaxed line-clamp-4 font-medium mb-6">{p.content}</p>
                                 <div className="pt-4 border-t border-border flex items-center justify-between">
                                     <span className="text-xs font-medium text-textSecondary flex items-center gap-1.5">
                                         <Calendar size={12} />

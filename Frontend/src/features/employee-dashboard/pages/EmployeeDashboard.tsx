@@ -5,15 +5,19 @@ import {
     Award,
     AlertCircle,
     LayoutDashboard,
-    Wind
+    Wind,
+    FileText
 } from 'lucide-react';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { Button } from '@/shared/ui/button';
+import { Skeleton, SkeletonButton, SkeletonCard } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
 import { useTodayAttendance, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
 import { ForcePasswordChangeModal } from '@/features/auth/components/ForcePasswordChangeModal';
 
-type View = 'dashboard' | 'leaves';
+import { PoliciesView } from '@/features/policies/pages/PoliciesView';
+
+type View = 'dashboard' | 'leaves' | 'policies';
 
 const EmployeeDashboard = () => {
     const [currentView, setCurrentView] = useState<View>('dashboard');
@@ -43,8 +47,9 @@ const EmployeeDashboard = () => {
 
     const hasAttendance = attendanceToday && 'id' in attendanceToday;
     const canCheckIn = !hasAttendance;
-    const canCheckOut = hasAttendance && !attendanceToday.check_out_at;
+    const canCheckOut = hasAttendance && !attendanceToday.check_out_time;
     
+    // Use check_in_at (ISO string built by hook) for elapsed time calculation
     const checkInTime = hasAttendance && attendanceToday.check_in_at ? new Date(attendanceToday.check_in_at).getTime() : null;
     const [elapsedMinutes, setElapsedMinutes] = useState(0);
 
@@ -69,16 +74,16 @@ const EmployeeDashboard = () => {
     // We only deduct it if the user has been here for more than 4 hours (240 mins) or if they've checked out.
     const breakMinutes = attendanceToday?.break_minutes ?? 60;
     
-    const displayMinutes = attendanceToday?.check_out_at 
-        ? (attendanceToday.work_minutes ?? 0)
-        : elapsedMinutes > 240 
-            ? Math.max(0, elapsedMinutes - breakMinutes) 
-            : elapsedMinutes; 
+    const displayMinutes = attendanceToday?.check_out_at
+        ? (attendanceToday.net_work_minutes ?? attendanceToday.work_minutes ?? 0)
+        : elapsedMinutes > 240
+            ? Math.max(0, elapsedMinutes - breakMinutes)
+            : elapsedMinutes;
 
     const totalStayMinutes = attendanceToday?.check_out_at
-        ? (attendanceToday.check_in_at && attendanceToday.check_out_at 
+        ? (attendanceToday.check_in_at && attendanceToday.check_out_at
             ? Math.floor((new Date(attendanceToday.check_out_at).getTime() - new Date(attendanceToday.check_in_at).getTime()) / 60000)
-            : 0)
+            : attendanceToday.net_work_minutes ?? 0)
         : elapsedMinutes;
 
     const workProgress = Math.min(100, (Number(displayMinutes) / 480) * 100);
@@ -87,6 +92,7 @@ const EmployeeDashboard = () => {
     const navItems = [
         { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: 'dashboard' },
         { icon: <Wind size={18} />, label: 'Leaves', path: 'leaves' },
+        { icon: <FileText size={18} />, label: 'Policies', path: 'policies' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -109,26 +115,28 @@ const EmployeeDashboard = () => {
                         </div>
                     )}
                     <div className="flex gap-3">
-                        <button
+                        <Button
+                            variant="outline"
                             onClick={() => setCurrentView('leaves')}
-                            className="px-5 py-2 text-sm font-medium uppercase tracking-wider text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all border border-border bg-surface"
+                            className="px-5 py-2 text-sm font-medium uppercase tracking-wider h-10"
                         >
                             Request Leave
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             className={cn(
-                                "px-6 py-2 rounded-md font-medium text-sm uppercase tracking-wider transition-all active:scale-[0.98]",
+                                "px-6 py-2 h-10 font-medium text-sm uppercase tracking-wider active:scale-[0.98]",
                                 canCheckIn
                                     ? "bg-primary text-white"
                                     : canCheckOut
-                                        ? "bg-warning text-white"
+                                        ? "bg-warning text-white border-none"
                                         : "bg-background text-textSecondary cursor-not-allowed"
                             )}
                             onClick={canCheckIn ? onCheckIn : onCheckOut}
-                            disabled={isSavingAttendance || (!canCheckIn && !canCheckOut)}
+                            disabled={!canCheckIn && !canCheckOut}
+                            loading={isSavingAttendance}
                         >
-                            {isSavingAttendance ? 'Saving...' : canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Done'}
-                        </button>
+                            {canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Done'}
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -164,12 +172,13 @@ const EmployeeDashboard = () => {
                         <h4 className="text-xl font-bold tracking-tight mb-2">Leave Registry</h4>
                         <p className="text-sm font-medium text-white/70 leading-relaxed">View your leave balance and track your request status in real-time within the enterprise cloud.</p>
                     </div>
-                    <button 
+                    <Button 
                         onClick={() => setCurrentView('leaves')}
-                        className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs uppercase tracking-widest hover:bg-white/90 transition-colors"
+                        variant="secondary"
+                        className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs uppercase tracking-widest hover:bg-white/90 transition-colors border-none"
                     >
                         Check Balance
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="card-premium p-8 bg-surface border border-border text-left">
@@ -199,14 +208,25 @@ const EmployeeDashboard = () => {
         return (
             <DashboardLayout navItems={customNavItems as any}>
                 <div className="space-y-12">
-                    <Skeleton className="h-12 w-64 rounded-2xl" />
-                    <div className="grid grid-cols-4 gap-8">
-                        <Skeleton className="h-32 rounded-3xl" />
-                        <Skeleton className="h-32 rounded-3xl" />
-                        <Skeleton className="h-32 rounded-3xl" />
-                        <Skeleton className="h-32 rounded-3xl" />
+                    <div className="flex justify-between items-end">
+                        <div className="space-y-2">
+                            <Skeleton className="h-8 w-48 rounded-xl" />
+                            <Skeleton className="h-4 w-64 rounded-md" />
+                        </div>
+                        <div className="flex gap-3">
+                            <SkeletonButton className="w-32" />
+                            <SkeletonButton className="w-32" />
+                        </div>
                     </div>
-                    <Skeleton className="h-96 rounded-3xl" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
+                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
+                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <Skeleton className="h-64 rounded-[2rem]" />
+                        <Skeleton className="h-64 rounded-[2rem]" />
+                    </div>
                 </div>
             </DashboardLayout>
         );
@@ -217,6 +237,7 @@ const EmployeeDashboard = () => {
             <main className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                 {currentView === 'dashboard' && renderDashboard()}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={false} />}
+                {currentView === 'policies' && <PoliciesView isAdmin={false} />}
             </main>
 
             <ForcePasswordChangeModal 

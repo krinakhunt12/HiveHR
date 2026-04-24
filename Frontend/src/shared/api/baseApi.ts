@@ -52,17 +52,23 @@ export interface Employee {
   employee_code: string;
   full_name: string;
   designation: string;
+  designation_name?: string | null;   // resolved by backend normalizer
   employment_type: 'full_time' | 'part_time' | 'contract';
   work_location?: 'office' | 'remote' | 'hybrid';
-  joined_on: string;
+  joined_on?: string | null;
+  date_of_joining?: string | null;    // new schema field name
   date_of_birth?: string | null;
   gender?: string | null;
   phone?: string | null;
   status: 'active' | 'inactive' | 'probation';
   department_id?: string | null;
+  designation_id?: string | null;
   policy_id?: string | null;
+  manager_id?: string | null;
   created_at: string;
   departments?: { id: string; name: string } | null;
+  designations?: { id: string; name: string } | null;
+  work_policies?: { id: string; policy_name: string } | null;
 }
 
 export interface WorkPolicy {

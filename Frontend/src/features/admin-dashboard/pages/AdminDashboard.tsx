@@ -81,9 +81,9 @@ const AdminDashboard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatBox title="Total Companies" value={String(stats?.total_companies ?? companies.length)} icon={<Building2 />} trend="Registered" color="primary" />
-                    <StatBox title="Active Subscriptions" value={String(stats?.active_subscriptions ?? companies.filter((c: any) => c.plan_status === 'active').length)} icon={<Zap />} trend="Live" color="primary" />
-                    <StatBox title="Total Employees" value={String(stats?.total_employees_platform ?? '—')} icon={<Users />} trend="Platform-wide" color="accent" />
-                    <StatBox title="Expiring Soon" value={String(stats?.expiring_soon ?? '—')} icon={<Clock />} trend="< 7 days" color="primary" />
+                    <StatBox title="Active Subscriptions" value={String(stats?.active_companies ?? companies.filter((c: any) => c.plan_status === 'active').length)} icon={<Zap />} trend="Live" color="primary" />
+                    <StatBox title="Total Employees" value={String(stats?.total_employees ?? '—')} icon={<Users />} trend="Platform-wide" color="accent" />
+                    <StatBox title="Expiring Soon" value={String((stats?.expiring_subscriptions?.length ?? stats?.expiring_soon ?? '—'))} icon={<Clock />} trend="< 7 days" color="primary" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

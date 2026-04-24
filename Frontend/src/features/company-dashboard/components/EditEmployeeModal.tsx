@@ -26,7 +26,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
         if (employee) {
             setFormData({
                 full_name: employee.full_name || '',
-                designation: employee.designation || '',
+                designation: (employee as any).designation_name ?? employee.designation ?? '',
                 employee_code: employee.employee_code || '',
                 status: employee.status || 'active'
             });

@@ -23,7 +23,8 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
         role: 'employee',
         employment_type: 'full_time',
         is_first_login: true,
-        joined_on: new Date().toISOString().split('T')[0]
+        date_of_joining: new Date().toISOString().split('T')[0],
+        joined_on: new Date().toISOString().split('T')[0], // backward compat
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
