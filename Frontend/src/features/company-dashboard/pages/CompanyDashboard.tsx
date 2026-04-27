@@ -257,7 +257,7 @@ const CompanyDashboard = () => {
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
                                             <div className="w-11 h-11 rounded-2xl bg-primary/5 flex items-center justify-center font-black text-primary text-sm border border-primary/10 group-hover:scale-110 transition-all shadow-sm">
-                                                {emp.full_name.charAt(0)}
+                                                {emp.full_name?.charAt(0) || '?'}
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{emp.full_name}</p>
@@ -353,8 +353,8 @@ const CompanyDashboard = () => {
                                 <div key={i} className="flex items-center justify-between group cursor-pointer p-2 rounded-xl hover:bg-primary/[0.02] transition-all">
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-textSecondary border border-primary/5 text-xs">
-                                            {record.employeeName.split(' ').map(n => n[0]).join('')}
-                                        </div>
+                                             {record.employeeName?.split(' ').map(n => n?.[0]).join('') || '?'}
+                                         </div>
                                         <div>
                                             <p className="text-sm font-bold text-textPrimary">{record.employeeName}</p>
                                             <p className="text-xs font-bold text-textSecondary uppercase tracking-widest opacity-40 mt-1">{record.work_location || 'Office'}</p>

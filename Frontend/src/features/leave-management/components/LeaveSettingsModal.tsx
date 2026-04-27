@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { useLeaveConfigurations, useLeaveConfigMutations } from '@/shared/api/hooks/hrHooks';
-import { Save, Plus, Trash2, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { Save, Plus, Trash2, ShieldCheck, ArrowRight, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { useAuthStore } from '@/shared/auth/store';
+import { detectRole } from '@/shared/utils/authUtils';
 
 interface LeaveSettingsModalProps {
     isOpen: boolean;
@@ -19,7 +21,11 @@ interface Configuration {
 
 export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps) => {
     const { toast } = useToast();
-    const { data: initialConfigs, isFetching: loading } = useLeaveConfigurations();
+    const { session } = useAuthStore();
+    const role = detectRole(session?.user);
+    const isSuperAdmin = role === 'admin';
+
+    const { data: initialConfigs, isFetching: loading } = useLeaveConfigurations({ enabled: isOpen && !isSuperAdmin });
     const { update, remove } = useLeaveConfigMutations();
     const [configs, setConfigs] = useState<Configuration[]>([]);
     // Track which existing ids are pending deletion (to call DELETE on save)
@@ -116,7 +122,17 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-4">
-                    {loading && configs.length === 0 ? (
+                    {isSuperAdmin ? (
+                        <div className="py-12 border-2 border-dashed border-primary/20 rounded-2xl flex flex-col items-center justify-center text-center space-y-4 bg-primary/[0.02]">
+                            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                                <Lock size={24} />
+                            </div>
+                            <h4 className="text-base font-bold text-textPrimary">Access Restricted</h4>
+                            <p className="text-sm font-medium text-textSecondary max-w-xs mx-auto">
+                                Super Admin accounts cannot manage company-specific leave types. Please log in as a Company Admin to modify these settings.
+                            </p>
+                        </div>
+                    ) : loading && configs.length === 0 ? (
                         <div className="py-10 flex items-center justify-center gap-3 text-textSecondary">
                             <Loader2 size={18} className="animate-spin text-primary" />
                             <span className="text-sm font-medium">Loading current policies...</span>
@@ -182,15 +198,17 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-between gap-6 pt-6">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleAdd}
-                        className="gap-2"
-                    >
-                        <Plus size={16} />
-                        Add Type
-                    </Button>
+                    {!isSuperAdmin && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleAdd}
+                            className="gap-2"
+                        >
+                            <Plus size={16} />
+                            Add Type
+                        </Button>
+                    )}
 
                     <div className="flex gap-4">
                         <Button
@@ -202,15 +220,17 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                         >
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
-                            loading={isSaving}
-                            className="px-8 h-12 rounded-xl shadow-lg gap-2"
-                        >
-                            <Save size={18} />
-                            {isSaving ? 'Saving...' : 'Save Policies'}
-                            {!isSaving && <ArrowRight size={16} className="ml-1" />}
-                        </Button>
+                        {!isSuperAdmin && (
+                            <Button
+                                type="submit"
+                                loading={isSaving}
+                                className="px-8 h-12 rounded-xl shadow-lg gap-2"
+                            >
+                                <Save size={18} />
+                                {isSaving ? 'Saving...' : 'Save Policies'}
+                                {!isSaving && <ArrowRight size={16} className="ml-1" />}
+                            </Button>
+                        )}
                     </div>
                 </div>
             </form>

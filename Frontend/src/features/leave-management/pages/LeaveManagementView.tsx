@@ -18,10 +18,13 @@ import { Skeleton, SkeletonButton, SkeletonCard, SkeletonTable } from '@/shared/
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
-import { useListLeaves, useLeaveMutations, useLeaveConfigurations, useLeaveBalance } from '@/shared/api/hooks/hrHooks';
+import { useListLeaves, useLeaveMutations, useLeaveBalance } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
+import { useAuthStore } from '@/shared/auth/store';
+import { detectRole } from '@/shared/utils/authUtils';
 import { LeaveRequestModal } from '../components/LeaveRequestModal';
 import { LeaveSettingsModal } from '../components/LeaveSettingsModal';
+import { Info } from 'lucide-react';
 
 interface LeaveManagementViewProps {
     isAdmin?: boolean;
@@ -32,14 +35,20 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
+    const { session } = useAuthStore();
+    const role = detectRole(session?.user);
+    const isSuperAdmin = role === 'admin';
+    const isCompanyAdmin = role === 'company_admin';
+    const isPrivileged = isSuperAdmin || isCompanyAdmin;
+
     const {
         data: leaves = [],
         isLoading,
         error,
         refetch
-    } = useListLeaves();
+    } = useListLeaves({}, { enabled: !isSuperAdmin });
 
-    const { data: balances = [] } = useLeaveBalance();
+    const { data: balances = [] } = useLeaveBalance({ enabled: !isPrivileged });
     const { review } = useLeaveMutations();
 
     const handleAction = async (id: string, status: 'approved' | 'rejected') => {
@@ -134,7 +143,17 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {balances.length > 0 ? (
+                {isPrivileged ? (
+                    <div className="col-span-full py-10 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col items-center justify-center text-center px-6">
+                        <Info className="text-primary mb-4" size={32} />
+                        <h3 className="text-lg font-bold text-textPrimary">{isSuperAdmin ? 'Platform Admin View' : 'Administrative Context'}</h3>
+                        <p className="text-sm font-semibold text-textSecondary opacity-70 mt-2 max-w-md">
+                            {isSuperAdmin 
+                                ? 'As a Super Admin, you are viewing the global dashboard. Leave quotas are scoped to individual employees.' 
+                                : 'As an Administrator, personal leave quotas are hidden. You can manage and review member requests below.'}
+                        </p>
+                    </div>
+                ) : balances.length > 0 ? (
                     balances.map((b: any) => (
                         <QuotaProgress
                             key={b.id}

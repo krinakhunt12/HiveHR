@@ -348,11 +348,12 @@ export function useHealth() {
 //  LEAVE TYPES  (company_admin manages, all can read)
 // ════════════════════════════════════════════════════════════════════════════
 
-export function useLeaveTypes() {
+export function useLeaveTypes(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: ['leave-types'],
     queryFn: () => invokeAndUnwrap<LeaveType[]>('leave/types'),
     staleTime: 10 * 60 * 1000,
+    ...options
   });
 }
 
@@ -360,7 +361,7 @@ export function useLeaveTypes() {
  * Legacy alias used by LeaveManagementView and LeaveRequestModal.
  * Maps backend LeaveType → old leave_configurations shape.
  */
-export function useLeaveConfigurations() {
+export function useLeaveConfigurations(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: ['leave-types'],
     queryFn: async () => {
@@ -375,6 +376,7 @@ export function useLeaveConfigurations() {
       }));
     },
     staleTime: 10 * 60 * 1000,
+    ...options
   });
 }
 
@@ -444,7 +446,7 @@ interface ListLeavesParams {
   limit?: number;
 }
 
-export function useListLeaves(params: ListLeavesParams = {}) {
+export function useListLeaves(params: ListLeavesParams = {}, options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: ['leaves', params],
     queryFn: async () => {
@@ -462,14 +464,16 @@ export function useListLeaves(params: ListLeavesParams = {}) {
       }));
     },
     staleTime: 2 * 60 * 1000,
+    ...options
   });
 }
 
-export function useLeaveBalance() {
+export function useLeaveBalance(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: ['leave-balance'],
     queryFn: () => invokeAndUnwrap<LeaveBalance[]>('leave/balance'),
     staleTime: 5 * 60 * 1000,
+    ...options
   });
 }
 

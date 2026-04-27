@@ -67,7 +67,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                 <option value="" disabled>Select Absence Type</option>
                                 {configs.map(c => (
                                     <option key={c.id} value={c.id}>
-                                        {c.leave_type.charAt(0).toUpperCase() + c.leave_type.slice(1)} Leave
+                                        {(c.leave_type?.charAt(0).toUpperCase() || '') + (c.leave_type?.slice(1) || '')} Leave
                                     </option>
                                 ))}
                             </select>

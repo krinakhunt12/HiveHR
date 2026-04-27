@@ -78,9 +78,9 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
         ? new Date(joinDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
         : null;
 
-    const initials = employee.full_name
+    const initials = (employee.full_name || 'U')
         .split(' ')
-        .map((n: string) => n[0])
+        .map((n: string) => n?.[0] || '')
         .join('')
         .toUpperCase()
         .slice(0, 2);
@@ -127,7 +127,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
                     <InfoRow
                         icon={<UserCheck size={14} />}
                         label="Gender"
-                        value={employee.gender
+                        value={employee.gender && employee.gender.length > 0
                             ? employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1)
                             : null}
                     />

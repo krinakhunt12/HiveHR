@@ -103,7 +103,7 @@ const AdminDashboard = () => {
                                             <div key={company.id} className="flex items-center justify-between p-4 rounded-2xl border border-primary/5 hover:bg-primary/[0.01] transition-all group">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-primary border border-primary/10">
-                                                        {company.name[0]}
+                                                        {company.name?.[0] || '?'}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
@@ -236,7 +236,7 @@ const AdminDashboard = () => {
                                             <td className="px-8 py-5">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-10 h-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center font-black text-primary text-sm">
-                                                        {company.name[0]}
+                                                        {company.name?.[0] || '?'}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
