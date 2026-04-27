@@ -184,7 +184,7 @@ const LandingPage = () => {
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
           <div className="relative z-10">
             <h2 className="text-3xl lg:text-6xl font-bold text-surface mb-8 tracking-tight font-display">Ready to evolve your culture?</h2>
-            <p className="text-textSecondary/60 mb-12 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams automating their operations today. Start your 14-day premium trial now.</p>
+            <p className="text-textSecondary mb-12 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams automating their operations today. Start your 14-day premium trial now.</p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/signup">
                 <Button size="lg" className="h-14 px-10 font-bold text-xs uppercase tracking-widest bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
@@ -241,7 +241,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-24">
             <h2 className="text-3xl lg:text-6xl font-bold tracking-tight mb-8 font-display leading-[1.1]">Built for every stage of growth.</h2>
-            <p className="text-textSecondary/60 text-lg max-w-2xl mx-auto font-medium">From seed stage startups to global enterprises, HiveHr scales with your team's complexity.</p>
+            <p className="text-textSecondary text-lg max-w-2xl mx-auto font-medium">From seed stage startups to global enterprises, HiveHr scales with your team's complexity.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -252,7 +252,7 @@ const LandingPage = () => {
             ].map((sol) => (
               <div key={sol.title} className="p-10 rounded-[2.5rem] bg-surface/5 border border-surface/10 hover:bg-surface/10 transition-all group hover:-translate-y-2">
                 <h3 className="text-xl font-bold mb-5 group-hover:text-primary transition-colors">{sol.title}</h3>
-                <p className="text-sm text-textSecondary/60 leading-relaxed font-bold opacity-80">{sol.desc}</p>
+                <p className="text-sm text-textSecondary leading-relaxed font-bold opacity-80">{sol.desc}</p>
               </div>
             ))}
           </div>
