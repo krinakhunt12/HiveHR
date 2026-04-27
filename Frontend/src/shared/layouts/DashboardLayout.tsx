@@ -65,7 +65,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           {isSidebarExpanded && (
             <div className="ml-3 overflow-hidden">
               <span className="block font-medium text-lg text-textPrimary tracking-tight leading-none font-sans">HiveHR</span>
-              <span className="text-xs font-bold text-primary tracking-[0.2em] mt-1.5 block uppercase opacity-80">{userRoleDisplay}</span>
+              <span className="text-xs font-bold text-primary mt-1.5 block">{userRoleDisplay}</span>
             </div>
           )}
         </div>
@@ -126,7 +126,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-textPrimary truncate tracking-tight">{userName}</p>
-                  <p className="text-sm font-medium text-textSecondary uppercase tracking-wide mt-0.5">{userRoleDisplay}</p>
+                  <p className="text-sm font-medium text-textSecondary mt-0.5">{userRoleDisplay}</p>
                 </div>
                 <ChevronDown size={12} className="text-textSecondary group-hover:text-textPrimary transition-colors" />
               </div>

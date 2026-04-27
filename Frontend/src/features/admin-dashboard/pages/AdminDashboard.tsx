@@ -340,7 +340,7 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
                 </div>
                 <div>
                     <p className="text-xs font-bold text-textSecondary uppercase mb-2 opacity-50">{title}</p>
-                    <p className="text-3xl font-bold text-textPrimary tracking-tight font-display">{value}</p>
+                    <p className="text-2xl font-semibold tracking-tight">{value}</p>
                 </div>
             </CardContent>
         </Card>

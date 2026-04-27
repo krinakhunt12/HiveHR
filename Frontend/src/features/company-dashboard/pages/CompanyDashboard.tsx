@@ -121,7 +121,7 @@ const CompanyDashboard = () => {
             <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-left">
                     <div className="text-left">
-                        <h1 className="text-3xl font-bold text-textPrimary tracking-tight font-display">Operational Intel</h1>
+                        <h1 className="text-2xl font-semibold tracking-tight">Operational Intel</h1>
                         <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Strategic overview for {session?.user?.email?.split('@')[1] || 'Enterprise'}.</p>
                     </div>
                     <div className="flex gap-3">
@@ -198,8 +198,8 @@ const CompanyDashboard = () => {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-textPrimary font-display">Personnel Registry</h2>
-                    <p className="text-sm font-semibold text-textSecondary mt-1 opacity-60">Managing {employees.length} enterprise members.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Personnel Registry</h2>
+                    <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Managing {employees.length} enterprise members.</p>
                 </div>
                 <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-primary/5 shadow-sm w-full md:w-[400px] focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                     <Search size={18} className="text-textSecondary/40" />
@@ -325,8 +325,8 @@ const CompanyDashboard = () => {
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-textPrimary font-display">Time & Operations</h2>
-                    <p className="text-sm font-semibold text-textSecondary mt-1 opacity-60">Synchronized attendance and compute metrics.</p>
+                    <h2 className="text-2xl font-semibold tracking-tight">Time & Operations</h2>
+                    <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Synchronized attendance and compute metrics.</p>
                 </div>
                 <div className="flex gap-3">
                     <Button variant="outline" className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em]">Export Logs</Button>
@@ -458,7 +458,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     </div>
                     {trend && (
                         <div className={cn(
-                            "flex items-center gap-1 text-xs font-bold uppercase tracking-widest px-2 py-1 rounded-lg border",
+                            "flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg border",
                             positive ? "text-success bg-success/5 border-success/10" : "text-error bg-error/5 border-error/10"
                         )}>
                             {positive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
