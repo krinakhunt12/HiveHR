@@ -58,27 +58,27 @@ export const Footer = () => {
             title="Company"
             links={[
               { name: 'About Us', href: '/#about' },
-              { name: 'Careers', href: '#' },
+              { name: 'Careers', href: '/careers' },
               { name: 'Our Vision', href: '/#about' },
-              { name: 'Security', href: '#' }
+              { name: 'Security', href: '/security' }
             ]}
           />
           <FooterCol
             title="Resources"
             links={[
-              { name: 'Help Center', href: '#' },
-              { name: 'System Status', href: '#' },
-              { name: 'Privacy Policy', href: '#' },
+              { name: 'Help Center', href: '/help' },
+              { name: 'System Status', href: '/status' },
+              { name: 'Privacy Policy', href: '/privacy' },
               { name: 'Contact', href: '/contact' }
             ]}
           />
         </div>
 
         <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs font-medium text-textSecondary">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
+          <p className="text-xs font-medium text-textSecondary">© 2026 HiveHr. All rights reserved.</p>
           <div className="flex gap-8">
-            <a href="#" className="text-xs font-medium text-textSecondary hover:text-primary transition-colors hover:opacity-100">Privacy Policy</a>
-            <a href="#" className="text-xs font-medium text-textSecondary hover:text-primary transition-colors hover:opacity-100">Cookie Policy</a>
+            <Link to="/privacy" className="text-xs font-medium text-textSecondary hover:text-primary transition-colors hover:opacity-100">Privacy Policy</Link>
+            <Link to="/status" className="text-xs font-medium text-textSecondary hover:text-primary transition-colors hover:opacity-100">System Status</Link>
           </div>
         </div>
       </div>
