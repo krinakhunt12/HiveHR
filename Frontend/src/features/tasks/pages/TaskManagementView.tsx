@@ -98,7 +98,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                 {/* Lateral Control Panel */}
                 <div className="lg:col-span-1 space-y-6">
                     <Card className="card-premium p-6 border-none shadow-none bg-white">
-                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 px-1">Filter</h4>
+                        <h4 className="text-sm font-bold text-slate-400  mb-6 px-1">Filter</h4>
                         <div className="space-y-2 text-left">
                             {['all', 'pending', 'in_progress', 'completed', 'blocked'].map((status) => (
                                 <button
@@ -121,7 +121,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                         <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
                             <Target size={120} className="text-primary" />
                         </div>
-                        <p className="text-sm font-medium uppercase tracking-widest text-primary mb-2 relative z-10">Performance</p>
+                        <p className="text-sm font-medium  text-primary mb-2 relative z-10">Performance</p>
                         <p className="text-xl font-medium text-textPrimary relative z-10">84.2%</p>
                         <p className="text-sm font-medium text-textSecondary mt-4 relative z-10">Tasks are being completed on time.</p>
                     </div>
@@ -166,7 +166,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                         <div className={cn("w-1.5 h-10 rounded-full", getPriorityColor(task.priority))} />
                                         <div className="flex gap-2">
                                             <span className={cn(
-                                                "px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-widest",
+                                                "px-2.5 py-1 rounded-md text-xs font-bold ",
                                                 getStatusInfo(task.status).color
                                             )}>
                                                 {getStatusInfo(task.status).label}
@@ -187,7 +187,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                             <div className="w-8 h-8 rounded-md bg-background border border-border flex items-center justify-center text-xs font-bold text-textSecondary shadow-sm">
                                                 {task.employees?.full_name?.charAt(0) || 'G'}
                                             </div>
-                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest truncate max-w-[100px]">
+                                            <p className="text-xs font-bold text-textSecondary  truncate max-w-[100px]">
                                                 {task.employees?.full_name || 'Global'}
                                             </p>
                                         </div>

@@ -159,13 +159,14 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                 </div>
 
                 <div className="pt-8 flex items-center justify-end gap-4 border-t border-border/40">
-                    <button
+                    <Button
+                        variant="ghost"
                         type="button"
                         onClick={onClose}
                         className="px-6 h-11 text-sm font-medium text-textSecondary hover:text-textPrimary transition-colors"
                     >
                         Cancel
-                    </button>
+                    </Button>
                     <Button
                         type="submit"
                         loading={create.isPending}

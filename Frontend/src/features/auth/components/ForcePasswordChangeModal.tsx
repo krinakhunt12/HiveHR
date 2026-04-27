@@ -3,7 +3,8 @@ import { useUpdatePassword } from '@/shared/api/hooks/authHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { ShieldCheck, Lock, ArrowRight } from 'lucide-react';
-
+import { Button } from '@/shared/ui/button';
+    
 interface ForcePasswordChangeModalProps {
     isOpen: boolean;
     onSuccess: () => void;
@@ -130,7 +131,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                             </div>
                         )}
 
-                        <button
+                        <Button
                             type="submit"
                             disabled={updatePassword.isPending}
                             className="w-full h-12 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 group flex items-center justify-center gap-2 mt-4"
@@ -146,7 +147,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </form>
                 </div>
             </div>

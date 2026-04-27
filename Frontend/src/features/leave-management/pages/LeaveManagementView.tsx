@@ -206,11 +206,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                 <tr key={req.id} className="hover:bg-primary/[0.01] transition-colors group">
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Individual'}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">{req.leave_type}</p>
+                                                        <p className="text-xs text-textSecondary font-bold  mt-1">{req.leave_type}</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary">{req.start_date} <ArrowRight size={12} className="inline mx-1 " /> {req.end_date}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">Standard Cycle</p>
+                                                        <p className="text-xs text-textSecondary font-bold  mt-1">Standard Cycle</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <span className={cn(
@@ -257,7 +257,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Anonymous'}</p>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-textSecondary mt-1">{req.leave_type}</p>
+                                                        <p className="text-xs font-bold  text-textSecondary mt-1">{req.leave_type}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -276,14 +276,14 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                         variant="outline"
                                                         disabled={review.isPending}
                                                         onClick={() => handleAction(req.id, 'rejected')}
-                                                        className="h-10 text-xs font-bold uppercase tracking-widest border-error/20 text-error hover:bg-error/10"
+                                                        className="h-10 text-xs font-bold  border-error/20 text-error hover:bg-error/10"
                                                     >
                                                         <XCircle size={14} className="mr-2" /> Decline
                                                     </Button>
                                                     <Button
                                                         disabled={review.isPending}
                                                         onClick={() => handleAction(req.id, 'approved')}
-                                                        className="h-10 text-xs font-bold uppercase tracking-widest"
+                                                        className="h-10 text-xs font-bold "
                                                     >
                                                         <CheckCircle2 size={14} className="mr-2" /> Approve
                                                     </Button>

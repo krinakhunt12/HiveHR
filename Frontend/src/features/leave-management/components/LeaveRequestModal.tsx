@@ -135,13 +135,14 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                 </div>
 
                 <div className="pt-8 flex items-center justify-end gap-4 border-t border-border/40">
-                    <button
+                    <Button
+                    variant="ghost"
                         type="button"
                         onClick={onClose}
                         className="px-6 h-11 text-sm font-medium text-textSecondary hover:text-textPrimary transition-colors"
                     >
                         Dismiss
-                    </button>
+                    </Button>
                     <Button
                         type="submit"
                         loading={submit.isPending}

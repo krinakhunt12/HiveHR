@@ -31,15 +31,15 @@ const Contact = () => {
                 <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
                   <form className="space-y-4">
                     <div>
-                      <label className="text-sm font-bold uppercase tracking-widest text-indigo-200 mb-2 block">Full Name</label>
+                      <label className="text-sm font-bold  text-indigo-200 mb-2 block">Full Name</label>
                       <input type="text" placeholder="Sarah Jenkins" className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 placeholder:text-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-white/30" />
                     </div>
                     <div>
-                      <label className="text-sm font-bold uppercase tracking-widest text-indigo-200 mb-2 block">Company Email</label>
+                      <label className="text-sm font-bold  text-indigo-200 mb-2 block">Company Email</label>
                       <input type="email" placeholder="name@company.com" className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 placeholder:text-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-white/30" />
                     </div>
                     <div>
-                      <label className="text-sm font-bold uppercase tracking-widest text-indigo-200 mb-2 block">Message</label>
+                      <label className="text-sm font-bold  text-indigo-200 mb-2 block">Message</label>
                       <textarea rows={4} placeholder="How can we help?" className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 placeholder:text-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-white/30 resize-none"></textarea>
                     </div>
                     <Button className="w-full h-12 bg-white text-indigo-600 hover:bg-indigo-50 font-bold">Send Message</Button>

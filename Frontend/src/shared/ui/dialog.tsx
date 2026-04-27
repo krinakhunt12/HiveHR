@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/shared/utils/cn';
-
+import { Button } from './button';
 interface DialogProps {
     isOpen: boolean;
     onClose: () => void;
@@ -34,12 +34,13 @@ export const Dialog = ({ isOpen, onClose, title, children, className }: DialogPr
             )}>
                 <div className="flex items-center justify-between px-10 py-8 border-b border-border/50 bg-slate-50/50">
                     <h3 className="text-2xl font-bold text-foreground tracking-tight font-sans">{title}</h3>
-                    <button
+                    <Button
+                    variant="ghost"
                         onClick={onClose}
                         className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-2xl transition-all text-muted-foreground hover:text-foreground shadow-sm hover:shadow-md"
                     >
                         <X size={20} />
-                    </button>
+                    </Button>
                 </div>
                 <div className="p-10 max-h-[85vh] overflow-y-auto">
                     {children}

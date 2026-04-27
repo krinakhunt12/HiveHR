@@ -151,7 +151,7 @@ const Signup = () => {
             )}
 
             <div className="py-4 px-5 bg-bg/80 rounded-xl border border-soft flex gap-4 items-start">
-              <ShieldCheck className="text-primary/60 w-4 h-4 shrink-0 mt-0.5" />
+              <ShieldCheck className="text-primary w-4 h-4 shrink-0 mt-0.5" />
               <p className="text-sm text-muted font-medium leading-relaxed">
                 By registering, you agree to our <span className="text-primary font-semibold cursor-pointer">Service Terms</span> and <span className="text-primary font-semibold cursor-pointer">Privacy Protocol</span>.
               </p>
@@ -170,7 +170,7 @@ const Signup = () => {
         </CardContent>
       </Card>
 
-      <div className="mt-10 text-sm font-medium text-dim uppercase tracking-widest text-center">
+      <div className="mt-10 text-sm font-medium text-dim  text-center">
         No credit card required. Instant activation.
       </div>
     </div>

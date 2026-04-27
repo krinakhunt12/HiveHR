@@ -24,7 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     )}>
       <div className="relative group mb-6">
         <div className="absolute -inset-4 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-500" />
-        <div className="relative w-20 h-20 bg-background border border-primary/5 rounded-3xl flex items-center justify-center text-primary/40 shadow-sm group-hover:text-primary/60 transition-colors">
+        <div className="relative w-20 h-20 bg-background border border-primary/5 rounded-3xl flex items-center justify-center text-primary shadow-sm group-hover:text-primary transition-colors">
           <Icon size={32} strokeWidth={1.5} />
         </div>
       </div>

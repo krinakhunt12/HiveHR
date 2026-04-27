@@ -74,7 +74,7 @@ const AdminDashboard = () => {
             <div className="space-y-10 text-left animate-in fade-in duration-700">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Platform Overview</h1>
+                        <h1 className="text-2xl font-bold text-textPrimary">Platform Overview</h1>
                         <p className="text-sm font-semibold text-textSecondary mt-1">Cross-tenant performance and subscription telemetry.</p>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs uppercase tracking-widest text-textSecondary font-bold mt-1">
+                                                        <p className="text-xs text-textSecondary font-bold mt-1">
                                                             {company.plans?.name ?? 'No Plan'} · {company.employee_count ?? 0} employees
                                                         </p>
                                                     </div>
@@ -148,7 +148,7 @@ const AdminDashboard = () => {
                             <div className="absolute -right-4 -bottom-4"><Shield size={120} /></div>
                             <CardContent className="p-8 pb-10">
                                 <Zap size={24} className="mb-6" />
-                                <h3 className="text-xl font-bold tracking-tight mb-2">Platform Security</h3>
+                                <h3 className="text-xl font-bold mb-2">Platform Security</h3>
                                 <p className="text-sm font-medium text-white/70 leading-relaxed">Multi-tenant data isolation enforced via RLS on all 16 database tables.</p>
                                 <div className="mt-8 flex items-center gap-2 text-xs font-bold text-white/60">
                                     <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
@@ -168,7 +168,7 @@ const AdminDashboard = () => {
                                     <div className="space-y-3">
                                         {Object.entries(stats.plan_distribution).map(([plan, count]: any) => (
                                             <div key={plan} className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-textSecondary uppercase tracking-widest">{plan}</span>
+                                                <span className="text-xs font-bold text-textSecondary">{plan}</span>
                                                 <span className="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-lg">{count} companies</span>
                                             </div>
                                         ))}
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">{company.email}</p>
+                                                        <p className="text-xs text-textSecondary font-bold mt-1">{company.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -254,7 +254,7 @@ const AdminDashboard = () => {
                                             </td>
                                             <td className="px-8 py-5">
                                                 <span className={cn(
-                                                    "px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-[0.15em] border shadow-sm",
+                                                    "px-3 py-1.5 rounded-lg text-xs font-semibold border shadow-sm",
                                                     company.plan_status === 'active' ? 'bg-success/5 text-success border-success/10' :
                                                         company.plan_status === 'suspended' ? 'bg-error/5 text-error border-error/10' :
                                                             'bg-warning/5 text-warning border-warning/10'
@@ -334,7 +334,7 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
                     <div className={cn("p-3 rounded-xl transition-all duration-300 shadow-sm", isAccent ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
                         {React.cloneElement(icon, { size: 20 })}
                     </div>
-                    <span className={cn("text-xs font-bold uppercase tracking-widest px-2 py-1 rounded-lg", isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary")}>
+                    <span className={cn("text-xs font-bold  px-2 py-1 rounded-lg", isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary")}>
                         {trend}
                     </span>
                 </div>

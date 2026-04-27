@@ -139,17 +139,17 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                         </div>
                     ) : configs.length === 0 ? (
                         <div className="py-12 border-2 border-dashed border-soft rounded-2xl flex flex-col items-center justify-center text-center space-y-4">
-                            <div className="w-12 h-12 bg-primary/5 rounded-full flex items-center justify-center text-primary/40">
+                            <div className="w-12 h-12 bg-primary/5 rounded-full flex items-center justify-center text-primary">
                                 <ShieldCheck size={24} />
                             </div>
                             <p className="text-sm font-medium text-textSecondary">No leave policies defined yet.</p>
-                            <button
+                            <Button
+                                variant="outline"
                                 type="button"
                                 onClick={handleAdd}
-                                className="text-sm font-bold text-primary uppercase tracking-widest hover:opacity-70 transition-opacity"
                             >
                                 Add First Policy
-                            </button>
+                            </Button>
                         </div>
                     ) : (
                         configs.map((config, index) => (
@@ -158,7 +158,7 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                                 className="flex flex-col sm:flex-row items-end gap-4 p-5 rounded-2xl bg-background/50 border border-soft group transition-all hover:bg-surface hover:border-primary/20"
                             >
                                 <div className="flex-1 space-y-2 text-left w-full">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-primary/60 ml-0.5">
+                                    <label className="text-xs font-bold text-primary ml-0.5">
                                         Leave Type
                                     </label>
                                     <input
@@ -171,7 +171,7 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                                     />
                                 </div>
                                 <div className="w-full sm:w-40 space-y-2 text-left">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-primary/60 ml-0.5">
+                                    <label className="text-xs font-bold text-primary ml-0.5">
                                         Annual Days
                                     </label>
                                     <input

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '../ui/button';
 
 const ErrorPage: React.FC<{ error?: Error | null }> = ({ error = null }) => {
   return (
@@ -11,12 +12,12 @@ const ErrorPage: React.FC<{ error?: Error | null }> = ({ error = null }) => {
           <pre className="text-sm text-rose-600 bg-rose-50 p-3 rounded mb-4 overflow-auto">{String(error.message)}</pre>
         )}
         <div className="flex gap-3 justify-center">
-          <button
+          <Button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-[var(--color-primary)] text-white rounded font-medium"
           >
             Reload
-          </button>
+          </Button>
           <Link to="/" className="px-4 py-2 border rounded font-medium text-slate-700">Home</Link>
         </div>
       </div>

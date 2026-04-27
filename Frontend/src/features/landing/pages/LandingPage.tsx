@@ -13,7 +13,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto text-center lg:text-left">
           <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
             <div className="lg:w-1/2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-sm font-semibold mb-8 uppercase tracking-widest border border-primary/10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-sm font-semibold mb-8  border border-primary/10">
                 Secure & Scalable HR Suite
               </div>
               <h1 className="text-4xl lg:text-7xl font-bold text-textPrimary leading-[1.05] mb-6 tracking-tight font-display">
@@ -24,11 +24,11 @@ const LandingPage = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link to="/signup">
-                  <Button size="lg" className="h-12 px-8 font-bold text-xs uppercase tracking-widest group">
+                  <Button size="lg" className="h-12 px-8 font-bold text-xs  group">
                     Start Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="h-12 px-8 font-bold text-xs uppercase tracking-widest border-border hover:bg-primary/5">
+                <Button size="lg" variant="outline" className="h-12 px-8 font-bold text-xs  border-border hover:bg-primary/5">
                   Request a Demo
                 </Button>
               </div>
@@ -187,11 +187,11 @@ const LandingPage = () => {
             <p className="text-textSecondary mb-12 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams automating their operations today. Start your 14-day premium trial now.</p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/signup">
-                <Button size="lg" className="h-14 px-10 font-bold text-xs uppercase tracking-widest bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
+                <Button size="lg" className="h-14 px-10 font-bold text-xs  bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
                   Initialize Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <span className="text-xs text-textSecondary font-bold uppercase tracking-widest">No credit card required.</span>
+              <span className="text-xs text-textSecondary font-bold ">No credit card required.</span>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@ const LandingPage = () => {
                 ].map((item) => (
                   <div key={item.name} className="p-5 rounded-2xl border border-border bg-background/50 group hover:border-primary/30 transition-all">
                     <p className="text-sm font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">{item.name}</p>
-                    <p className="text-xs text-textSecondary font-bold uppercase tracking-widest">{item.desc}</p>
+                    <p className="text-xs text-textSecondary font-bold ">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -312,8 +312,8 @@ const LandingPage = () => {
                 <h2 className="text-3xl lg:text-6xl font-bold mb-8 tracking-tight font-display leading-[1.1]">Let's talk about your culture.</h2>
                 <p className="text-surface/80 text-lg font-medium mb-12">Our consultants are ready to help you architect your organizational infrastructure.</p>
                 <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
-                  <Button size="lg" className="bg-surface text-primary hover:bg-surface/90 font-bold text-xs uppercase tracking-widest px-10 h-16  shadow-black/10">Schedule a Consultation</Button>
-                  <Button size="lg" variant="outline" className="border-white/30 text-surface hover:bg-white/10 font-bold text-xs uppercase tracking-widest px-10 h-16">Email Sales</Button>
+                  <Button size="lg" className="bg-surface text-primary hover:bg-surface/90 font-bold text-xs  px-10 h-16  shadow-black/10">Schedule a Consultation</Button>
+                  <Button size="lg" variant="outline" className="border-white/30 text-surface hover:bg-white/10 font-bold text-xs  px-10 h-16">Email Sales</Button>
                 </div>
               </div>
               <div className="lg:w-1/2 w-full max-w-md">

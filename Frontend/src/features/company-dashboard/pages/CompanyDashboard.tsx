@@ -275,7 +275,7 @@ const CompanyDashboard = () => {
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-[0.15em] border shadow-sm",
+                                            "px-3 py-1.5 rounded-lg text-xs font-semibold border shadow-sm",
                                             emp.status === 'active' ? 'bg-success/5 text-success border-success/10' : 'bg-background text-textSecondary border-primary/5'
                                         )}>
                                             {emp.status}
@@ -338,7 +338,7 @@ const CompanyDashboard = () => {
                 <Card className="card-premium p-6 bg-white col-span-2">
                     <div className="flex items-center justify-between mb-8">
                         <h4 className="text-sm font-bold text-textSecondary uppercase">Real-time Attendance</h4>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-semibold tracking-widest">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-semibold">
                             <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
                             Live Sync
                         </div>
@@ -357,13 +357,13 @@ const CompanyDashboard = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold text-textPrimary">{record.employeeName}</p>
-                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1">{record.work_location || 'Office'}</p>
+                                            <p className="text-xs font-bold text-textSecondary  mt-1">{record.work_location || 'Office'}</p>
                                         </div>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm font-bold text-primary">{record.check_in_time ? record.check_in_time.slice(0, 5) : '--:--'}</p>
                                         <p className={cn(
-                                            "text-xs font-bold uppercase tracking-widest mt-1",
+                                            "text-xs font-bold  mt-1",
                                             record.status === 'present' ? 'text-success' : 'text-primary'
                                         )}>{record.status}</p>
                                     </div>

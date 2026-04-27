@@ -44,9 +44,9 @@ export const Navbar = () => {
           </div>
 
           <div className="md:hidden">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-textSecondary hover:text-primary transition-colors">
+            <Button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-textSecondary hover:text-primary transition-colors">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

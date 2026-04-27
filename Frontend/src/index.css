@@ -3,7 +3,7 @@
 @import "./App.css";
 
 @theme {
-  --font-sans: "Inter", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Outfit", "Inter", "Poppins", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Inter", sans-serif;
 
   --text-xs: 0.875rem;
@@ -73,7 +73,7 @@
   }
 
   body {
-    @apply bg-background text-textPrimary font-sans antialiased selection:bg-primary/10 selection:text-primary;
+    @apply bg-background text-textPrimary font-display antialiased selection:bg-primary/10 selection:text-primary;
   }
 }
 

@@ -144,7 +144,7 @@ const EmployeeDashboard = () => {
             {error && (
                 <div className="p-4 bg-error/10 border border-error/20 rounded-md flex items-center gap-3 text-error animate-pulse">
                     <AlertCircle size={18} />
-                    <p className="text-sm font-medium uppercase tracking-widest">{error}</p>
+                    <p className="text-sm font-medium ">{error}</p>
                 </div>
             )}
 

@@ -50,7 +50,7 @@ interface InfoRowProps {
 
 const InfoRow = ({ icon, label, value, mono }: InfoRowProps) => (
     <div className="flex items-start gap-4 py-3.5 border-b border-border/40 last:border-0">
-        <div className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 text-primary/60">
+        <div className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 text-primary">
             {icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -94,7 +94,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
                 </div>
                 <div className="flex-1 min-w-0">
                     <h2 className="text-xl font-bold text-textPrimary tracking-tight truncate">{employee.full_name}</h2>
-                    <p className="text-sm font-semibold text-primary/70 mt-0.5 truncate">{designation}</p>
+                    <p className="text-sm font-semibold text-primary mt-0.5 truncate">{designation}</p>
                     <div className="flex items-center gap-3 mt-3 flex-wrap">
                         {/* Status badge */}
                         <span className={cn(
@@ -177,7 +177,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
                     </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <CircleDot size={10} className="text-primary/40" />
+                    <CircleDot size={10} className="text-primary" />
                     <span className="text-xs font-bold text-textSecondary">
                         Read-only view
                     </span>

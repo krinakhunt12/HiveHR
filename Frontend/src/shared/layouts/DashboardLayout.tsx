@@ -111,9 +111,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
             if (item.onClick) {
               return (
-                <button key={item.label} onClick={() => handleNavClick(item)} className={className}>
+                <Button variant="ghost" className={cn(className, "flex-col items-start")}
+                  key={item.label} onClick={() => handleNavClick(item)}>
                   {Content}
-                </button>
+                </Button>
               );
             }
 
@@ -180,7 +181,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               {isSidebarExpanded ? <X size={16} /> : <Menu size={16} />}
             </Button>
             <div className="h-4 w-[1px] bg-border hidden md:block"></div>
-            <h2 className="text-sm font-medium text-textSecondary uppercase tracking-widest hidden md:block">Dashboard</h2>
+            <h2 className="text-sm font-medium text-textSecondary  hidden md:block">Dashboard</h2>
           </div>
 
           <div className="flex items-center gap-3">
@@ -189,10 +190,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               <span className="text-sm font-medium text-primary">Live</span>
             </div>
 
-            <button className="relative p-1.5 text-textSecondary hover:text-primary hover:bg-primary/10 transition-all rounded-md group">
+            <Button variant="ghost" className="relative p-1.5 text-textSecondary hover:text-primary hover:bg-primary/10 transition-all rounded-md group">
               <Bell size={16} />
               <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-error rounded-full border border-surface"></span>
-            </button>
+            </Button>
           </div>
         </header>
 

@@ -77,7 +77,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-textSecondary">Policy Title</label>
+                        <label className="text-xs font-bold  text-textSecondary">Policy Title</label>
                         <input
                             required
                             type="text"
@@ -89,7 +89,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-textSecondary">Policy Category</label>
+                        <label className="text-xs font-bold  text-textSecondary">Policy Category</label>
                         <select
                             className="input-premium w-full bg-background/50"
                             value={type}
@@ -105,7 +105,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-widest text-textSecondary">Rules & Description</label>
+                        <label className="text-xs font-bold  text-textSecondary">Rules & Description</label>
                         <textarea
                             required
                             rows={6}
@@ -262,7 +262,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                                 </div>
                                 <div className="space-y-1">
                                     <CardTitle className="text-base font-medium text-textPrimary leading-tight">{p.title}</CardTitle>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-textSecondary">{p.category}</p>
+                                    <p className="text-xs font-bold  text-textSecondary">{p.category}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="pt-2">
@@ -272,9 +272,9 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                                         <Calendar size={12} />
                                         {new Date(p.created_at).toLocaleDateString()}
                                     </span>
-                                    <button className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-1.5 group/btn hover:text-primaryLight transition-all">
+                                    <Button variant="ghost" className="text-xs font-bold text-primary  flex items-center gap-1.5 group/btn hover:text-primaryLight transition-all">
                                         Read Full <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>
