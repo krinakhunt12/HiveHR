@@ -48,10 +48,10 @@ export const Footer = () => {
           <FooterCol
             title="Solutions"
             links={[
-              { name: 'Large Farms', href: '/solutions' },
-              { name: 'Seed Teams', href: '/solutions' },
-              { name: 'Cooperatives', href: '/solutions' },
-              { name: 'Agri-Enterprise', href: '/solutions' }
+              { name: 'Large Farms', href: '/solutions#farms' },
+              { name: 'Seed Teams', href: '/solutions#seed' },
+              { name: 'Cooperatives', href: '/solutions#coops' },
+              { name: 'Agri-Enterprise', href: '/solutions#enterprise' }
             ]}
           />
           <FooterCol

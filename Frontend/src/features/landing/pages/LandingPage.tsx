@@ -22,16 +22,18 @@ const LandingPage = () => {
               <p className="text-base lg:text-lg text-textSecondary mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                 Manage your team, payroll, and performance all in one place with a simple workspace designed for impact.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <Link to="/signup">
-                  <Button size="lg" className="h-12 px-8 font-medium text-sm group">
-                    Start Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Button size="lg" variant="outline" className="h-12 px-8 font-medium text-sm  border-border hover:bg-primary/5">
-                  Request a Demo
-                </Button>
-              </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                  <Link to="/signup">
+                    <Button size="lg" className="h-12 px-8 font-medium text-sm group">
+                      Start Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link to="/contact">
+                    <Button size="lg" variant="outline" className="h-12 px-8 font-medium text-sm  border-border hover:bg-primary/5">
+                      Request a Demo
+                    </Button>
+                  </Link>
+                </div>
             </div>
             <div className="lg:w-1/2 relative group">
               <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-3xl group-hover:bg-primary/20 transition-all duration-500"></div>
@@ -312,8 +314,12 @@ const LandingPage = () => {
                 <h2 className="text-3xl lg:text-6xl font-bold mb-8 tracking-tight font-display">Let's build a better workplace.</h2>
                 <p className="text-surface/80 text-lg font-medium mb-12">We're here to help you manage your team more effectively and grow your business.</p>
                 <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
-                  <Button size="lg" className="w-1/2">Schedule a Consultation</Button>
-                  <Button size="lg" variant="outline">Email Sales</Button>
+                  <Link to="/contact">
+                    <Button size="lg" className="w-full sm:w-auto px-10">Schedule a Consultation</Button>
+                  </Link>
+                  <a href="mailto:sales@hivehr.io">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto px-10">Email Sales</Button>
+                  </a>
                 </div>
               </div>
               <div className="lg:w-1/2 w-full max-w-md">

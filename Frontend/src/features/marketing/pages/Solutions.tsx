@@ -15,12 +15,12 @@ const Solutions = () => {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: 'Engineering', desc: 'Make it easy to bring on new team members and build a great culture.' },
-              { title: 'Product Teams', desc: 'Align design and product with your company goals.' },
-              { title: 'Startups', desc: 'Move fast with a simple HR setup that grows with you.' },
-              { title: 'Enterprise', desc: 'Stay secure and follow rules even as you grow across the world.' }
+              { id: 'farms', title: 'Large Farms', desc: 'Scale your large agricultural enterprise with robust HR tools.' },
+              { id: 'seed', title: 'Seed Teams', desc: 'Move fast with simple tools designed for early-stage teams.' },
+              { id: 'coops', title: 'Cooperatives', desc: 'Manage member resources and team coordination effectively.' },
+              { id: 'enterprise', title: 'Agri-Enterprise', desc: 'Stay secure and compliant across global operations.' }
             ].map((sol) => (
-              <div key={sol.title} className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
+              <div key={sol.id} id={sol.id} className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
                 <h3 className="text-xl font-semibold mb-4 group-hover:text-indigo-400 transition-colors">{sol.title}</h3>
                 <p className="text-sm text-slate-400 leading-relaxed font-medium">{sol.desc}</p>
               </div>
