@@ -147,7 +147,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                     <div className="col-span-full py-10 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col items-center justify-center text-center px-6">
                         <Info className="text-primary mb-4" size={32} />
                         <h3 className="text-lg font-bold text-textPrimary">{isSuperAdmin ? 'Platform Admin View' : 'Administrative Context'}</h3>
-                        <p className="text-sm font-semibold text-textSecondary opacity-70 mt-2 max-w-md">
+                        <p className="text-sm font-medium text-textSecondary opacity-70 mt-2 max-w-md">
                             {isSuperAdmin
                                 ? 'As a Super Admin, you are viewing the global dashboard. Leave quotas are scoped to individual employees.'
                                 : 'As an Administrator, personal leave quotas are hidden. You can manage and review member requests below.'}
