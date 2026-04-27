@@ -60,7 +60,7 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Policies</h1>
-          <p className="text-sm font-medium text-textSecondary mt-1 opacity-60">Review and acknowledge company guidelines.</p>
+          <p className="text-sm font-medium text-textSecondary mt-1">Review and acknowledge company guidelines.</p>
         </div>
         <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
           <div className="relative w-full md:w-72">
@@ -106,7 +106,7 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
         <main className="md:col-span-3">
           {filteredPolicies.length === 0 ? (
             <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed">
-              <p className="text-sm text-muted-foreground mb-4">No policies found matching your criteria.</p>
+              <p className="text-sm text-textSecondary mb-4">No policies found matching your criteria.</p>
               <Button variant="outline" size="sm" onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}>
                 Clear Filters
               </Button>

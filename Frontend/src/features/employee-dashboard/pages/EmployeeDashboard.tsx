@@ -105,7 +105,7 @@ const EmployeeDashboard = () => {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">Welcome, {userName}</h1>
-                    <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    <p className="text-sm font-medium text-textSecondary mt-1.5">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-4 items-center">
                     {hasAttendance && !attendanceToday.check_out_at && (

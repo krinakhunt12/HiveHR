@@ -187,7 +187,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                             <div className="w-8 h-8 rounded-md bg-background border border-border flex items-center justify-center text-xs font-bold text-textSecondary shadow-sm">
                                                 {task.employees?.full_name?.charAt(0) || 'G'}
                                             </div>
-                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest truncate max-w-[100px] opacity-60">
+                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest truncate max-w-[100px]">
                                                 {task.employees?.full_name || 'Global'}
                                             </p>
                                         </div>

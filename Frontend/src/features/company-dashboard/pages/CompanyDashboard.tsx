@@ -122,7 +122,7 @@ const CompanyDashboard = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-left">
                     <div className="text-left">
                         <h1 className="text-2xl font-semibold tracking-tight">Operational Intel</h1>
-                        <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Strategic overview for {session?.user?.email?.split('@')[1] || 'Enterprise'}.</p>
+                        <p className="text-sm font-medium text-textSecondary mt-1.5">Strategic overview for {session?.user?.email?.split('@')[1] || 'Enterprise'}.</p>
                     </div>
                     <div className="flex gap-3">
                         <Button variant="outline">
@@ -151,7 +151,7 @@ const CompanyDashboard = () => {
                         <div className="flex items-center justify-between mb-10">
                             <div>
                                 <h3 className="text-lg font-bold font-display text-textPrimary">Resource Velocity</h3>
-                                <p className="text-xs font-semibold text-textSecondary opacity-50 mt-1">Personnel expansion metrics</p>
+                                <p className="text-xs font-medium text-textSecondary mt-1">Personnel expansion metrics</p>
                             </div>
                             <div className="flex items-center gap-4 text-xs font-bold text-textSecondary">
                                 <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /> Projected</div>
@@ -172,7 +172,7 @@ const CompanyDashboard = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="flex justify-between mt-6 px-1 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">
+                        <div className="flex justify-between mt-6 px-1 text-xs font-bold text-textSecondary">
                             <span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Dec</span>
                         </div>
                     </div>
@@ -185,7 +185,7 @@ const CompanyDashboard = () => {
                             <h4 className="text-xl font-bold tracking-tight mb-2">Automated Registry</h4>
                             <p className="text-sm font-medium text-white/70 leading-relaxed">System monitoring suggests high engagement across all field regions for the current cycle.</p>
                         </div>
-                        <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 mt-8 font-bold text-xs uppercase tracking-widest">
+                        <Button className="w-full h-11 text-xs font-semibold text-white">
                             Audit Attendance Logs
                         </Button>
                     </div>
@@ -199,7 +199,7 @@ const CompanyDashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h2 className="text-2xl font-semibold tracking-tight">Personnel Registry</h2>
-                    <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Managing {employees.length} enterprise members.</p>
+                    <p className="text-sm font-medium text-textSecondary mt-1.5">Managing {employees.length} enterprise members.</p>
                 </div>
                 <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-primary/5 shadow-sm w-full md:w-[400px] focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                     <Search size={18} className="text-textSecondary" />
@@ -326,18 +326,18 @@ const CompanyDashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h2 className="text-2xl font-semibold tracking-tight">Time & Operations</h2>
-                    <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Synchronized attendance and compute metrics.</p>
+                    <p className="text-sm font-medium text-textSecondary mt-1.5">Synchronized attendance and compute metrics.</p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em]">Export Logs</Button>
-                    <Button variant="outline" className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em]">Shift Schedule</Button>
+                    <Button variant="outline" className="px-6 text-xs font-bold">Export Logs</Button>
+                    <Button variant="outline" className="px-6 text-xs font-bold">Shift Schedule</Button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <Card className="card-premium p-6 bg-white col-span-2">
                     <div className="flex items-center justify-between mb-8">
-                        <h4 className="text-sm font-bold text-textSecondary opacity-50 uppercase">Real-time Attendance</h4>
+                        <h4 className="text-sm font-bold text-textSecondary uppercase">Real-time Attendance</h4>
                         <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-semibold tracking-widest">
                             <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
                             Live Sync
@@ -346,7 +346,7 @@ const CompanyDashboard = () => {
                     <div className="space-y-6">
                         {attendanceRecords.length === 0 ? (
                             <div className="py-12 text-center">
-                                <p className="text-sm text-muted-foreground">No attendance logs for today yet.</p>
+                                <p className="text-sm text-textSecondary">No attendance logs for today yet.</p>
                             </div>
                         ) : (
                             attendanceRecords.slice(0, 5).map((record, i) => (
@@ -374,7 +374,7 @@ const CompanyDashboard = () => {
                 </Card>
 
                 <Card className="card-premium p-6 bg-white flex flex-col justify-between">
-                    <h4 className="text-sm font-bold text-textSecondary opacity-50 uppercase mb-6">Average Utilization</h4>
+                    <h4 className="text-sm font-bold text-textSecondary uppercase mb-6">Average Utilization</h4>
                     <div className="flex flex-col items-center justify-center py-8">
                         <div className="relative w-32 h-32 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">
@@ -383,7 +383,7 @@ const CompanyDashboard = () => {
                             </svg>
                             <span className="absolute text-2xl font-bold text-textPrimary">88%</span>
                         </div>
-                        <p className="mt-6 text-xs font-bold text-textSecondary opacity-40 uppercase tracking-[0.2em]">Efficiency Index</p>
+                        <p className="mt-6 text-xs font-semibold text-textSecondary">Efficiency Index</p>
                     </div>
                 </Card>
 
@@ -392,7 +392,7 @@ const CompanyDashboard = () => {
                         <div className="p-2.5 bg-white/10 rounded-xl text-white">
                             <Wind size={20} />
                         </div>
-                        <span className="text-xs font-bold uppercase tracking-widest opacity-60">Registry Health</span>
+                        <span className="text-xs font-bold">Registry Health</span>
                     </div>
                     <div>
                         <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-2">Cycle Status</p>
@@ -467,7 +467,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     )}
                 </div>
                 <div>
-                    <p className="text-xs font-bold text-textSecondary uppercase mb-2 opacity-50">{title}</p>
+                    <p className="text-xs font-bold text-textSecondary uppercase mb-2">{title}</p>
                     <p className="text-2xl font-bold text-textPrimary font-display tracking-tight leading-none">{value}</p>
                 </div>
             </div>

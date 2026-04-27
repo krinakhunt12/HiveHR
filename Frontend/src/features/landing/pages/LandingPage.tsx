@@ -125,7 +125,7 @@ const LandingPage = () => {
                     </div>
                     <span className="text-sm font-bold">Pulse Score: 98%</span>
                   </div>
-                  <p className="text-xs text-textSecondary leading-relaxed font-bold opacity-60">Team alignment is at a 12-month high after the last integration.</p>
+                  <p className="text-xs text-textSecondary leading-relaxed font-bold">Team alignment is at a 12-month high after the last integration.</p>
                 </Card>
               </div>
             </div>

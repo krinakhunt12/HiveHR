@@ -33,7 +33,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       </div>
       <div className="space-y-4 max-w-sm mx-auto">
         <h3 className="text-xl font-bold text-textPrimary tracking-tight font-display">{title}</h3>
-        <p className="text-sm font-semibold text-textSecondary opacity-60 leading-relaxed">
+        <p className="text-sm font-semibold text-textSecondary leading-relaxed">
           {description}
         </p>
         

@@ -147,7 +147,7 @@ const AdminDashboard = () => {
                         <Card className="card-premium bg-gradient-to-br from-primary to-primaryDark text-white border-none overflow-hidden relative">
                             <div className="absolute -right-4 -bottom-4 opacity-10"><Shield size={120} /></div>
                             <CardContent className="p-8 pb-10">
-                                <Zap size={24} className="mb-6 opacity-60" />
+                                <Zap size={24} className="mb-6" />
                                 <h3 className="text-xl font-bold tracking-tight mb-2">Platform Security</h3>
                                 <p className="text-sm font-medium text-white/70 leading-relaxed">Multi-tenant data isolation enforced via RLS on all 16 database tables.</p>
                                 <div className="mt-8 flex items-center gap-2 text-xs font-bold text-white/60">
@@ -339,7 +339,7 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
                     </span>
                 </div>
                 <div>
-                    <p className="text-xs font-bold text-textSecondary uppercase mb-2 opacity-50">{title}</p>
+                    <p className="text-xs font-bold text-textSecondary uppercase mb-2">{title}</p>
                     <p className="text-2xl font-semibold tracking-tight">{value}</p>
                 </div>
             </CardContent>

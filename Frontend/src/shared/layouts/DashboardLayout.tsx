@@ -54,11 +54,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col bg-surface transition-all duration-300 fixed h-full z-40 overflow-hidden border-r border-border",
+          "hidden lg:flex flex-col bg-surface transition-all duration-300 fixed h-full z-40 overflow-x-hidden border-r border-border",
           isSidebarExpanded ? "w-84" : "w-20"
         )}
       >
-        <div className="h-16 flex items-center px-6 mb-2">
+        <div className={cn(
+          "h-16 flex items-center mb-2 transition-all duration-300",
+          isSidebarExpanded ? "px-6" : "justify-center"
+        )}>
           <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 border border-primary/20">
             <Leaf className="text-primary w-5 h-5 relative z-10 animate-float" />
           </div>
@@ -70,7 +73,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           )}
         </div>
 
-        <nav className="flex-1 px-4 md:px-8 space-y-2 overflow-y-auto custom-scrollbar">
+        <nav className={cn(
+          "flex-1 space-y-2 overflow-y-auto overflow-x-hidden custom-scrollbar transition-all duration-300",
+          isSidebarExpanded ? "px-4 md:px-8" : "px-4"
+        )}>
           {navItems.map((item) => {
             const isActive = item.onClick
               ? (activeInternalTab === item.path || (!activeInternalTab && navItems.indexOf(item) === 0))
@@ -95,7 +101,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             );
 
             const className = cn(
-              "flex items-center w-full px-3 gap-3 py-2.5 rounded-lg transition-all duration-200 relative cursor-pointer mx-1",
+              "flex items-center w-full py-2.5 rounded-lg transition-all duration-200 relative cursor-pointer",
+              isSidebarExpanded ? "px-3 gap-3 mx-1" : "justify-center px-0 mx-0 gap-0",
               isActive
                 ? "bg-primary/10 text-primary border border-primary/10"
                 : "text-textSecondary hover:text-textPrimary hover:bg-background"
@@ -132,8 +139,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               </div>
             </div>
           ) : (
-            <div className="flex justify-center py-2">
-              <div className="w-8 h-8 bg-primary/10 text-primary rounded-md flex items-center justify-center font-medium text-sm border border-primary/10">
+            <div className="flex justify-center py-2 transition-all">
+              <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-bold text-sm border border-primary/10 shadow-sm">
                 {userInitials}
               </div>
             </div>
@@ -158,7 +165,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         isSidebarExpanded ? "lg:ml-84" : "lg:ml-20"
       )}>
         {/* Top Header */}
-        <header className="h-14 bg-surface border-b border-border flex items-center justify-between px-8 sticky top-0 z-20">
+        <header className={cn(
+          "h-14 bg-surface border-b border-border flex items-center justify-between sticky top-0 z-20 transition-all duration-300",
+          isSidebarExpanded ? "px-8" : "px-5"
+        )}>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
@@ -183,7 +193,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </div>
         </header>
 
-        <div className="p-8 lg:p-12 w-full max-w-7xl mx-auto">
+        <div className="p-6 lg:p-8 w-full max-w-7xl mx-auto">
           {children}
         </div>
       </main>

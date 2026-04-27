@@ -43,7 +43,7 @@ export const PricingCard = ({ name, price, desc, features, featured = false }: a
       <ul className="space-y-5 mb-12">
         {features.map((f: string) => (
           <li key={f} className="flex items-center gap-4 text-sm font-bold text-textPrimary/80">
-            <CheckCircle2 className="w-4 h-4 text-primary shrink-0 opacity-60" />
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             <span>{f}</span>
           </li>
         ))}
