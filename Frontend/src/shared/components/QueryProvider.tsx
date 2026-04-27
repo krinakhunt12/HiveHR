@@ -16,6 +16,20 @@ export function QueryProvider({ children }: Props) {
         // Only show toast for unexpected errors, or specific ones
         // Many queries might fail silently or handle errors locally
         if (error instanceof ApiError) {
+          if (error.statusCode === 401) {
+            queryClient.clear();
+            // Optional: avoid multiple toasts if many queries fail at once
+            if (!(window as any)._is_logging_out) {
+              (window as any)._is_logging_out = true;
+              toast({
+                title: 'Session Expired',
+                description: 'Please log in again to continue.',
+                type: 'info',
+              });
+              setTimeout(() => { (window as any)._is_logging_out = false; }, 5000);
+            }
+            return;
+          }
           if (error.statusCode >= 500) {
             toast({
               title: 'Server Error',
@@ -29,6 +43,19 @@ export function QueryProvider({ children }: Props) {
     mutationCache: new MutationCache({
       onError: (error) => {
         if (error instanceof ApiError) {
+          if (error.statusCode === 401) {
+            queryClient.clear();
+            if (!(window as any)._is_logging_out) {
+              (window as any)._is_logging_out = true;
+              toast({
+                title: 'Session Expired',
+                description: 'Please log in again to continue.',
+                type: 'info',
+              });
+              setTimeout(() => { (window as any)._is_logging_out = false; }, 5000);
+            }
+            return;
+          }
           toast({
             title: 'Action Failed',
             description: error.message || 'We could not complete this action.',

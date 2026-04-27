@@ -217,6 +217,8 @@ export interface Plan {
   created_at: string;
 }
 
+import { useAuthStore } from '../auth/store';
+
 // ─── Token Helper ───────────────────────────────────────────────────────────
 
 function getAccessTokenFromStore(): string | null {
@@ -224,7 +226,16 @@ function getAccessTokenFromStore(): string | null {
     const raw = localStorage.getItem('hivehr_session');
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return parsed?.state?.session?.access_token ?? null;
+    const session = parsed?.state?.session;
+    if (!session) return null;
+
+    // Optional: Pre-emptive expiration check (Supabase tokens use seconds)
+    if (session.expires_at) {
+      const now = Math.floor(Date.now() / 1000);
+      if (session.expires_at < now) return null;
+    }
+
+    return session.access_token ?? null;
   } catch {
     return null;
   }
@@ -274,6 +285,13 @@ export async function invokeApi<T = any>(path: string, options: InvokeOptions = 
   try { body = await response.json(); } catch { body = {}; }
 
   if (!response.ok) {
+    // If JWT is expired or invalid (401), automatically clear session and log out
+    if (response.status === 401 && !options.isPublic) {
+      console.warn('JWT Expired or Unauthorized. Force logging out...');
+      useAuthStore.getState().clearSession();
+      // Optional: window.location.href = '/login';
+    }
+
     const message = body?.message || `Request failed (${response.status})`;
     const code = body?.code || `HTTP_${response.status}`;
     throw new ApiError(message, code, response.status, body?.errors ?? null);
