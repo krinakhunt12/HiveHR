@@ -56,7 +56,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <aside
         className={cn(
           "hidden lg:flex flex-col bg-surface transition-all duration-300 fixed h-full z-40 overflow-x-hidden border-r border-border",
-          isSidebarExpanded ? "w-84" : "w-20"
+          isSidebarExpanded ? "w-72" : "w-20"
         )}
       >
         <div className={cn(
