@@ -48,7 +48,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             <Button 
                 onClick={onRetry} 
                 variant="outline"
-                className="font-bold text-xs uppercase tracking-widest border-primary/10 hover:bg-primary/5 h-11 px-8 rounded-xl"
+                className="font-bold text-xs border-primary/10 hover:bg-primary/5 h-11 px-8 rounded-xl"
             >
               <RefreshCcw size={14} className="mr-2" /> Attempt Reconnect
             </Button>
