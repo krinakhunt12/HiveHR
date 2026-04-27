@@ -107,7 +107,7 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs uppercase tracking-widest text-textSecondary font-black opacity-40 mt-1">
+                                                        <p className="text-xs uppercase tracking-widest text-textSecondary font-bold opacity-40 mt-1">
                                                             {company.plans?.name ?? 'No Plan'} · {company.employee_count ?? 0} employees
                                                         </p>
                                                     </div>
@@ -222,12 +222,12 @@ const AdminDashboard = () => {
                             <table className="w-full text-left">
                                 <thead className="bg-primary/[0.02] border-b border-primary/5">
                                     <tr>
-                                        <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Company</th>
-                                        <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Plan</th>
-                                        <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Employees</th>
-                                        <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Status</th>
-                                        <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Expiry</th>
-                                        <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em] text-right">Actions</th>
+                                        <th className="px-8 py-5 text-xs font-bold text-textSecondary">Company</th>
+                                        <th className="px-8 py-5 text-xs font-bold text-textSecondary">Plan</th>
+                                        <th className="px-8 py-5 text-xs font-bold text-textSecondary">Employees</th>
+                                        <th className="px-8 py-5 text-xs font-bold text-textSecondary">Status</th>
+                                        <th className="px-8 py-5 text-xs font-bold text-textSecondary">Expiry</th>
+                                        <th className="px-8 py-5 text-xs font-bold text-textSecondary text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-primary/5">
@@ -235,12 +235,12 @@ const AdminDashboard = () => {
                                         <tr key={company.id} className="hover:bg-primary/[0.01] transition-colors group">
                                             <td className="px-8 py-5">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center font-black text-primary text-sm">
+                                                    <div className="w-10 h-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center font-bold text-primary text-sm">
                                                         {company.name?.[0] || '?'}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs text-textSecondary font-black uppercase tracking-widest mt-1 opacity-50">{company.email}</p>
+                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1 opacity-50">{company.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -254,7 +254,7 @@ const AdminDashboard = () => {
                                             </td>
                                             <td className="px-8 py-5">
                                                 <span className={cn(
-                                                    "px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-[0.15em] border shadow-sm",
+                                                    "px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-[0.15em] border shadow-sm",
                                                     company.plan_status === 'active' ? 'bg-success/5 text-success border-success/10' :
                                                         company.plan_status === 'suspended' ? 'bg-error/5 text-error border-error/10' :
                                                             'bg-warning/5 text-warning border-warning/10'
@@ -334,12 +334,12 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
                     <div className={cn("p-3 rounded-xl transition-all duration-300 shadow-sm", isAccent ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
                         {React.cloneElement(icon, { size: 20 })}
                     </div>
-                    <span className={cn("text-xs font-black uppercase tracking-widest px-2 py-1 rounded-lg", isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary")}>
+                    <span className={cn("text-xs font-bold uppercase tracking-widest px-2 py-1 rounded-lg", isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary")}>
                         {trend}
                     </span>
                 </div>
                 <div>
-                    <p className="text-xs font-black text-textSecondary uppercase tracking-[0.2em] mb-2 opacity-50">{title}</p>
+                    <p className="text-xs font-bold text-textSecondary uppercase mb-2 opacity-50">{title}</p>
                     <p className="text-3xl font-bold text-textPrimary tracking-tight font-display">{value}</p>
                 </div>
             </CardContent>

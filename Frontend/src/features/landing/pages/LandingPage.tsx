@@ -52,7 +52,7 @@ const LandingPage = () => {
       {/* Trust Section */}
       <section className="py-16 border-y border-border/50">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-xs font-black text-textSecondary uppercase tracking-[0.3em] text-center mb-10 opacity-40">Trusted by 2,000+ scaling organizations</p>
+          <p className="text-xs font-bold text-textSecondary uppercase tracking-[0.3em] text-center mb-10 opacity-40">Trusted by 2,000+ scaling organizations</p>
           <div className="flex flex-wrap justify-center gap-x-12 gap-y-8 opacity-30 grayscale group hover:grayscale-0 transition-all duration-700">
             {['Acme', 'Sphere', 'Orbit', 'Locus', 'Nebula'].map((logo) => (
               <span key={logo} className="text-xl font-bold tracking-tighter text-textSecondary uppercase">{logo}</span>
@@ -130,7 +130,7 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="lg:w-1/2 order-1 lg:order-2">
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6 block">Unified Infrastructure</span>
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6 block">Unified Infrastructure</span>
               <h3 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight leading-[1.1] font-display">Measure the output, not the input.</h3>
               <p className="text-base lg:text-lg text-textSecondary font-medium leading-relaxed mb-10 opacity-70">
                 HiveHr provides the clarity managers need to make data-driven decisions without intruding on the workflow of individual contributors.
@@ -191,7 +191,7 @@ const LandingPage = () => {
                   Initialize Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <span className="text-xs text-textSecondary font-black uppercase tracking-widest opacity-40">No credit card required.</span>
+              <span className="text-xs text-textSecondary font-bold uppercase tracking-widest opacity-40">No credit card required.</span>
             </div>
           </div>
         </div>
@@ -202,7 +202,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row items-center gap-24">
             <div className="lg:w-1/2">
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6 block">Connected Ecosystem</span>
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6 block">Connected Ecosystem</span>
               <h2 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight font-display">Syncs with your stack.</h2>
               <p className="text-base lg:text-lg text-textSecondary font-medium leading-relaxed mb-12 opacity-70">
                 Native integrations with the tools your team already uses. No more manual data entry or fragmented workflows.
@@ -216,7 +216,7 @@ const LandingPage = () => {
                 ].map((item) => (
                   <div key={item.name} className="p-5 rounded-2xl border border-border bg-background/50 group hover:border-primary/30 transition-all">
                     <p className="text-sm font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">{item.name}</p>
-                    <p className="text-xs text-textSecondary font-black uppercase tracking-widest opacity-40">{item.desc}</p>
+                    <p className="text-xs text-textSecondary font-bold uppercase tracking-widest opacity-40">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -293,7 +293,7 @@ const LandingPage = () => {
       {/* About Section */}
       <section id="about" className="py-32 bg-background/50 border-y border-border">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-10 block">Our Manifesto</span>
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-10 block">Our Manifesto</span>
           <h2 className="text-3xl lg:text-5xl font-bold text-textPrimary mb-10 tracking-tight italic font-display">"Software should get out of the way of the people it's designed to serve."</h2>
           <p className="text-lg lg:text-xl text-textSecondary font-medium leading-[1.8] mb-12 opacity-80">
             We founded HiveHr on the belief that modern organizational culture is built on trust, transparency, and clarity. Our tools are designed to provide the infrastructure that enables high-performance teams to thrive without the administrative friction of legacy systems.
@@ -320,10 +320,10 @@ const LandingPage = () => {
                 <div className="bg-white/10 backdrop-blur-xl rounded-[2.5rem] p-10 border border-white/20 ">
                   <div className="space-y-6">
                     <div>
-                      <label className="text-xs font-black uppercase tracking-[0.2em] text-surface/60 mb-3 block ml-1">Company Email</label>
+                      <label className="text-xs font-bold uppercase tracking-[0.2em] text-surface/60 mb-3 block ml-1">Company Email</label>
                       <input type="text" placeholder="name@company.com" className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 placeholder:text-surface/30 focus:outline-none focus:ring-4 focus:ring-white/10 transition-all text-sm font-bold" />
                     </div>
-                    <Button className="w-full h-14 bg-surface text-primary hover:bg-surface/95 font-black text-xs uppercase tracking-[0.2em] rounded-xl ">Request Access</Button>
+                    <Button className="w-full h-14 bg-surface text-primary hover:bg-surface/95 font-bold text-xs uppercase tracking-[0.2em] rounded-xl ">Request Access</Button>
                   </div>
                 </div>
               </div>

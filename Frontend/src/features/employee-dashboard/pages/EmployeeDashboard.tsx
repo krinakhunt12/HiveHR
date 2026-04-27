@@ -104,8 +104,8 @@ const EmployeeDashboard = () => {
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
                 <div>
-                    <h1 className="text-xl font-medium text-slate-900 tracking-tight font-sans">Welcome, {userName}</h1>
-                    <p className="text-sm font-medium text-slate-400 mt-0.5">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    <h1 className="text-2xl font-semibold tracking-tight">Welcome, {userName}</h1>
+                    <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-4 items-center">
                     {hasAttendance && !attendanceToday.check_out_at && (
@@ -118,13 +118,13 @@ const EmployeeDashboard = () => {
                         <Button
                             variant="outline"
                             onClick={() => setCurrentView('leaves')}
-                            className="px-5 py-2 text-sm font-medium uppercase tracking-wider h-10"
+                            className="px-5 py-2 text-sm font-medium h-10"
                         >
                             Request Leave
                         </Button>
                         <Button
                             className={cn(
-                                "px-6 py-2 h-10 font-medium text-sm uppercase tracking-wider active:scale-[0.98]",
+                                "px-6 py-2 h-10 font-medium text-sm active:scale-[0.98]",
                                 canCheckIn
                                     ? "bg-primary text-white"
                                     : canCheckOut
@@ -150,7 +150,7 @@ const EmployeeDashboard = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div className="card-premium p-6 border border-border flex flex-col justify-center bg-surface shadow-none overflow-hidden relative">
-                    <p className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-4">Work Progress (8h)</p>
+                    <p className="text-sm font-medium text-textSecondary mb-4">Work Progress (8h)</p>
                     <div className="flex items-center gap-4">
                         <div className="flex-1 h-2 bg-background rounded-full overflow-hidden">
                             <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${workProgress}%` }}></div>
@@ -175,7 +175,7 @@ const EmployeeDashboard = () => {
                     <Button
                         onClick={() => setCurrentView('leaves')}
                         variant="secondary"
-                        className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs uppercase tracking-widest hover:bg-white/90 transition-colors border-none"
+                        className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs hover:bg-white/90 transition-colors border-none"
                     >
                         Check Balance
                     </Button>
@@ -262,7 +262,7 @@ const StatCard = ({ title, value, icon, trend, theme }: any) => {
                     {React.cloneElement(icon, { size: 18 })}
                 </div>
                 <div>
-                    <p className="text-sm font-medium text-textSecondary uppercase tracking-widest mb-1">{title}</p>
+                    <p className="text-sm font-medium text-textSecondary mb-1">{title}</p>
                     <div className="flex items-center gap-2">
                         <p className="text-lg font-medium text-textPrimary tracking-tight">{value}</p>
                         {trend && <span className="text-sm font-medium text-success bg-success/10 px-1.5 py-0.5 rounded-md">{trend}</span>}

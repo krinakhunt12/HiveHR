@@ -20,7 +20,7 @@ export const Testimonial = ({ quote, author, role }: any) => (
     <p className="text-lg font-medium italic text-textSecondary leading-relaxed mb-8 opacity-80">"{quote}"</p>
     <div>
       <p className="text-sm font-bold text-textPrimary font-display">{author}</p>
-      <p className="text-xs text-textSecondary font-black uppercase tracking-widest mt-1 opacity-40">{role}</p>
+      <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1 opacity-40">{role}</p>
     </div>
   </div>
 );
@@ -31,10 +31,10 @@ export const PricingCard = ({ name, price, desc, features, featured = false }: a
     featured ? "border-primary scale-105 z-10" : "border-border hover:border-primary/30"
   )}>
     {featured && (
-      <div className="absolute top-0 right-0 bg-primary text-surface text-xs font-black uppercase tracking-[0.2em] px-4 py-2 rounded-bl-xl shadow-lg">Most Popular</div>
+      <div className="absolute top-0 right-0 bg-primary text-surface text-xs font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-bl-xl shadow-lg">Most Popular</div>
     )}
     <CardContent className="p-10">
-      <h3 className="text-sm font-black uppercase tracking-[0.2em] text-textSecondary opacity-40 mb-2">{name}</h3>
+      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-textSecondary opacity-40 mb-2">{name}</h3>
       <div className="flex items-baseline gap-1 mb-8">
         <span className="text-4xl font-bold tracking-tight text-textPrimary font-display">{price === 'Custom' ? '' : '$'}{price}</span>
         {price !== 'Custom' && <span className="text-textSecondary text-xs font-bold uppercase tracking-widest ml-1 opacity-40">/mo</span>}
@@ -49,7 +49,7 @@ export const PricingCard = ({ name, price, desc, features, featured = false }: a
         ))}
       </ul>
       <Button className={cn(
-        "w-full h-14 font-black text-xs uppercase tracking-[0.2em] rounded-xl shadow-lg transition-all active:scale-95",
+        "w-full h-14 font-bold text-xs uppercase tracking-[0.2em] rounded-xl shadow-lg transition-all active:scale-95",
         featured ? "bg-primary text-surface hover:bg-primary/90" : "bg-textPrimary text-surface hover:bg-textPrimary/90 shadow-black/10"
       )}>
         {name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}

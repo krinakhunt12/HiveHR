@@ -5,8 +5,10 @@ import { Badge } from '@/shared/ui/badge';
 import { Input } from '@/shared/ui/input';
 import { Separator } from '@/shared/ui/separator';
 import { SkeletonCard } from '@/shared/ui/skeleton';
+import { useToast } from '@/shared/ui/toast/useToast';
 import { usePolicies, usePolicyMutations, type CompanyPolicy } from '../hooks/usePolicies';
-import { Search, ChevronLeft, BookOpen, Clock, Laptop, Users, Lock } from 'lucide-react';
+import { Search, ChevronLeft, BookOpen, Clock, Laptop, Users, Lock, Plus, Trash2 } from 'lucide-react';
+import { AddPolicyModal } from '../components/AddPolicyModal';
 
 const CATEGORIES = [
   { id: 'all', name: 'All Policies', icon: BookOpen },
@@ -16,22 +18,23 @@ const CATEGORIES = [
   { id: 'Attendance', name: 'Attendance', icon: Clock },
 ];
 
-export const PoliciesView = ({ isAdmin: _isAdmin = false }: { isAdmin?: boolean }) => {
+export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
   const { data: policies = [], isLoading } = usePolicies();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewingPolicy, setViewingPolicy] = useState<CompanyPolicy | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const filteredPolicies = policies.filter((p) => {
     const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         p.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.content.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   if (isLoading) {
     return (
-      <div className="p-6 md:p-8 space-y-6">
+      <div>
         <div className="space-y-2">
           <div className="h-8 w-48 bg-muted animate-pulse rounded-md" />
           <div className="h-4 w-64 bg-muted animate-pulse rounded-md" />
@@ -53,20 +56,27 @@ export const PoliciesView = ({ isAdmin: _isAdmin = false }: { isAdmin?: boolean 
   }
 
   return (
-    <div className="p-6 md:p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Policies</h1>
-          <p className="text-sm text-muted-foreground mt-1">Review and acknowledge company guidelines.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Policies</h1>
+          <p className="text-sm font-medium text-textSecondary mt-1 opacity-60">Review and acknowledge company guidelines.</p>
         </div>
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search policies..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
+        <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search policies..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          {isAdmin && (
+            <Button onClick={() => setIsAddModalOpen(true)}>
+              <Plus className="h-4 w-4" /> Add Policy
+            </Button>
+          )}
         </div>
       </div>
 
@@ -104,30 +114,52 @@ export const PoliciesView = ({ isAdmin: _isAdmin = false }: { isAdmin?: boolean 
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {filteredPolicies.map((policy) => (
-                <PolicyCard 
-                  key={policy.id} 
-                  policy={policy} 
-                  onView={() => setViewingPolicy(policy)} 
+                <PolicyCard
+                  key={policy.id}
+                  policy={policy}
+                  isAdmin={isAdmin}
+                  onView={() => setViewingPolicy(policy)}
                 />
               ))}
             </div>
           )}
         </main>
       </div>
+      <AddPolicyModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
     </div>
   );
 };
 
-const PolicyCard = ({ policy, onView }: { policy: CompanyPolicy, onView: () => void }) => {
-  const { acknowledge } = usePolicyMutations();
+const PolicyCard = ({ policy, onView, isAdmin }: { policy: CompanyPolicy, onView: () => void, isAdmin: boolean }) => {
+  const { acknowledge, remove } = usePolicyMutations();
+  const { toast } = useToast();
   const isNew = new Date(policy.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete "${policy.title}"?`)) return;
+    try {
+      await remove.mutateAsync(policy.id);
+      toast({ title: 'Policy Deleted', description: 'The policy has been removed.', type: 'success' });
+    } catch (err: any) {
+      toast({ title: 'Delete Failed', description: err.message, type: 'error' });
+    }
+  };
 
   return (
     <Card className="flex flex-col h-full transition-colors hover:bg-accent/5">
       <CardHeader className="p-4 md:p-6 space-y-2">
-        <div className="flex gap-2">
-          {policy.is_mandatory && <Badge variant="destructive">Mandatory</Badge>}
-          {isNew && <Badge variant="secondary">New</Badge>}
+        <div className="flex justify-between items-start">
+          <div className="flex gap-2">
+            {policy.is_mandatory && <Badge variant="destructive">Mandatory</Badge>}
+            {isNew && <Badge variant="secondary">New</Badge>}
+          </div>
+          {isAdmin && (
+            <div className="flex gap-1">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
         <CardTitle className="text-lg font-semibold line-clamp-1">{policy.title}</CardTitle>
         <CardDescription className="text-sm text-muted-foreground line-clamp-2">
@@ -136,15 +168,17 @@ const PolicyCard = ({ policy, onView }: { policy: CompanyPolicy, onView: () => v
       </CardHeader>
       <CardFooter className="p-4 md:p-6 pt-0 mt-auto flex gap-2">
         <Button variant="default" size="sm" className="flex-1" onClick={onView}>View</Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex-1"
-          disabled={acknowledge.isPending}
-          onClick={() => acknowledge.mutate(policy.id)}
-        >
-          Acknowledge
-        </Button>
+        {!isAdmin && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            disabled={acknowledge.isPending}
+            onClick={() => acknowledge.mutate(policy.id)}
+          >
+            Acknowledge
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
@@ -178,8 +212,8 @@ const PolicyDetail = ({ policy, onBack }: { policy: CompanyPolicy, onBack: () =>
           <p className="text-xs text-muted-foreground">Last updated {new Date(policy.updated_at).toLocaleDateString()}</p>
           <div className="flex gap-2 w-full sm:w-auto">
             <Button variant="ghost" size="sm" onClick={onBack}>Cancel</Button>
-            <Button 
-              variant="default" 
+            <Button
+              variant="default"
               size="sm"
               disabled={acknowledge.isPending}
               onClick={() => acknowledge.mutate(policy.id)}

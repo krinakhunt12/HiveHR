@@ -57,7 +57,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                 <div className="space-y-6">
                     {/* Name Field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Full Name</label>
+                        <label className="text-xs font-bold text-primary ml-1">Full Name</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <User className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -75,7 +75,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                     {/* Role and ID Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Job Title</label>
+                            <label className="text-xs font-bold text-primary ml-1">Job Title</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Briefcase className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -90,7 +90,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Internal Code</label>
+                            <label className="text-xs font-bold text-primary ml-1">Internal Code</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Hash className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -108,7 +108,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
 
                     {/* Status Select */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Account Status</label>
+                        <label className="text-xs font-bold text-primary ml-1">Account Status</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Shield className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />

@@ -49,8 +49,8 @@ const CompanyDashboard = () => {
     } = useListEmployees();
 
     const { remove: removeEmployee } = useEmployeeMutations();
-    const { data: attendance = [] } = useListAttendance({ 
-        date: new Date().toISOString().split('T')[0] 
+    const { data: attendance = [] } = useListAttendance({
+        date: new Date().toISOString().split('T')[0]
     });
 
     const attendanceRecords = useMemo(() => {
@@ -122,13 +122,13 @@ const CompanyDashboard = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-left">
                     <div className="text-left">
                         <h1 className="text-3xl font-bold text-textPrimary tracking-tight font-display">Operational Intel</h1>
-                        <p className="text-sm font-semibold text-textSecondary mt-1.5 opacity-60">Strategic overview for {session?.user?.email?.split('@')[1] || 'Enterprise'}.</p>
+                        <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Strategic overview for {session?.user?.email?.split('@')[1] || 'Enterprise'}.</p>
                     </div>
                     <div className="flex gap-3">
-                        <Button variant="outline" className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em] border-primary/10 hover:bg-primary/5">
+                        <Button variant="outline">
                             <BarChart3 size={16} className="mr-2" /> Analytics
                         </Button>
-                        <Button onClick={() => setIsAddModalOpen(true)} className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em]">
+                        <Button onClick={() => setIsAddModalOpen(true)}>
                             <UserPlus size={16} className="mr-2" /> Onboard Member
                         </Button>
                     </div>
@@ -136,12 +136,12 @@ const CompanyDashboard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <StatCard title="Active Employees" value={String(activeEmployees)} icon={<Users />} trend="+4%" positive={true} />
-                    <StatCard 
-                        title="Attendance Rate" 
-                        value={`${employees.length > 0 ? ((attendance.length / employees.length) * 100).toFixed(1) : "0"}%`} 
-                        icon={<Clock />} 
-                        trend={`${attendance.length} checked in`} 
-                        positive={true} 
+                    <StatCard
+                        title="Attendance Rate"
+                        value={`${employees.length > 0 ? ((attendance.length / employees.length) * 100).toFixed(1) : "0"}%`}
+                        icon={<Clock />}
+                        trend={`${attendance.length} checked in`}
+                        positive={true}
                     />
                     <StatCard title="Leave Utilization" value="08" icon={<Wind />} trend="-2" positive={true} />
                 </div>
@@ -151,9 +151,9 @@ const CompanyDashboard = () => {
                         <div className="flex items-center justify-between mb-10">
                             <div>
                                 <h3 className="text-lg font-bold font-display text-textPrimary">Resource Velocity</h3>
-                                <p className="text-xs font-bold text-textSecondary opacity-50 uppercase tracking-widest mt-1">Personnel expansion metrics</p>
+                                <p className="text-xs font-semibold text-textSecondary opacity-50 mt-1">Personnel expansion metrics</p>
                             </div>
-                            <div className="flex items-center gap-4 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">
+                            <div className="flex items-center gap-4 text-xs font-bold text-textSecondary">
                                 <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /> Projected</div>
                                 <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary/20" /> Actual</div>
                             </div>
@@ -172,7 +172,7 @@ const CompanyDashboard = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="flex justify-between mt-6 px-1 text-xs font-black text-textSecondary/40 uppercase tracking-[0.2em]">
+                        <div className="flex justify-between mt-6 px-1 text-xs font-bold text-textSecondary/40 uppercase tracking-[0.2em]">
                             <span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Dec</span>
                         </div>
                     </div>
@@ -218,11 +218,11 @@ const CompanyDashboard = () => {
                     <table className="w-full text-left">
                         <thead className="bg-primary/[0.02] border-b border-primary/5">
                             <tr>
-                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Member Info</th>
-                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Designation</th>
-                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Timeline</th>
-                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Status</th>
-                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em] text-right">Actions</th>
+                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Member Info</th>
+                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Designation</th>
+                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Timeline</th>
+                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Status</th>
+                                <th className="px-8 py-5 text-xs font-bold text-textSecondary text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-primary/5">
@@ -256,7 +256,7 @@ const CompanyDashboard = () => {
                                 <tr key={emp.id} className="group hover:bg-primary/[0.01] transition-all cursor-pointer">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-11 h-11 rounded-2xl bg-primary/5 flex items-center justify-center font-black text-primary text-sm border border-primary/10 group-hover:scale-110 transition-all shadow-sm">
+                                            <div className="w-11 h-11 rounded-2xl bg-primary/5 flex items-center justify-center font-bold text-primary text-sm border border-primary/10 group-hover:scale-110 transition-all shadow-sm">
                                                 {emp.full_name?.charAt(0) || '?'}
                                             </div>
                                             <div>
@@ -275,7 +275,7 @@ const CompanyDashboard = () => {
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-[0.15em] border shadow-sm",
+                                            "px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-[0.15em] border shadow-sm",
                                             emp.status === 'active' ? 'bg-success/5 text-success border-success/10' : 'bg-background text-textSecondary border-primary/5'
                                         )}>
                                             {emp.status}
@@ -337,8 +337,8 @@ const CompanyDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <Card className="card-premium p-6 bg-white col-span-2">
                     <div className="flex items-center justify-between mb-8">
-                        <h4 className="text-sm font-black uppercase tracking-[0.2em] text-textSecondary opacity-50">Real-time Attendance</h4>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-black uppercase tracking-widest">
+                        <h4 className="text-sm font-bold text-textSecondary opacity-50 uppercase">Real-time Attendance</h4>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-semibold tracking-widest">
                             <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
                             Live Sync
                         </div>
@@ -353,8 +353,8 @@ const CompanyDashboard = () => {
                                 <div key={i} className="flex items-center justify-between group cursor-pointer p-2 rounded-xl hover:bg-primary/[0.02] transition-all">
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-textSecondary border border-primary/5 text-xs">
-                                             {record.employeeName?.split(' ').map(n => n?.[0]).join('') || '?'}
-                                         </div>
+                                            {record.employeeName?.split(' ').map(n => n?.[0]).join('') || '?'}
+                                        </div>
                                         <div>
                                             <p className="text-sm font-bold text-textPrimary">{record.employeeName}</p>
                                             <p className="text-xs font-bold text-textSecondary uppercase tracking-widest opacity-40 mt-1">{record.work_location || 'Office'}</p>
@@ -363,7 +363,7 @@ const CompanyDashboard = () => {
                                     <div className="text-right">
                                         <p className="text-sm font-bold text-primary">{record.check_in_time ? record.check_in_time.slice(0, 5) : '--:--'}</p>
                                         <p className={cn(
-                                            "text-xs font-black uppercase tracking-widest mt-1",
+                                            "text-xs font-bold uppercase tracking-widest mt-1",
                                             record.status === 'present' ? 'text-success' : 'text-primary'
                                         )}>{record.status}</p>
                                     </div>
@@ -374,7 +374,7 @@ const CompanyDashboard = () => {
                 </Card>
 
                 <Card className="card-premium p-6 bg-white flex flex-col justify-between">
-                    <h4 className="text-sm font-black uppercase tracking-[0.2em] text-textSecondary opacity-50 mb-6">Average Utilization</h4>
+                    <h4 className="text-sm font-bold text-textSecondary opacity-50 uppercase mb-6">Average Utilization</h4>
                     <div className="flex flex-col items-center justify-center py-8">
                         <div className="relative w-32 h-32 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">
@@ -392,10 +392,10 @@ const CompanyDashboard = () => {
                         <div className="p-2.5 bg-white/10 rounded-xl text-white">
                             <Wind size={20} />
                         </div>
-                        <span className="text-xs font-black uppercase tracking-widest opacity-60">Registry Health</span>
+                        <span className="text-xs font-bold uppercase tracking-widest opacity-60">Registry Health</span>
                     </div>
                     <div>
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-2">Cycle Status</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-2">Cycle Status</p>
                         <h4 className="text-2xl font-bold tracking-tight">Q3 Pulse Safe</h4>
                         <p className="text-xs font-medium text-white/70 mt-3 leading-relaxed">Leave and attendance records are fully synchronized across core clusters.</p>
                     </div>
@@ -458,7 +458,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     </div>
                     {trend && (
                         <div className={cn(
-                            "flex items-center gap-1 text-xs font-black uppercase tracking-widest px-2 py-1 rounded-lg border",
+                            "flex items-center gap-1 text-xs font-bold uppercase tracking-widest px-2 py-1 rounded-lg border",
                             positive ? "text-success bg-success/5 border-success/10" : "text-error bg-error/5 border-error/10"
                         )}>
                             {positive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
@@ -467,8 +467,8 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     )}
                 </div>
                 <div>
-                    <p className="text-xs font-black text-textSecondary uppercase tracking-[0.2em] mb-2 opacity-50">{title}</p>
-                    <p className="text-3xl font-bold text-textPrimary font-display tracking-tight leading-none">{value}</p>
+                    <p className="text-xs font-bold text-textSecondary uppercase mb-2 opacity-50">{title}</p>
+                    <p className="text-2xl font-bold text-textPrimary font-display tracking-tight leading-none">{value}</p>
                 </div>
             </div>
         </div>

@@ -65,7 +65,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           {isSidebarExpanded && (
             <div className="ml-3 overflow-hidden">
               <span className="block font-medium text-lg text-textPrimary tracking-tight leading-none font-sans">HiveHR</span>
-              <span className="text-xs font-black text-primary tracking-[0.2em] mt-1.5 block uppercase opacity-80">{userRoleDisplay}</span>
+              <span className="text-xs font-bold text-primary tracking-[0.2em] mt-1.5 block uppercase opacity-80">{userRoleDisplay}</span>
             </div>
           )}
         </div>
@@ -173,7 +173,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-primary/10 rounded border border-primary/10">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">Live</span>
+              <span className="text-sm font-medium text-primary">Live</span>
             </div>
 
             <button className="relative p-1.5 text-textSecondary hover:text-primary hover:bg-primary/10 transition-all rounded-md group">

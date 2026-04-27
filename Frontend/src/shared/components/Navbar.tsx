@@ -27,7 +27,7 @@ export const Navbar = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className="text-xs font-black uppercase tracking-[0.2em] text-textSecondary hover:text-primary transition-colors"
+                className="text-xs font-bold uppercase tracking-[0.2em] text-textSecondary hover:text-primary transition-colors"
               >
                 {item.name}
               </Link>
@@ -64,17 +64,17 @@ export const Navbar = () => {
               key={item.name}
               to={item.path}
               onClick={() => setIsMenuOpen(false)}
-              className="block text-xs font-black text-textSecondary uppercase tracking-[0.2em] hover:text-primary px-2 py-1"
+              className="block text-xs font-bold text-textSecondary uppercase tracking-[0.2em] hover:text-primary px-2 py-1"
             >
               {item.name}
             </Link>
           ))}
           <div className="pt-4 flex flex-col gap-4">
             <Link to="/login" className="w-full">
-              <Button variant="outline" className="w-full text-xs font-black uppercase tracking-[0.2em] h-14 rounded-xl border-border">Login</Button>
+              <Button variant="outline" className="w-full text-xs font-bold uppercase tracking-[0.2em] h-14 rounded-xl border-border">Login</Button>
             </Link>
             <Link to="/signup" className="w-full">
-              <Button className="w-full text-xs font-black uppercase tracking-[0.2em] h-14 rounded-xl bg-primary text-surface shadow-lg shadow-primary/20">Get Started</Button>
+              <Button className="w-full text-xs font-bold uppercase tracking-[0.2em] h-14 rounded-xl bg-primary text-surface shadow-lg shadow-primary/20">Get Started</Button>
             </Link>
           </div>
         </div>

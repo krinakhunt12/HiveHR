@@ -54,7 +54,7 @@ const InfoRow = ({ icon, label, value, mono }: InfoRowProps) => (
             {icon}
         </div>
         <div className="flex-1 min-w-0">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-textSecondary/50 mb-0.5">{label}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-textSecondary/50 mb-0.5">{label}</p>
             <p className={cn(
                 'text-sm font-semibold text-textPrimary truncate',
                 mono && 'font-mono tracking-wide',
@@ -90,7 +90,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
             {/* Hero section */}
             <div className="flex items-center gap-6 mb-10 pb-10 border-b border-border/40">
                 <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/15 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl font-black text-primary tracking-tight">{initials}</span>
+                    <span className="text-2xl font-bold text-primary tracking-tight">{initials}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                     <h2 className="text-xl font-bold text-textPrimary tracking-tight truncate">{employee.full_name}</h2>
@@ -98,7 +98,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
                     <div className="flex items-center gap-3 mt-3 flex-wrap">
                         {/* Status badge */}
                         <span className={cn(
-                            'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-[0.15em] border',
+                            'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-[0.15em] border',
                             status.color
                         )}>
                             <span className={cn('w-1.5 h-1.5 rounded-full', status.dot)} />
@@ -106,7 +106,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
                         </span>
                         {/* Employee code badge */}
                         {employee.employee_code && (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-[0.15em] bg-gray-50 text-gray-500 border border-gray-200">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-[0.15em] bg-gray-50 text-gray-500 border border-gray-200">
                                 <Hash size={9} />
                                 {employee.employee_code}
                             </span>
@@ -119,7 +119,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
                 {/* Left column — Personal & Contact */}
                 <div>
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-textSecondary/40 mb-3 flex items-center gap-2">
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-textSecondary/40 mb-3 flex items-center gap-2">
                         <User size={10} /> Personal & Contact
                     </p>
                     <InfoRow icon={<Mail size={14} />} label="Email" value={(employee as any).email} />
@@ -145,7 +145,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
 
                 {/* Right column — Employment */}
                 <div>
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-textSecondary/40 mb-3 flex items-center gap-2">
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-textSecondary/40 mb-3 flex items-center gap-2">
                         <Briefcase size={10} /> Employment Details
                     </p>
                     <InfoRow icon={<Briefcase size={14} />} label="Designation" value={designation} />
@@ -167,7 +167,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
 
             {/* Status footer strip */}
             <div className="mt-10 pt-6 border-t border-border/40 flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.15em] text-textSecondary/40">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-textSecondary/40">
                     <Clock size={10} />
                     <span>
                         Record created{' '}
@@ -178,7 +178,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
                 </div>
                 <div className="flex items-center gap-1.5">
                     <CircleDot size={10} className="text-primary/40" />
-                    <span className="text-xs font-black uppercase tracking-[0.15em] text-textSecondary/40">
+                    <span className="text-xs font-bold uppercase tracking-[0.15em] text-textSecondary/40">
                         Read-only view
                     </span>
                 </div>

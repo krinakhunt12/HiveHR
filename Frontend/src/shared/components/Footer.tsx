@@ -75,10 +75,10 @@ export const Footer = () => {
         </div>
 
         <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs font-black text-textSecondary uppercase tracking-[0.3em] opacity-40">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
+          <p className="text-xs font-bold text-textSecondary uppercase tracking-[0.3em] opacity-40">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
           <div className="flex gap-8">
-            <a href="#" className="text-xs font-black text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] opacity-40 hover:opacity-100">Privacy Policy</a>
-            <a href="#" className="text-xs font-black text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] opacity-40 hover:opacity-100">Cookie Policy</a>
+            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] opacity-40 hover:opacity-100">Privacy Policy</a>
+            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] opacity-40 hover:opacity-100">Cookie Policy</a>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ export const Footer = () => {
 
 const FooterCol = ({ title, links }: { title: string, links: { name: string, href: string }[] }) => (
   <div className="text-left">
-    <h4 className="text-xs font-black uppercase tracking-[0.3em] text-textPrimary mb-8">{title}</h4>
+    <h4 className="text-xs font-bold uppercase tracking-[0.3em] text-textPrimary mb-8">{title}</h4>
     <ul className="space-y-4">
       {links.map((link) => (
         <li key={link.name}>
