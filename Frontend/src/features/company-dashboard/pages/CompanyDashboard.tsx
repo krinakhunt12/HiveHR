@@ -172,7 +172,7 @@ const CompanyDashboard = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="flex justify-between mt-6 px-1 text-xs font-bold text-textSecondary/40 uppercase tracking-[0.2em]">
+                        <div className="flex justify-between mt-6 px-1 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">
                             <span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Dec</span>
                         </div>
                     </div>
@@ -202,7 +202,7 @@ const CompanyDashboard = () => {
                     <p className="text-sm font-medium text-textSecondary mt-1.5 opacity-60">Managing {employees.length} enterprise members.</p>
                 </div>
                 <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-primary/5 shadow-sm w-full md:w-[400px] focus-within:ring-4 focus-within:ring-primary/5 transition-all">
-                    <Search size={18} className="text-textSecondary/40" />
+                    <Search size={18} className="text-textSecondary" />
                     <input
                         type="text"
                         placeholder="Search by name, ID or role..."

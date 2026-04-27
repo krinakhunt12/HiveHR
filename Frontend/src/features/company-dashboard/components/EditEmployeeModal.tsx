@@ -66,7 +66,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                                 required
                                 value={formData.full_name}
                                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
+                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
                                 placeholder="Stakeholder Name"
                             />
                         </div>
@@ -84,7 +84,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                                     required
                                     value={formData.designation}
                                     onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
                                     placeholder="Designation"
                                 />
                             </div>
@@ -99,7 +99,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                                     required
                                     value={formData.employee_code}
                                     onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
                                     placeholder="ID Code"
                                 />
                             </div>
@@ -123,7 +123,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                                 <option value="on_leave">Extended Leave</option>
                                 <option value="terminated">Off-boarded</option>
                             </select>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary/50">
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>

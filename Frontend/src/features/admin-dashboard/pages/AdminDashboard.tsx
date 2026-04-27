@@ -193,7 +193,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="flex gap-3">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary/40 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary w-4 h-4" />
                         <input
                             type="text"
                             value={query}

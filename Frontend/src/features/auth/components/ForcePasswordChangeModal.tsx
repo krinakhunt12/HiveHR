@@ -99,7 +99,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                                     type="password"
                                     value={formData.newPassword}
                                     onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
                                     placeholder="Min 8 characters"
                                 />
                             </div>
@@ -117,7 +117,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                                     type="password"
                                     value={formData.confirmPassword}
                                     onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary/50"
+                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
                                     placeholder="Repeat password"
                                 />
                             </div>
