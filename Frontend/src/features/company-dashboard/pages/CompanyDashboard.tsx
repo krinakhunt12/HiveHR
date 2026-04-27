@@ -118,7 +118,7 @@ const CompanyDashboard = () => {
         }
 
         return (
-            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-left">
                     <div className="text-left">
                         <h1 className="text-2xl font-semibold tracking-tight">Operational Intel</h1>
