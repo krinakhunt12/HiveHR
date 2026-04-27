@@ -4,51 +4,54 @@ import { CheckCircle2 } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 
 export const FeatureCard = ({ icon, title, description }: any) => (
-  <Card className="hover:border-slate-200 transition-all duration-300 shadow-none border-slate-100/60 group">
-    <CardContent className="p-8">
-      <div className="w-10 h-10 bg-[var(--color-primary)] rounded-lg flex items-center justify-center mb-6 shadow-sm shadow-indigo-100 group-hover:scale-110 transition-transform duration-500">
+  <Card className="hover:border-primary/30 transition-all duration-300 shadow-none border-border group bg-surface">
+    <CardContent className="p-10">
+      <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
         {icon}
       </div>
-      <h3 className="text-lg font-semibold text-[var(--color-text-main)] mb-2 tracking-tight transition-colors group-hover:text-[var(--color-primary)]">{title}</h3>
-      <p className="text-sm text-slate-400 leading-relaxed font-medium">{description}</p>
+      <h3 className="text-xl font-bold text-textPrimary mb-3 tracking-tight transition-colors group-hover:text-primary font-display">{title}</h3>
+      <p className="text-sm text-textSecondary leading-relaxed font-medium opacity-70">{description}</p>
     </CardContent>
   </Card>
 );
 
 export const Testimonial = ({ quote, author, role }: any) => (
-  <div className="relative">
-    <p className="text-lg font-medium italic text-slate-500 leading-relaxed mb-6">"{quote}"</p>
+  <div className="relative p-8 rounded-3xl bg-surface border border-border/50 shadow-sm">
+    <p className="text-lg font-medium italic text-textSecondary leading-relaxed mb-8 opacity-80">"{quote}"</p>
     <div>
-      <p className="text-sm font-semibold text-[var(--color-text-main)]">{author}</p>
-      <p className="text-sm text-slate-400 font-medium">{role}</p>
+      <p className="text-sm font-bold text-textPrimary font-display">{author}</p>
+      <p className="text-xs text-textSecondary font-black uppercase tracking-widest mt-1 opacity-40">{role}</p>
     </div>
   </div>
 );
 
 export const PricingCard = ({ name, price, desc, features, featured = false }: any) => (
   <Card className={cn(
-    "relative transition-all duration-300 shadow-none overflow-hidden",
-    featured ? "border-indigo-600 scale-105 z-10 shadow-xl shadow-indigo-100/50" : "border-slate-100 hover:border-slate-200"
+    "relative transition-all duration-500 shadow-none overflow-hidden bg-surface",
+    featured ? "border-primary scale-105 z-10" : "border-border hover:border-primary/30"
   )}>
     {featured && (
-      <div className="absolute top-0 right-0 bg-indigo-600 text-white text-sm font-black uppercase tracking-widest px-4 py-1 rounded-bl-lg">Most Popular</div>
+      <div className="absolute top-0 right-0 bg-primary text-surface text-xs font-black uppercase tracking-[0.2em] px-4 py-2 rounded-bl-xl shadow-lg">Most Popular</div>
     )}
-    <CardContent className="p-8">
-      <h3 className="text-lg font-semibold text-[var(--color-text-main)] mb-2 tracking-tight">{name}</h3>
-      <div className="flex items-baseline gap-1 mb-6">
-        <span className="text-3xl font-bold tracking-tight">{price === 'Custom' ? '' : '$'}{price}</span>
-        {price !== 'Custom' && <span className="text-slate-400 text-sm font-medium">/mo</span>}
+    <CardContent className="p-10">
+      <h3 className="text-sm font-black uppercase tracking-[0.2em] text-textSecondary opacity-40 mb-2">{name}</h3>
+      <div className="flex items-baseline gap-1 mb-8">
+        <span className="text-4xl font-bold tracking-tight text-textPrimary font-display">{price === 'Custom' ? '' : '$'}{price}</span>
+        {price !== 'Custom' && <span className="text-textSecondary text-xs font-bold uppercase tracking-widest ml-1 opacity-40">/mo</span>}
       </div>
-      <p className="text-sm text-slate-500 font-medium mb-8 leading-relaxed">{desc}</p>
-      <ul className="space-y-4 mb-10">
+      <p className="text-sm text-textSecondary font-medium mb-10 leading-relaxed opacity-70">{desc}</p>
+      <ul className="space-y-5 mb-12">
         {features.map((f: string) => (
-          <li key={f} className="flex items-center gap-3 text-sm font-medium text-slate-600">
-            <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+          <li key={f} className="flex items-center gap-4 text-sm font-bold text-textPrimary/80">
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0 opacity-60" />
             <span>{f}</span>
           </li>
         ))}
       </ul>
-      <Button className={cn("w-full h-11 font-semibold", featured ? "bg-indigo-600 hover:bg-indigo-700" : "bg-slate-900 hover:bg-slate-800 text-white")}>
+      <Button className={cn(
+        "w-full h-14 font-black text-xs uppercase tracking-[0.2em] rounded-xl shadow-lg transition-all active:scale-95",
+        featured ? "bg-primary text-surface hover:bg-primary/90" : "bg-textPrimary text-surface hover:bg-textPrimary/90 shadow-black/10"
+      )}>
         {name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
       </Button>
     </CardContent>

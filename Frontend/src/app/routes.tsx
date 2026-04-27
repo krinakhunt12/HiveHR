@@ -1,4 +1,5 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
+import { Suspense } from "react";
 import LandingPage from "@/features/landing/pages/LandingPage";
 import Login from "@/features/auth/pages/Login";
 import Signup from "@/features/auth/pages/Signup";
@@ -8,6 +9,8 @@ import AdminDashboard from "@/features/admin-dashboard/pages/AdminDashboard";
 import { marketingRoutes } from "@/features/marketing/routes";
 import RequireRole from "@/app/guards/RequireRole";
 import { useAuthStore } from "@/shared/auth/store";
+import { RouteErrorBoundary } from "@/shared/components/RouteErrorBoundary";
+import { LoadingState } from "@/shared/components/LoadingState";
 
 import { detectRole } from "@/shared/utils/authUtils";
 
@@ -34,68 +37,81 @@ const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 export const router = createBrowserRouter([
   {
     path: "/",
+    errorElement: <RouteErrorBoundary />,
     element: (
-      <PublicOnly>
-        <LandingPage />
-      </PublicOnly>
+      <Suspense fallback={<LoadingState />}>
+        <Outlet />
+      </Suspense>
     ),
-  },
-  ...marketingRoutes,
-  {
-    path: "/login",
-    element: (
-      <PublicOnly>
-        <Login />
-      </PublicOnly>
-    ),
-  },
-  {
-    path: "/signup",
-    element: (
-      <PublicOnly>
-        <Signup />
-      </PublicOnly>
-    ),
-  },
-  {
-    path: "/reset-password",
-    element: <ResetPasswordPage />,
-  },
-  {
-    path: "/dashboard",
     children: [
       {
-        index: true,
-        element: <Navigate to="/login" replace />,
-      },
-      {
-        path: "admin",
+        path: "/",
         element: (
-          <RequireRole allowedRoles={['admin']}>
-            <AdminDashboard />
-          </RequireRole>
+          <PublicOnly>
+            <LandingPage />
+          </PublicOnly>
+        ),
+      },
+      ...marketingRoutes,
+      {
+        path: "/login",
+        element: (
+          <PublicOnly>
+            <Login />
+          </PublicOnly>
         ),
       },
       {
-        path: "company",
+        path: "/signup",
         element: (
-          <RequireRole allowedRoles={['company_admin', 'admin']}>
-            <CompanyDashboard />
-          </RequireRole>
+          <PublicOnly>
+            <Signup />
+          </PublicOnly>
         ),
       },
       {
-        path: "employee",
-        element: (
-          <RequireRole allowedRoles={['employee']}>
-            <EmployeeDashboard />
-          </RequireRole>
-        ),
+        path: "/reset-password",
+        element: <ResetPasswordPage />,
       },
-    ],
-  },
-  {
-    path: "*",
-    element: <Navigate to="/" replace />,
+      {
+        path: "/dashboard",
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/login" replace />,
+          },
+          {
+            path: "admin",
+            element: (
+              <RequireRole allowedRoles={['admin']}>
+                <AdminDashboard />
+              </RequireRole>
+            ),
+          },
+          {
+            path: "company",
+            element: (
+              <RequireRole allowedRoles={['company_admin', 'admin']}>
+                <CompanyDashboard />
+              </RequireRole>
+            ),
+          },
+          {
+            path: "employee",
+            element: (
+              <RequireRole allowedRoles={['employee']}>
+                <EmployeeDashboard />
+              </RequireRole>
+            ),
+          },
+        ],
+      },
+      {
+        path: "*",
+        element: <Navigate to="/" replace />,
+      },
+    ]
   },
 ]);
+
+

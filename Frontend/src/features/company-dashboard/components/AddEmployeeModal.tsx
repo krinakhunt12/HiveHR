@@ -50,7 +50,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     {/* Name Field */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Full Name</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Full Name</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <UserPlus className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -67,7 +67,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Email Field */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Email Address</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Email Address</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Mail className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -85,7 +85,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Role / Designation Field */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Job Title</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Job Title</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Briefcase className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -102,7 +102,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Employee ID Field */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Internal Code</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Internal Code</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Hash className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -119,7 +119,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Permissions / Role Select */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">System Role</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">System Role</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Shield className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -134,7 +134,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary/50">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </div>
                         </div>
@@ -142,7 +142,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Join Date Field */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Joining Date</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Joining Date</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -169,7 +169,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                     <Button
                         type="submit"
                         loading={create.isPending}
-                        className="px-8 h-11 rounded-xl shadow-lg shadow-primary/10"
+                        className="px-8 h-11 rounded-xl"
                     >
                         <span>Confirm Admission</span>
                         {!create.isPending && <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />}

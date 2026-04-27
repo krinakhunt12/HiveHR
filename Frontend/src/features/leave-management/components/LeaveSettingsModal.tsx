@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { useLeaveConfigurations, useLeaveConfigMutations } from '@/shared/api/hooks/hrHooks';
-import { Save, Plus, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Save, Plus, Trash2, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 
 interface LeaveSettingsModalProps {
@@ -10,7 +10,9 @@ interface LeaveSettingsModalProps {
     onClose: () => void;
 }
 
+// id is present for existing types fetched from server; absent for newly added rows
 interface Configuration {
+    id?: string;
     leave_type: string;
     annual_allowance: number;
 }
@@ -18,48 +20,91 @@ interface Configuration {
 export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps) => {
     const { toast } = useToast();
     const { data: initialConfigs, isFetching: loading } = useLeaveConfigurations();
-    const { update } = useLeaveConfigMutations();
+    const { update, remove } = useLeaveConfigMutations();
     const [configs, setConfigs] = useState<Configuration[]>([]);
+    // Track which existing ids are pending deletion (to call DELETE on save)
+    const [deletedIds, setDeletedIds] = useState<string[]>([]);
+    // Only seed from server on first open, not on every re-render
+    const seededRef = useRef(false);
 
     useEffect(() => {
-        if (initialConfigs) {
-            setConfigs(initialConfigs.map(c => ({ 
-                leave_type: c.leave_type, 
-                annual_allowance: c.annual_allowance 
+        if (isOpen && !seededRef.current && initialConfigs) {
+            setConfigs(initialConfigs.map(c => ({
+                id: c.id,
+                leave_type: c.leave_type,
+                annual_allowance: c.annual_allowance,
             })));
+            setDeletedIds([]);
+            seededRef.current = true;
         }
-    }, [initialConfigs, isOpen]);
+        if (!isOpen) {
+            // Reset seed flag so next open re-seeds fresh data
+            seededRef.current = false;
+        }
+    }, [isOpen, initialConfigs]);
 
     const handleAdd = () => {
-        setConfigs([...configs, { leave_type: '', annual_allowance: 10 }]);
+        setConfigs(prev => [...prev, { leave_type: '', annual_allowance: 10 }]);
     };
 
     const handleRemove = (index: number) => {
-        setConfigs(configs.filter((_, i) => i !== index));
+        const target = configs[index];
+        // If it has an id (server record), queue it for deletion on save
+        if (target.id) {
+            setDeletedIds(prev => [...prev, target.id!]);
+        }
+        setConfigs(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleUpdate = (index: number, key: keyof Configuration, value: any) => {
-        const newConfigs = [...configs];
-        newConfigs[index] = { ...newConfigs[index], [key]: value };
-        setConfigs(newConfigs);
+        setConfigs(prev => {
+            const next = [...prev];
+            next[index] = { ...next[index], [key]: value };
+            return next;
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Validate
+
+        // Validate — all rows must have a name
         if (configs.some(c => !c.leave_type.trim())) {
-            return toast({ title: 'Validation Error', description: 'All leave types must have a name', type: 'error' });
+            return toast({ title: 'Validation Error', description: 'All leave types must have a name.', type: 'error' });
+        }
+
+        // Validate — no duplicate names in the list
+        const names = configs.map(c => c.leave_type.trim().toLowerCase());
+        if (new Set(names).size !== names.length) {
+            return toast({ title: 'Duplicate Name', description: 'Each leave type must have a unique name.', type: 'error' });
         }
 
         try {
-            await update.mutateAsync(configs);
-            toast({ title: 'Settings Updated', description: 'Leave allowances have been updated successfully.', type: 'success' });
+            // 1. Delete removed types
+            if (deletedIds.length > 0) {
+                await Promise.all(deletedIds.map(id => remove.mutateAsync(id)));
+            }
+
+            // 2. Save (create or update) remaining configs
+            if (configs.length > 0) {
+                await update.mutateAsync(configs);
+            }
+
+            toast({ title: 'Settings Updated', description: 'Leave policies saved successfully.', type: 'success' });
             onClose();
         } catch (err: any) {
-            toast({ title: 'Update Failed', description: err.message || 'Failed to save settings', type: 'error' });
+            const msg = err?.message ?? 'Failed to save settings';
+            // Surface the exact error cleanly instead of showing raw Postgres code
+            toast({
+                title: 'Save Failed',
+                description: msg.includes('duplicate') || msg.includes('23505')
+                    ? 'A leave type with that name already exists. Please use a different name.'
+                    : msg,
+                type: 'error',
+            });
         }
     };
+
+    const isSaving = update.isPending || remove.isPending;
 
     return (
         <Dialog isOpen={isOpen} onClose={onClose} title="Leave Policy Settings">
@@ -71,49 +116,18 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-4">
-                    {configs.map((config, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row items-end gap-4 p-5 rounded-2xl bg-background/50 border border-soft group transition-all hover:bg-surface hover:border-primary/20">
-                            <div className="flex-1 space-y-2 text-left w-full">
-                                <label className="text-xs font-bold uppercase tracking-widest text-primary/60 ml-0.5">Leave Type</label>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="e.g. Vacation, Sick, Personal"
-                                    value={config.leave_type}
-                                    onChange={e => handleUpdate(index, 'leave_type', e.target.value)}
-                                    className="input-premium h-11 bg-bg border-soft focus:bg-surface"
-                                />
-                            </div>
-                            <div className="w-full sm:w-40 space-y-2 text-left">
-                                <label className="text-xs font-bold uppercase tracking-widest text-primary/60 ml-0.5">Annual Days</label>
-                                <input
-                                    type="number"
-                                    required
-                                    min="0"
-                                    value={config.annual_allowance}
-                                    onChange={e => handleUpdate(index, 'annual_allowance', parseInt(e.target.value))}
-                                    className="input-premium h-11 bg-bg border-soft focus:bg-surface"
-                                />
-                            </div>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleRemove(index)}
-                                className="h-11 w-11 text-textSecondary hover:text-error hover:bg-error/10"
-                            >
-                                <Trash2 size={18} />
-                            </Button>
+                    {loading && configs.length === 0 ? (
+                        <div className="py-10 flex items-center justify-center gap-3 text-textSecondary">
+                            <Loader2 size={18} className="animate-spin text-primary" />
+                            <span className="text-sm font-medium">Loading current policies...</span>
                         </div>
-                    ))}
-
-                    {configs.length === 0 && !loading && (
+                    ) : configs.length === 0 ? (
                         <div className="py-12 border-2 border-dashed border-soft rounded-2xl flex flex-col items-center justify-center text-center space-y-4">
                             <div className="w-12 h-12 bg-primary/5 rounded-full flex items-center justify-center text-primary/40">
                                 <ShieldCheck size={24} />
                             </div>
                             <p className="text-sm font-medium text-textSecondary">No leave policies defined yet.</p>
-                             <button
+                            <button
                                 type="button"
                                 onClick={handleAdd}
                                 className="text-sm font-bold text-primary uppercase tracking-widest hover:opacity-70 transition-opacity"
@@ -121,6 +135,49 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                                 Add First Policy
                             </button>
                         </div>
+                    ) : (
+                        configs.map((config, index) => (
+                            <div
+                                key={config.id ?? `new-${index}`}
+                                className="flex flex-col sm:flex-row items-end gap-4 p-5 rounded-2xl bg-background/50 border border-soft group transition-all hover:bg-surface hover:border-primary/20"
+                            >
+                                <div className="flex-1 space-y-2 text-left w-full">
+                                    <label className="text-xs font-bold uppercase tracking-widest text-primary/60 ml-0.5">
+                                        Leave Type
+                                    </label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="e.g. Vacation, Sick, Personal"
+                                        value={config.leave_type}
+                                        onChange={e => handleUpdate(index, 'leave_type', e.target.value)}
+                                        className="input-premium h-11 bg-bg border-soft focus:bg-surface"
+                                    />
+                                </div>
+                                <div className="w-full sm:w-40 space-y-2 text-left">
+                                    <label className="text-xs font-bold uppercase tracking-widest text-primary/60 ml-0.5">
+                                        Annual Days
+                                    </label>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="0"
+                                        value={config.annual_allowance}
+                                        onChange={e => handleUpdate(index, 'annual_allowance', parseInt(e.target.value) || 0)}
+                                        className="input-premium h-11 bg-bg border-soft focus:bg-surface"
+                                    />
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleRemove(index)}
+                                    className="h-11 w-11 text-textSecondary hover:text-error hover:bg-error/10 flex-shrink-0"
+                                >
+                                    <Trash2 size={18} />
+                                </Button>
+                            </div>
+                        ))
                     )}
                 </div>
 
@@ -134,24 +191,25 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                         <Plus size={16} />
                         Add Type
                     </Button>
-                    
+
                     <div className="flex gap-4">
                         <Button
                             type="button"
                             variant="ghost"
                             onClick={onClose}
+                            disabled={isSaving}
                             className="text-textSecondary hover:text-error"
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
-                            loading={update.isPending}
-                            className="px-8 h-12 rounded-xl shadow-lg shadow-primary/20 gap-2"
+                            loading={isSaving}
+                            className="px-8 h-12 rounded-xl shadow-lg gap-2"
                         >
                             <Save size={18} />
-                            {update.isPending ? 'Saving...' : 'Save Policies'}
-                            {!update.isPending && <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />}
+                            {isSaving ? 'Saving...' : 'Save Policies'}
+                            {!isSaving && <ArrowRight size={16} className="ml-1" />}
                         </Button>
                     </div>
                 </div>
@@ -159,4 +217,3 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
         </Dialog>
     );
 };
-

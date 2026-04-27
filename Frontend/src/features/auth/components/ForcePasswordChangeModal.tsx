@@ -74,7 +74,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/95 backdrop-blur-xl animate-in fade-in duration-500">
-            <div className="relative bg-surface rounded-[2.5rem] border border-border/50 shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
+            <div className="relative bg-surface rounded-[2.5rem] border border-border/50  w-full max-w-lg overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
                 <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
 
                 <div className="px-10 pt-12 pb-8 text-center">
@@ -89,7 +89,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                     <form onSubmit={handleSubmit} className="space-y-6 text-left">
                         {/* New Password Field */}
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">New Password</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">New Password</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -107,7 +107,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
 
                         {/* Confirm Password Field */}
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Confirm Password</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Confirm Password</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -133,7 +133,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                         <button
                             type="submit"
                             disabled={updatePassword.isPending}
-                            className="w-full h-14 bg-primary text-white rounded-xl font-bold text-sm shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 group flex items-center justify-center gap-2 mt-4"
+                            className="w-full h-14 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 group flex items-center justify-center gap-2 mt-4"
                         >
                             {updatePassword.isPending ? (
                                 <>

@@ -9,34 +9,34 @@ const LandingPage = () => {
   return (
     <MarketingLayout>
       {/* Hero Section */}
-      <section className="pt-40 pb-24 px-6 bg-slate-50/20">
+      <section className="pt-40 pb-24 px-6 bg-background/50">
         <div className="max-w-7xl mx-auto text-center lg:text-left">
           <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
             <div className="lg:w-1/2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50/50 text-[var(--color-primary)]/80 text-sm font-semibold mb-8 uppercase tracking-widest border border-indigo-100/50">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-sm font-semibold mb-8 uppercase tracking-widest border border-primary/10">
                 Secure & Scalable HR Suite
               </div>
-              <h1 className="text-4xl lg:text-7xl font-semibold text-[var(--color-text-main)] leading-[1.05] mb-6 tracking-tight">
-                Modern teams need <span className="text-[var(--color-primary)]/80 italic">modern culture.</span>
+              <h1 className="text-4xl lg:text-7xl font-bold text-textPrimary leading-[1.05] mb-6 tracking-tight font-display">
+                Modern teams need <span className="text-primary italic">modern culture.</span>
               </h1>
-              <p className="text-base lg:text-lg text-slate-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+              <p className="text-base lg:text-lg text-textSecondary mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                 Streamline global employee management, payroll, and performance with a minimal workspace designed for impact.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link to="/signup">
-                  <Button size="lg" className="h-12 px-8 font-medium text-sm group">
+                  <Button size="lg" className="h-12 px-8 font-bold text-xs uppercase tracking-widest group">
                     Start Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="h-12 px-8 font-medium text-sm border-slate-200">
+                <Button size="lg" variant="outline" className="h-12 px-8 font-bold text-xs uppercase tracking-widest border-border hover:bg-primary/5">
                   Request a Demo
                 </Button>
               </div>
             </div>
             <div className="lg:w-1/2 relative group">
-              <div className="absolute -inset-4 bg-indigo-100/30 rounded-3xl blur-2xl group-hover:bg-indigo-100/40 transition-all duration-500"></div>
-              <div className="relative rounded-2xl overflow-hidden border border-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.08)] bg-white p-2">
-                <div className="rounded-xl overflow-hidden bg-slate-50/80 aspect-[16/10]">
+              <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-3xl group-hover:bg-primary/20 transition-all duration-500"></div>
+              <div className="relative rounded-2xl overflow-hidden border border-border  bg-surface p-2">
+                <div className="rounded-xl overflow-hidden bg-background aspect-[16/10]">
                   <img
                     src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
                     alt="Workplace Collaboration"
@@ -50,12 +50,12 @@ const LandingPage = () => {
       </section>
 
       {/* Trust Section */}
-      <section className="py-16 border-y border-slate-50">
+      <section className="py-16 border-y border-border/50">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-sm font-bold text-slate-300 uppercase tracking-[0.2em] text-center mb-10">Trusted by 2,000+ scaling organizations</p>
-          <div className="flex flex-wrap justify-center gap-x-12 gap-y-8 opacity-40 grayscale group hover:grayscale-0 transition-all duration-700">
+          <p className="text-xs font-black text-textSecondary uppercase tracking-[0.3em] text-center mb-10 opacity-40">Trusted by 2,000+ scaling organizations</p>
+          <div className="flex flex-wrap justify-center gap-x-12 gap-y-8 opacity-30 grayscale group hover:grayscale-0 transition-all duration-700">
             {['Acme', 'Sphere', 'Orbit', 'Locus', 'Nebula'].map((logo) => (
-              <span key={logo} className="text-xl font-bold tracking-tighter text-slate-400">{logo}</span>
+              <span key={logo} className="text-xl font-bold tracking-tighter text-textSecondary uppercase">{logo}</span>
             ))}
           </div>
         </div>
@@ -64,9 +64,9 @@ const LandingPage = () => {
       {/* Core Platform Section */}
       <section id="features" className="py-32">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-2xl text-center mx-auto mb-20">
-            <h2 className="text-2xl lg:text-4xl font-semibold text-[var(--color-text-main)] mb-4 tracking-tight">Everything you need, nothing you don't.</h2>
-            <p className="text-base text-slate-400 font-medium leading-relaxed">We've removed the noise to focus on the essential artifacts that drive organizational success.</p>
+          <div className="max-w-2xl text-center mx-auto mb-24">
+            <h2 className="text-3xl lg:text-5xl font-bold text-textPrimary mb-6 tracking-tight font-display">Everything you need, nothing you don't.</h2>
+            <p className="text-base text-textSecondary font-medium leading-relaxed opacity-70">We've removed the noise to focus on the essential artifacts that drive organizational success.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -105,11 +105,11 @@ const LandingPage = () => {
       </section>
 
       {/* Deep Dive Section 1 */}
-      <section className="py-32 bg-slate-50/20 px-6 overflow-hidden">
+      <section className="py-32 bg-background/50 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-20">
+          <div className="flex flex-col lg:flex-row items-center gap-24">
             <div className="lg:w-1/2 order-2 lg:order-1 relative">
-              <div className="relative rounded-2xl overflow-hidden border border-slate-100/50 shadow-2xl bg-white p-3">
+              <div className="relative rounded-2xl overflow-hidden border border-border  bg-surface p-3">
                 <img
                   src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=1200"
                   alt="Data Dashboard"
@@ -118,31 +118,31 @@ const LandingPage = () => {
               </div>
               {/* Floating card */}
               <div className="absolute top-1/2 -right-8 -translate-y-1/2 hidden lg:block">
-                <Card className="px-6 py-4 border-slate-100 shadow-xl max-w-[240px]">
+                <Card className="px-6 py-5 border-border  max-w-[260px] bg-surface">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-emerald-50 rounded-lg">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    <div className="p-2 bg-success/10 rounded-lg">
+                      <CheckCircle2 className="w-4 h-4 text-success" />
                     </div>
-                    <span className="text-sm font-semibold">Pulse Score: 98%</span>
+                    <span className="text-sm font-bold">Pulse Score: 98%</span>
                   </div>
-                  <p className="text-sm text-slate-400 leading-relaxed font-medium">Team alignment is at a 12-month high after the last integration.</p>
+                  <p className="text-xs text-textSecondary leading-relaxed font-bold opacity-60">Team alignment is at a 12-month high after the last integration.</p>
                 </Card>
               </div>
             </div>
             <div className="lg:w-1/2 order-1 lg:order-2">
-              <span className="text-sm font-black uppercase tracking-widest text-[var(--color-primary)]/70 mb-4 block">Unified Infrastructure</span>
-              <h3 className="text-3xl lg:text-5xl font-semibold text-[var(--color-text-main)] mb-6 tracking-tight leading-tight">Measure the output, not the input.</h3>
-              <p className="text-base lg:text-lg text-slate-400 font-medium leading-relaxed mb-8">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6 block">Unified Infrastructure</span>
+              <h3 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight leading-[1.1] font-display">Measure the output, not the input.</h3>
+              <p className="text-base lg:text-lg text-textSecondary font-medium leading-relaxed mb-10 opacity-70">
                 HiveHr provides the clarity managers need to make data-driven decisions without intruding on the workflow of individual contributors.
               </p>
-              <ul className="space-y-4">
+              <ul className="space-y-5">
                 {[
                   'Automated performance benchmarks',
                   'Zero-friction feedback loops',
                   'Asynchronous goal tracking'
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm font-medium text-slate-500">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-300"></div>
+                  <li key={item} className="flex items-center gap-4 text-sm font-bold text-textPrimary/70">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -180,31 +180,31 @@ const LandingPage = () => {
 
       {/* Final CTA */}
       <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto rounded-3xl bg-slate-900 p-12 lg:p-20 text-center relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+        <div className="max-w-5xl mx-auto rounded-[3rem] bg-textPrimary p-12 lg:p-24 text-center relative overflow-hidden group border border-primary/10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
           <div className="relative z-10">
-            <h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6 tracking-tight">Ready to evolve your culture?</h2>
-            <p className="text-slate-400 mb-10 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams automating their operations today. Start your 14-day premium trial now.</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <h2 className="text-3xl lg:text-6xl font-bold text-surface mb-8 tracking-tight font-display">Ready to evolve your culture?</h2>
+            <p className="text-textSecondary/60 mb-12 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams automating their operations today. Start your 14-day premium trial now.</p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/signup">
-                <Button size="lg" className="h-14 px-10 font-semibold bg-white text-slate-950 hover:bg-slate-50 border-0 group shadow-xl">
+                <Button size="lg" className="h-14 px-10 font-bold text-xs uppercase tracking-widest bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
                   Initialize Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <span className="text-sm text-slate-500 font-medium">No credit card required.</span>
+              <span className="text-xs text-textSecondary font-black uppercase tracking-widest opacity-40">No credit card required.</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Integrations Section */}
-      <section id="integrations" className="py-24 bg-white">
+      <section id="integrations" className="py-24 bg-surface">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+          <div className="flex flex-col lg:flex-row items-center gap-24">
             <div className="lg:w-1/2">
-              <span className="text-sm font-black uppercase tracking-widest text-[var(--color-primary)]/70 mb-4 block">Connected Ecosystem</span>
-              <h2 className="text-3xl lg:text-5xl font-semibold text-[var(--color-text-main)] mb-6 tracking-tight">Syncs with your entire stack.</h2>
-              <p className="text-base lg:text-lg text-slate-400 font-medium leading-relaxed mb-10">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6 block">Connected Ecosystem</span>
+              <h2 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight font-display">Syncs with your stack.</h2>
+              <p className="text-base lg:text-lg text-textSecondary font-medium leading-relaxed mb-12 opacity-70">
                 Native integrations with the tools your team already uses. No more manual data entry or fragmented workflows.
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -214,17 +214,17 @@ const LandingPage = () => {
                   { name: 'Jira', desc: 'Project management' },
                   { name: 'Google Workspace', desc: 'Identity & SSO' }
                 ].map((item) => (
-                  <div key={item.name} className="p-4 rounded-xl border border-slate-50 bg-slate-50/30">
-                    <p className="text-sm font-semibold text-[var(--color-text-main)] mb-1">{item.name}</p>
-                    <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">{item.desc}</p>
+                  <div key={item.name} className="p-5 rounded-2xl border border-border bg-background/50 group hover:border-primary/30 transition-all">
+                    <p className="text-sm font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">{item.name}</p>
+                    <p className="text-xs text-textSecondary font-black uppercase tracking-widest opacity-40">{item.desc}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="lg:w-1/2 grid grid-cols-3 gap-6">
+            <div className="lg:w-1/2 grid grid-cols-3 gap-6 opacity-30 grayscale">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                <div key={i} className="aspect-square rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center hover:scale-105 transition-transform">
-                  <div className="w-10 bg-white rounded-lg shadow-sm"></div>
+                <div key={i} className="aspect-square rounded-2xl bg-background border border-border flex items-center justify-center hover:scale-105 transition-all">
+                  <div className="w-10 h-10 bg-surface rounded-lg shadow-sm border border-border/50"></div>
                 </div>
               ))}
             </div>
@@ -233,15 +233,15 @@ const LandingPage = () => {
       </section>
 
       {/* Solutions Section */}
-      <section id="solutions" className="py-32 bg-slate-900 text-white overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500 rounded-full blur-[120px]"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500 rounded-full blur-[120px]"></div>
+      <section id="solutions" className="py-32 bg-textPrimary text-surface overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary rounded-full blur-[150px]"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primaryLight rounded-full blur-[150px]"></div>
         </div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl lg:text-5xl font-semibold tracking-tight mb-6">Built for every stage of growth.</h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">From seed stage startups to global enterprises, HiveHr scales with your team's complexity.</p>
+          <div className="text-center mb-24">
+            <h2 className="text-3xl lg:text-6xl font-bold tracking-tight mb-8 font-display leading-[1.1]">Built for every stage of growth.</h2>
+            <p className="text-textSecondary/60 text-lg max-w-2xl mx-auto font-medium">From seed stage startups to global enterprises, HiveHr scales with your team's complexity.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -250,9 +250,9 @@ const LandingPage = () => {
               { title: 'Startups', desc: 'Move fast with lean HR infrastructure that grows with you.' },
               { title: 'Enterprise', desc: 'Maintain compliance and security at global scale.' }
             ].map((sol) => (
-              <div key={sol.title} className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
-                <h3 className="text-xl font-semibold mb-4 group-hover:text-indigo-400 transition-colors">{sol.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed font-medium">{sol.desc}</p>
+              <div key={sol.title} className="p-10 rounded-[2.5rem] bg-surface/5 border border-surface/10 hover:bg-surface/10 transition-all group hover:-translate-y-2">
+                <h3 className="text-xl font-bold mb-5 group-hover:text-primary transition-colors">{sol.title}</h3>
+                <p className="text-sm text-textSecondary/60 leading-relaxed font-bold opacity-80">{sol.desc}</p>
               </div>
             ))}
           </div>
@@ -262,11 +262,11 @@ const LandingPage = () => {
       {/* Pricing Section */}
       <section id="pricing" className="py-32">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-2xl text-center mx-auto mb-20">
-            <h2 className="text-3xl lg:text-4xl font-semibold text-[var(--color-text-main)] mb-4 tracking-tight">Simple, predictable pricing.</h2>
-            <p className="text-base text-slate-400 font-medium leading-relaxed">No hidden fees. No complex tiers. Just everything you need to manage your team.</p>
+          <div className="max-w-2xl text-center mx-auto mb-24">
+            <h2 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-6 tracking-tight font-display">Simple, predictable pricing.</h2>
+            <p className="text-base text-textSecondary font-medium leading-relaxed opacity-70">No hidden fees. No complex tiers. Just everything you need to manage your team.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-10">
             <PricingCard
               name="Starter"
               price="0"
@@ -291,39 +291,39 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-32 bg-slate-50/30 border-y border-slate-50">
+      <section id="about" className="py-32 bg-background/50 border-y border-border">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <span className="text-sm font-black uppercase tracking-widest text-[var(--color-primary)]/70 mb-8 block">Our Manifesto</span>
-          <h2 className="text-3xl lg:text-4xl font-semibold text-[var(--color-text-main)] mb-8 tracking-tight italic">"Software should get out of the way of the people it's designed to serve."</h2>
-          <p className="text-lg text-slate-500 font-medium leading-[1.8] mb-12">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-10 block">Our Manifesto</span>
+          <h2 className="text-3xl lg:text-5xl font-bold text-textPrimary mb-10 tracking-tight italic font-display">"Software should get out of the way of the people it's designed to serve."</h2>
+          <p className="text-lg lg:text-xl text-textSecondary font-medium leading-[1.8] mb-12 opacity-80">
             We founded HiveHr on the belief that modern organizational culture is built on trust, transparency, and clarity. Our tools are designed to provide the infrastructure that enables high-performance teams to thrive without the administrative friction of legacy systems.
           </p>
-          <div className="h-[1px] w-24 bg-slate-200 mx-auto"></div>
+          <div className="h-[1px] w-24 bg-primary/20 mx-auto"></div>
         </div>
       </section>
 
       {/* Contact Section */}
       <section id="contact" className="py-32">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="rounded-[40px] bg-indigo-600 p-12 lg:p-24 text-white relative overflow-hidden">
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mb-48 -mr-48"></div>
+          <div className="rounded-[3rem] bg-primary p-12 lg:p-24 text-surface relative overflow-hidden border border-white/10">
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[150px] -mb-48 -mr-48"></div>
             <div className="relative z-10 flex flex-col lg:flex-row gap-16 items-center">
               <div className="lg:w-1/2 text-center lg:text-left">
-                <h2 className="text-3xl lg:text-5xl font-semibold mb-6 tracking-tight">Let's talk about your culture.</h2>
-                <p className="text-indigo-100 text-lg font-medium opacity-80 mb-10">Our consultants are ready to help you architect your organizational infrastructure.</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Button size="lg" className="bg-white text-indigo-600 hover:bg-slate-50 font-semibold px-8 h-14">Schedule a Consultation</Button>
-                  <Button size="lg" variant="outline" className="border-indigo-400 text-white hover:bg-indigo-500/50 font-semibold px-8 h-14">Email Sales</Button>
+                <h2 className="text-3xl lg:text-6xl font-bold mb-8 tracking-tight font-display leading-[1.1]">Let's talk about your culture.</h2>
+                <p className="text-surface/80 text-lg font-medium opacity-80 mb-12">Our consultants are ready to help you architect your organizational infrastructure.</p>
+                <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
+                  <Button size="lg" className="bg-surface text-primary hover:bg-surface/90 font-bold text-xs uppercase tracking-widest px-10 h-16  shadow-black/10">Schedule a Consultation</Button>
+                  <Button size="lg" variant="outline" className="border-white/30 text-surface hover:bg-white/10 font-bold text-xs uppercase tracking-widest px-10 h-16">Email Sales</Button>
                 </div>
               </div>
               <div className="lg:w-1/2 w-full max-w-md">
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
-                  <div className="space-y-4">
+                <div className="bg-white/10 backdrop-blur-xl rounded-[2.5rem] p-10 border border-white/20 ">
+                  <div className="space-y-6">
                     <div>
-                      <label className="text-sm font-bold uppercase tracking-widest text-indigo-200 mb-2 block">Company Email</label>
-                      <input type="text" placeholder="name@company.com" className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 placeholder:text-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-white/30" />
+                      <label className="text-xs font-black uppercase tracking-[0.2em] text-surface/60 mb-3 block ml-1">Company Email</label>
+                      <input type="text" placeholder="name@company.com" className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 placeholder:text-surface/30 focus:outline-none focus:ring-4 focus:ring-white/10 transition-all text-sm font-bold" />
                     </div>
-                    <Button className="w-full h-12 bg-white text-indigo-600 hover:bg-indigo-50 font-bold">Request Access</Button>
+                    <Button className="w-full h-14 bg-surface text-primary hover:bg-surface/95 font-black text-xs uppercase tracking-[0.2em] rounded-xl ">Request Access</Button>
                   </div>
                 </div>
               </div>

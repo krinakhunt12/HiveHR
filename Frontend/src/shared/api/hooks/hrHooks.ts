@@ -399,19 +399,26 @@ export function useLeaveConfigMutations() {
   });
 
   const update = useMutation({
-    mutationFn: async (configs: { leave_type: string; annual_allowance: number }[]) => {
-      for (const c of configs) {
-        await invokeApi('leave/types', {
-          method: 'POST',
-          body: {
+    mutationFn: async (configs: { id?: string; leave_type: string; annual_allowance: number }[]) => {
+      // Run creates and updates in parallel, separated by whether they have an id
+      await Promise.all(
+        configs.map((c) => {
+          const body = {
             name: c.leave_type,
             annual_quota: c.annual_allowance,
             is_paid: true,
             carry_forward: false,
             min_notice_days: 0,
-          },
-        });
-      }
+          };
+          if (c.id) {
+            // Existing type — use PUT /:id to update
+            return invokeApi(`leave/types/${c.id}`, { method: 'PUT', body });
+          } else {
+            // New type — use POST (backend upserts on company_id+name conflict)
+            return invokeApi('leave/types', { method: 'POST', body });
+          }
+        })
+      );
     },
     onSuccess: invalidate,
   });

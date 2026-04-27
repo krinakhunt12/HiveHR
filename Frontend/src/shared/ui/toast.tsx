@@ -38,7 +38,7 @@ export const ToasterProvider: React.FC<{ children?: React.ReactNode }> = ({ chil
           <div
             key={t.id}
             className={cn(
-              "max-w-md w-full p-6 rounded-[1.5rem] shadow-2xl border backdrop-blur-xl animate-in slide-in-from-right-10 fade-in duration-500 flex flex-col gap-1",
+              "max-w-md w-full p-6 rounded-[1.5rem]  border backdrop-blur-xl animate-in slide-in-from-right-10 fade-in duration-500 flex flex-col gap-1",
               t.type === 'error' ? 'bg-destructive/10 border-destructive/20 text-destructive' :
                 t.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800' :
                   'bg-background/80 border-border text-foreground shadow-premium'

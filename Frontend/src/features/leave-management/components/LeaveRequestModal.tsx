@@ -55,7 +55,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                 <div className="space-y-6 text-left">
                     {/* Leave Type Select */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Absence Category</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Absence Category</label>
                         <div className="relative group">
                             <select
                                 required
@@ -73,7 +73,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary/50">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </div>
                         </div>
@@ -82,7 +82,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                     {/* Date Range Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Commencement Date</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Commencement Date</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -98,7 +98,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Conclusion Date</label>
+                            <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Conclusion Date</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -117,7 +117,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
 
                     {/* Reason Textarea */}
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Rationale</label>
+                        <label className="text-xs font-bold uppercase tracking-[0.1em] text-primary/80 ml-1">Rationale</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-4 flex items-center justify-center pointer-events-none">
                                 <MessageSquare className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -145,7 +145,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                     <Button
                         type="submit"
                         loading={submit.isPending}
-                        className="px-8 h-11 rounded-xl shadow-lg shadow-primary/10 group"
+                        className="px-8 h-11 rounded-xl group"
                     >
                         <span>Dispatch Request</span>
                         {!submit.isPending && <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />}

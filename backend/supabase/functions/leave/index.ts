@@ -185,14 +185,18 @@ Deno.serve(async (req: Request) => {
             });
         }
 
+        // Upsert: if a leave type with this name already exists for the company, update it instead
         const { data, error } = await svcClient
           .from("leave_types")
-          .insert({ company_id: companyId, name, is_paid, annual_quota, carry_forward, max_carry_forward, min_notice_days, requires_document, leave_policy_id })
+          .upsert(
+            { company_id: companyId, name, is_paid, annual_quota, carry_forward, max_carry_forward, min_notice_days, requires_document, leave_policy_id, is_active: true },
+            { onConflict: "company_id,name", ignoreDuplicates: false }
+          )
           .select()
           .single();
         if (error) throw error;
-        await logAction(svcClient, ctx, "CREATE_LEAVE_TYPE", "leave_types", data.id, body);
-        return createdRes("Leave type created", data);
+        await logAction(svcClient, ctx, "UPSERT_LEAVE_TYPE", "leave_types", data.id, body);
+        return createdRes("Leave type saved", data);
       }
 
       if (method === "PUT" && typeId) {

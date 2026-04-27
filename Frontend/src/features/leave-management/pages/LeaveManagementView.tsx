@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-    Calendar, 
-    CheckCircle2, 
-    XCircle, 
+import {
+    Calendar,
+    CheckCircle2,
+    XCircle,
     ArrowRight,
     Filter,
     Search,
@@ -32,14 +32,13 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-    const { 
-        data: leaves = [], 
-        isLoading, 
+    const {
+        data: leaves = [],
+        isLoading,
         error,
-        refetch 
+        refetch
     } = useListLeaves();
 
-    const { data: configs = [] } = useLeaveConfigurations();
     const { data: balances = [] } = useLeaveBalance();
     const { review } = useLeaveMutations();
 
@@ -63,9 +62,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     if (error) {
         return (
             <div className="min-h-[600px] flex items-center justify-center">
-                <ErrorState 
-                    error={error as Error} 
-                    onRetry={() => refetch()} 
+                <ErrorState
+                    error={error as Error}
+                    onRetry={() => refetch()}
                 />
             </div>
         );
@@ -126,7 +125,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                     {!isAdmin && (
                         <Button
                             onClick={() => setIsRequestModalOpen(true)}
-                            className="gap-2 px-6 h-11 text-xs font-bold uppercase tracking-widest shadow-xl shadow-primary/20"
+                            className="gap-2 px-6 h-11 text-xs font-bold uppercase tracking-widest"
                         >
                             <Plus size={18} /> Initiate Request
                         </Button>
@@ -137,17 +136,17 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {balances.length > 0 ? (
                     balances.map((b: any) => (
-                        <QuotaProgress 
-                            key={b.id} 
-                            label={b.leave_types?.name || 'Leave'} 
-                            current={Number(b.taken) + Number(b.pending)} 
-                            total={Number(b.quota) + Number(b.carry_forward)} 
-                            color={b.leave_types?.name?.toLowerCase() === 'sick' ? 'accent' : 'primary'} 
+                        <QuotaProgress
+                            key={b.id}
+                            label={b.leave_types?.name || 'Leave'}
+                            current={Number(b.taken) + Number(b.pending)}
+                            total={Number(b.quota) + Number(b.carry_forward)}
+                            color={b.leave_types?.name?.toLowerCase() === 'sick' ? 'accent' : 'primary'}
                         />
                     ))
                 ) : (
                     <div className="col-span-full py-10 bg-surface rounded-2xl border border-dashed border-border flex flex-col items-center justify-center">
-                         <p className="text-sm font-bold text-textSecondary opacity-40">No leave quotas assigned to your current policy.</p>
+                        <p className="text-sm font-bold text-textSecondary opacity-40">No leave quotas assigned to your current policy.</p>
                     </div>
                 )}
             </div>
@@ -166,9 +165,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         </CardHeader>
                         <CardContent className="p-0 min-h-[300px]">
                             {historyRequests.length === 0 ? (
-                                <EmptyState 
-                                    title="Registry Empty" 
-                                    description="Historical leave records will appear here once processed." 
+                                <EmptyState
+                                    title="Registry Empty"
+                                    description="Historical leave records will appear here once processed."
                                     icon={History}
                                     className="py-20"
                                 />
@@ -177,10 +176,10 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                     <table className="w-full text-left">
                                         <thead className="bg-primary/[0.01]">
                                             <tr>
-                                                <th className="px-8 py-4 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Resource</th>
-                                                <th className="px-8 py-4 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Duration</th>
-                                                <th className="px-8 py-4 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Status</th>
-                                                <th className="px-8 py-4 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em] text-right">Review</th>
+                                                <th className="px-8 py-4 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Resource</th>
+                                                <th className="px-8 py-4 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Duration</th>
+                                                <th className="px-8 py-4 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Status</th>
+                                                <th className="px-8 py-4 text-xs font-black text-textSecondary uppercase tracking-[0.2em] text-right">Review</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-primary/5">
@@ -188,15 +187,15 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                 <tr key={req.id} className="hover:bg-primary/[0.01] transition-colors group">
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Individual'}</p>
-                                                        <p className="text-[10px] text-textSecondary font-black uppercase tracking-widest mt-1 opacity-50">{req.leave_type}</p>
+                                                        <p className="text-xs text-textSecondary font-black uppercase tracking-widest mt-1 opacity-50">{req.leave_type}</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary">{req.start_date} <ArrowRight size={12} className="inline mx-1 opacity-30" /> {req.end_date}</p>
-                                                        <p className="text-[10px] text-textSecondary font-black uppercase tracking-widest mt-1 opacity-50">Standard Cycle</p>
+                                                        <p className="text-xs text-textSecondary font-black uppercase tracking-widest mt-1 opacity-50">Standard Cycle</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <span className={cn(
-                                                            "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] border shadow-sm",
+                                                            "px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-[0.15em] border shadow-sm",
                                                             req.status === 'approved' ? 'bg-success/5 text-success border-success/10' : 'bg-error/5 text-error border-error/10'
                                                         )}>
                                                             {req.status}
@@ -222,9 +221,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         </CardHeader>
                         <CardContent className="p-0 min-h-[300px]">
                             {pendingRequests.length === 0 ? (
-                                <EmptyState 
-                                    title="All Clear" 
-                                    description="No pending leave requests require review." 
+                                <EmptyState
+                                    title="All Clear"
+                                    description="No pending leave requests require review."
                                     icon={CheckCircle2}
                                     className="py-16"
                                 />
@@ -239,11 +238,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Anonymous'}</p>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-textSecondary opacity-50 mt-1">{req.leave_type}</p>
+                                                        <p className="text-xs font-black uppercase tracking-widest text-textSecondary opacity-50 mt-1">{req.leave_type}</p>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="bg-primary/[0.02] p-4 rounded-xl border border-primary/5 mb-6">
                                                 <div className="flex items-center gap-3 text-textPrimary mb-3">
                                                     <Calendar size={14} className="text-primary opacity-60" />
@@ -254,18 +253,18 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
                                             {isAdmin && (
                                                 <div className="grid grid-cols-2 gap-3">
-                                                    <Button 
-                                                        variant="outline" 
+                                                    <Button
+                                                        variant="outline"
                                                         disabled={review.isPending}
                                                         onClick={() => handleAction(req.id, 'rejected')}
-                                                        className="h-10 text-[10px] font-black uppercase tracking-widest border-error/20 text-error hover:bg-error/10"
+                                                        className="h-10 text-xs font-black uppercase tracking-widest border-error/20 text-error hover:bg-error/10"
                                                     >
                                                         <XCircle size={14} className="mr-2" /> Decline
                                                     </Button>
-                                                    <Button 
+                                                    <Button
                                                         disabled={review.isPending}
                                                         onClick={() => handleAction(req.id, 'approved')}
-                                                        className="h-10 text-[10px] font-black uppercase tracking-widest"
+                                                        className="h-10 text-xs font-black uppercase tracking-widest"
                                                     >
                                                         <CheckCircle2 size={14} className="mr-2" /> Approve
                                                     </Button>
@@ -278,11 +277,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         </CardContent>
                     </Card>
 
-                    <Card className="card-premium bg-gradient-to-br from-primary to-primaryDark p-8 text-white border-none shadow-xl shadow-primary/20">
+                    <Card className="card-premium bg-gradient-to-br from-primary to-primaryDark p-8 text-white border-none ">
                         <div className="p-3 bg-white/10 w-fit rounded-xl mb-6"><Wind size={24} /></div>
                         <h4 className="text-xl font-bold tracking-tight mb-2">Policy Overview</h4>
                         <p className="text-xs font-medium text-white/70 leading-relaxed mb-6">Global leave parameters are optimized for enterprise stability. Review the updated handbook for Q3 guidelines.</p>
-                        <Button variant="outline" className="w-full h-11 text-[10px] font-black uppercase tracking-widest text-white border-white/20 hover:bg-white/10">
+                        <Button variant="outline" className="w-full h-11 text-xs font-black uppercase tracking-widest text-white border-white/20 hover:bg-white/10">
                             Download Handbook
                         </Button>
                     </Card>
@@ -303,7 +302,7 @@ const QuotaProgress = ({ label, current, total, color }: { label: string, curren
         <Card className="card-premium p-8 bg-white text-left group">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <p className="text-[10px] font-black text-textSecondary uppercase tracking-[0.2em] opacity-40 mb-2">{label}</p>
+                    <p className="text-xs font-black text-textSecondary uppercase tracking-[0.2em] opacity-40 mb-2">{label}</p>
                     <p className="text-2xl font-bold text-textPrimary font-display tracking-tight">{current}/{total} <span className="text-xs font-bold text-textSecondary opacity-40 ml-1">Days</span></p>
                 </div>
                 <div className={cn(
@@ -313,10 +312,10 @@ const QuotaProgress = ({ label, current, total, color }: { label: string, curren
                     <CalendarRange size={20} />
                 </div>
             </div>
-            
+
             <div className="space-y-3">
                 <div className="h-2 bg-primary/5 rounded-full overflow-hidden">
-                    <div 
+                    <div
                         className={cn(
                             "h-full transition-all duration-1000",
                             isAccent ? "bg-accent shadow-[0_0_12px_rgba(217,119,6,0.4)]" : "bg-primary shadow-[0_0_12px_rgba(5,150,105,0.4)]"
@@ -324,7 +323,7 @@ const QuotaProgress = ({ label, current, total, color }: { label: string, curren
                         style={{ width: `${percentage}%` }}
                     />
                 </div>
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-textSecondary opacity-40">
+                <div className="flex justify-between text-xs font-black uppercase tracking-widest text-textSecondary opacity-40">
                     <span>Utilization</span>
                     <span>{Math.round(percentage)}%</span>
                 </div>

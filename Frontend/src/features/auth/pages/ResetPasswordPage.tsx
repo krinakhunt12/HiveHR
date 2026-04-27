@@ -43,7 +43,7 @@ const ResetPasswordPage = () => {
 
     return (
         <div className="min-h-screen bg-bg flex items-center justify-center p-6">
-            <Card className="w-full max-w-md border-soft shadow-2xl shadow-indigo-500/5 animate-in fade-in zoom-in duration-300">
+            <Card className="w-full max-w-md border-soft  shadow-indigo-500/5 animate-in fade-in zoom-in duration-300">
                 <CardHeader className="pt-10 pb-6 text-center">
                     <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary">
                         <ShieldCheck size={32} />

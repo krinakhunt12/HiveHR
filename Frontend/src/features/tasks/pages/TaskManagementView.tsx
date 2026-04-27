@@ -67,9 +67,9 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
     if (error) {
         return (
             <div className="min-h-[500px] flex items-center justify-center">
-                <ErrorState 
-                    error={error as Error} 
-                    onRetry={() => refetch()} 
+                <ErrorState
+                    error={error as Error}
+                    onRetry={() => refetch()}
                 />
             </div>
         );
@@ -150,10 +150,10 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                             ))
                         ) : filteredTasks.length === 0 ? (
                             <div className="col-span-full flex items-center justify-center">
-                                <EmptyState 
+                                <EmptyState
                                     title={filterStatus === 'all' ? "No Tasks Assigned" : `No ${filterStatus.replace('_', ' ')} tasks`}
-                                    description={filterStatus === 'all' 
-                                        ? "There are currently no tasks in the enterprise registry." 
+                                    description={filterStatus === 'all'
+                                        ? "There are currently no tasks in the enterprise registry."
                                         : `No tasks match the selected status filter.`
                                     }
                                     icon={CheckSquare}
@@ -166,7 +166,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                         <div className={cn("w-1.5 h-10 rounded-full", getPriorityColor(task.priority))} />
                                         <div className="flex gap-2">
                                             <span className={cn(
-                                                "px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest",
+                                                "px-2.5 py-1 rounded-md text-xs font-black uppercase tracking-widest",
                                                 getStatusInfo(task.status).color
                                             )}>
                                                 {getStatusInfo(task.status).label}
@@ -187,13 +187,13 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                             <div className="w-8 h-8 rounded-md bg-background border border-border flex items-center justify-center text-xs font-bold text-textSecondary shadow-sm">
                                                 {task.employees?.full_name?.charAt(0) || 'G'}
                                             </div>
-                                            <p className="text-[10px] font-black text-textSecondary uppercase tracking-widest truncate max-w-[100px] opacity-60">
+                                            <p className="text-xs font-black text-textSecondary uppercase tracking-widest truncate max-w-[100px] opacity-60">
                                                 {task.employees?.full_name || 'Global'}
                                             </p>
                                         </div>
 
                                         <div className="flex items-center gap-4">
-                                            <div className="flex items-center gap-1.5 text-textSecondary font-bold text-[10px] opacity-50 uppercase tracking-widest">
+                                            <div className="flex items-center gap-1.5 text-textSecondary font-bold text-xs opacity-50 uppercase tracking-widest">
                                                 <Clock size={12} />
                                                 <span>{task.due_date || 'Ongoing'}</span>
                                             </div>

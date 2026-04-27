@@ -48,7 +48,7 @@ const EmployeeDashboard = () => {
     const hasAttendance = attendanceToday && 'id' in attendanceToday;
     const canCheckIn = !hasAttendance;
     const canCheckOut = hasAttendance && !attendanceToday.check_out_time;
-    
+
     // Use check_in_at (ISO string built by hook) for elapsed time calculation
     const checkInTime = hasAttendance && attendanceToday.check_in_at ? new Date(attendanceToday.check_in_at).getTime() : null;
     const [elapsedMinutes, setElapsedMinutes] = useState(0);
@@ -58,7 +58,7 @@ const EmployeeDashboard = () => {
             setElapsedMinutes(0);
             return;
         }
-        
+
         const updateElapsed = () => {
             const now = new Date().getTime();
             setElapsedMinutes(Math.floor((now - checkInTime) / 60000));
@@ -66,14 +66,14 @@ const EmployeeDashboard = () => {
 
         updateElapsed();
         const interval = setInterval(updateElapsed, 30000); // Update every 30s
-        
+
         return () => clearInterval(interval);
     }, [checkInTime, attendanceToday?.check_out_at]);
 
     // Break logic: Usually 60 mins. 
     // We only deduct it if the user has been here for more than 4 hours (240 mins) or if they've checked out.
     const breakMinutes = attendanceToday?.break_minutes ?? 60;
-    
+
     const displayMinutes = attendanceToday?.check_out_at
         ? (attendanceToday.net_work_minutes ?? attendanceToday.work_minutes ?? 0)
         : elapsedMinutes > 240
@@ -110,7 +110,7 @@ const EmployeeDashboard = () => {
                 <div className="flex flex-col md:flex-row gap-4 items-center">
                     {hasAttendance && !attendanceToday.check_out_at && (
                         <div className="text-right mr-4">
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Target Punch Out (9h)</p>
+                            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Target Punch Out (9h)</p>
                             <p className="text-lg font-medium text-primary tracking-tight">{estimatedPunchOut}</p>
                         </div>
                     )}
@@ -157,14 +157,14 @@ const EmployeeDashboard = () => {
                         </div>
                         <span className="text-sm font-medium text-textPrimary">{Math.round(workProgress)}%</span>
                     </div>
-                    {workProgress >= 100 && <div className="absolute top-2 right-2 text-[10px] text-success font-bold uppercase tracking-tighter">Requirement Met</div>}
+                    {workProgress >= 100 && <div className="absolute top-2 right-2 text-xs text-success font-bold uppercase tracking-tighter">Requirement Met</div>}
                 </div>
                 <StatCard title="Total Stay" value={`${Math.floor(totalStayMinutes / 60)}h ${totalStayMinutes % 60}m`} icon={<Clock />} theme={totalStayMinutes >= 540 ? "primary" : "warning"} />
                 <StatCard title="Work Minutes" value={String(displayMinutes)} icon={<Award />} theme="primary" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="card-premium p-8 bg-gradient-to-br from-primary to-primaryDark text-white flex flex-col justify-between shadow-xl shadow-primary/20 text-left border-none">
+                <div className="card-premium p-8 bg-gradient-to-br from-primary to-primaryDark text-white flex flex-col justify-between  text-left border-none">
                     <div>
                         <div className="p-3 bg-white/10 w-fit rounded-xl mb-6">
                             <Wind size={24} />
@@ -172,7 +172,7 @@ const EmployeeDashboard = () => {
                         <h4 className="text-xl font-bold tracking-tight mb-2">Leave Registry</h4>
                         <p className="text-sm font-medium text-white/70 leading-relaxed">View your leave balance and track your request status in real-time within the enterprise cloud.</p>
                     </div>
-                    <Button 
+                    <Button
                         onClick={() => setCurrentView('leaves')}
                         variant="secondary"
                         className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs uppercase tracking-widest hover:bg-white/90 transition-colors border-none"
@@ -240,8 +240,8 @@ const EmployeeDashboard = () => {
                 {currentView === 'policies' && <PoliciesView isAdmin={false} />}
             </main>
 
-            <ForcePasswordChangeModal 
-                isOpen={!!(user?.role === 'employee' && user?.is_first_login)} 
+            <ForcePasswordChangeModal
+                isOpen={!!(user?.role === 'employee' && user?.is_first_login)}
                 onSuccess={() => refetchMe()}
             />
         </DashboardLayout>

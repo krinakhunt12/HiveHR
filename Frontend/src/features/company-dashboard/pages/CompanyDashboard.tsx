@@ -8,6 +8,7 @@ import {
     LayoutDashboard,
     Trash2,
     Edit3,
+    Eye,
     Wind,
     BarChart3,
     ArrowUpRight,
@@ -21,11 +22,12 @@ import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
-import { useListEmployees, useEmployeeMutations, type Employee } from '@/shared/api/hooks/hrHooks';
+import { useListEmployees, useEmployeeMutations, type Employee, useListAttendance } from '@/shared/api/hooks/hrHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { AddEmployeeModal } from '../components/AddEmployeeModal';
 import { EditEmployeeModal } from '../components/EditEmployeeModal';
+import { EmployeeViewModal } from '../components/EmployeeViewModal';
 import { PoliciesView } from '@/features/policies/pages/PoliciesView';
 
 type View = 'overview' | 'directory' | 'time' | 'leaves' | 'policies';
@@ -35,17 +37,32 @@ const CompanyDashboard = () => {
     const [query, setQuery] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+    const [viewingEmployee, setViewingEmployee] = useState<Employee | null>(null);
     const { session } = useAuthStore();
     const { toast } = useToast();
 
-    const { 
-        data: employees = [], 
-        isLoading: loadingEmployees, 
+    const {
+        data: employees = [],
+        isLoading: loadingEmployees,
         error: employeesError,
-        refetch: refetchEmployees 
+        refetch: refetchEmployees
     } = useListEmployees();
 
     const { remove: removeEmployee } = useEmployeeMutations();
+    const { data: attendance = [] } = useListAttendance({ 
+        date: new Date().toISOString().split('T')[0] 
+    });
+
+    const attendanceRecords = useMemo(() => {
+        return attendance.map(record => {
+            const emp = employees.find(e => e.id === record.employee_id);
+            return {
+                ...record,
+                employeeName: emp?.full_name || 'Unknown Employee',
+                work_location: (emp as any)?.work_location || 'Office'
+            };
+        });
+    }, [attendance, employees]);
 
     const isLoading = loadingEmployees;
     const globalError = employeesError;
@@ -90,8 +107,8 @@ const CompanyDashboard = () => {
         if (globalError) {
             return (
                 <div className="min-h-[600px] flex items-center justify-center">
-                    <ErrorState 
-                        error={globalError as Error} 
+                    <ErrorState
+                        error={globalError as Error}
                         onRetry={() => {
                             refetchEmployees();
                         }}
@@ -111,7 +128,7 @@ const CompanyDashboard = () => {
                         <Button variant="outline" className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em] border-primary/10 hover:bg-primary/5">
                             <BarChart3 size={16} className="mr-2" /> Analytics
                         </Button>
-                        <Button onClick={() => setIsAddModalOpen(true)} className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em] shadow-xl shadow-primary/20">
+                        <Button onClick={() => setIsAddModalOpen(true)} className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em]">
                             <UserPlus size={16} className="mr-2" /> Onboard Member
                         </Button>
                     </div>
@@ -119,7 +136,13 @@ const CompanyDashboard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <StatCard title="Active Employees" value={String(activeEmployees)} icon={<Users />} trend="+4%" positive={true} />
-                    <StatCard title="Attendance Rate" value="94.2%" icon={<Clock />} trend="+1.2%" positive={true} />
+                    <StatCard 
+                        title="Attendance Rate" 
+                        value={`${employees.length > 0 ? ((attendance.length / employees.length) * 100).toFixed(1) : "0"}%`} 
+                        icon={<Clock />} 
+                        trend={`${attendance.length} checked in`} 
+                        positive={true} 
+                    />
                     <StatCard title="Leave Utilization" value="08" icon={<Wind />} trend="-2" positive={true} />
                 </div>
 
@@ -130,7 +153,7 @@ const CompanyDashboard = () => {
                                 <h3 className="text-lg font-bold font-display text-textPrimary">Resource Velocity</h3>
                                 <p className="text-xs font-bold text-textSecondary opacity-50 uppercase tracking-widest mt-1">Personnel expansion metrics</p>
                             </div>
-                            <div className="flex items-center gap-4 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">
+                            <div className="flex items-center gap-4 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">
                                 <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /> Projected</div>
                                 <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary/20" /> Actual</div>
                             </div>
@@ -142,19 +165,19 @@ const CompanyDashboard = () => {
                                         className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary to-primaryLight rounded-t-xl transition-all duration-1000 group-hover:brightness-110"
                                         style={{ height: `${h}%` }}
                                     >
-                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-textPrimary text-[10px] font-bold text-white px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-textPrimary text-xs font-bold text-white px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                             {h}%
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <div className="flex justify-between mt-6 px-1 text-[10px] font-black text-textSecondary/40 uppercase tracking-[0.2em]">
+                        <div className="flex justify-between mt-6 px-1 text-xs font-black text-textSecondary/40 uppercase tracking-[0.2em]">
                             <span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Dec</span>
                         </div>
                     </div>
 
-                    <div className="card-premium p-8 bg-gradient-to-br from-primary to-primaryDark text-white flex flex-col justify-between shadow-xl shadow-primary/20 text-left border-none">
+                    <div className="card-premium p-8 bg-gradient-to-br from-primary to-primaryDark text-white flex flex-col justify-between text-left border-none">
                         <div>
                             <div className="p-3 bg-white/10 w-fit rounded-xl mb-6">
                                 <Clock size={24} />
@@ -190,16 +213,16 @@ const CompanyDashboard = () => {
                 </div>
             </div>
 
-            <div className="card-premium p-0 border border-primary/5 shadow-xl shadow-primary/[0.02] overflow-hidden bg-white min-h-[400px]">
+            <div className="card-premium p-0 border border-primary/5 overflow-hidden bg-white min-h-[400px]">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-primary/[0.02] border-b border-primary/5">
                             <tr>
-                                <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Member Info</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Designation</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Timeline</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em]">Status</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-textSecondary uppercase tracking-[0.2em] text-right">Actions</th>
+                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Member Info</th>
+                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Designation</th>
+                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Timeline</th>
+                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em]">Status</th>
+                                <th className="px-8 py-5 text-xs font-black text-textSecondary uppercase tracking-[0.2em] text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-primary/5">
@@ -216,8 +239,8 @@ const CompanyDashboard = () => {
                             ) : filteredEmployees.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-8 py-20 text-center">
-                                        <EmptyState 
-                                            title={query ? "No search results" : "Registry Empty"} 
+                                        <EmptyState
+                                            title={query ? "No search results" : "Registry Empty"}
                                             description={query ? `No members match "${query}" in this organization.` : "Personnel records will appear here once onboarded."}
                                             icon={Users}
                                             className="p-12"
@@ -238,21 +261,21 @@ const CompanyDashboard = () => {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{emp.full_name}</p>
-                                                <p className="text-[10px] text-textSecondary font-black uppercase tracking-widest mt-1.5 opacity-50">{emp.employee_code || '---'}</p>
+                                                <p className="text-xs text-textSecondary font-semibold mt-1.5 opacity-50">{emp.employee_code || '---'}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
                                         <p className="text-sm font-bold text-textPrimary leading-none">{(emp as any).designation_name ?? emp.designation ?? '—'}</p>
-                                        <p className="text-[10px] text-textSecondary font-black uppercase tracking-widest mt-1.5 opacity-50">{emp.employment_type}</p>
+                                        <p className="text-xs text-textSecondary font-semibold mt-1.5 opacity-50">{emp.employment_type}</p>
                                     </td>
                                     <td className="px-8 py-5">
-                                        <p className="text-sm font-bold text-textPrimary">{emp.joined_on || '---'}</p>
-                                        <p className="text-[10px] text-textSecondary font-black uppercase tracking-widest mt-1.5 opacity-50">Onboarded</p>
+                                        <p className="text-sm font-bold text-textPrimary">{emp.date_of_joining || '---'}</p>
+                                        <p className="text-xs text-textSecondary font-semibold mt-1.5 opacity-50">Onboarded</p>
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] border shadow-sm",
+                                            "px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-[0.15em] border shadow-sm",
                                             emp.status === 'active' ? 'bg-success/5 text-success border-success/10' : 'bg-background text-textSecondary border-primary/5'
                                         )}>
                                             {emp.status}
@@ -263,8 +286,18 @@ const CompanyDashboard = () => {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
+                                                onClick={() => setViewingEmployee(emp)}
+                                                className="h-10 w-10 text-textSecondary hover:text-primary hover:bg-primary/5 rounded-xl"
+                                                title="View Details"
+                                            >
+                                                <Eye size={18} />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => setEditingEmployee(emp)}
                                                 className="h-10 w-10 text-textSecondary hover:text-primary hover:bg-primary/5 rounded-xl"
+                                                title="Edit Employee"
                                             >
                                                 <Edit3 size={18} />
                                             </Button>
@@ -273,6 +306,7 @@ const CompanyDashboard = () => {
                                                 size="icon"
                                                 onClick={() => handleDeleteEmployee(emp.id, emp.full_name)}
                                                 className="h-10 w-10 text-textSecondary hover:text-error hover:bg-error/5 rounded-xl"
+                                                title="Remove Employee"
                                             >
                                                 <Trash2 size={18} />
                                             </Button>
@@ -289,7 +323,7 @@ const CompanyDashboard = () => {
 
     const renderOperationsView = () => (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
-             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight text-textPrimary font-display">Time & Operations</h2>
                     <p className="text-sm font-semibold text-textSecondary mt-1 opacity-60">Synchronized attendance and compute metrics.</p>
@@ -304,33 +338,38 @@ const CompanyDashboard = () => {
                 <Card className="card-premium p-6 bg-white col-span-2">
                     <div className="flex items-center justify-between mb-8">
                         <h4 className="text-sm font-black uppercase tracking-[0.2em] text-textSecondary opacity-50">Real-time Attendance</h4>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-[10px] font-black uppercase tracking-widest">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-black uppercase tracking-widest">
                             <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
                             Live Sync
                         </div>
                     </div>
                     <div className="space-y-6">
-                        {[
-                            { name: 'Sarah Wilson', status: 'Checked In', time: '08:42 AM', type: 'Office' },
-                            { name: 'Marcus Chen', status: 'Remote', time: '09:05 AM', type: 'Sync' },
-                            { name: 'Elena Rodriguez', status: 'Checked In', time: '08:15 AM', type: 'Field' }
-                        ].map((log, i) => (
-                            <div key={i} className="flex items-center justify-between group cursor-pointer p-2 rounded-xl hover:bg-primary/[0.02] transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-textSecondary border border-primary/5 text-xs">
-                                        {log.name.split(' ').map(n=>n[0]).join('')}
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-textPrimary">{log.name}</p>
-                                        <p className="text-[10px] font-bold text-textSecondary uppercase tracking-widest opacity-40 mt-1">{log.type}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-bold text-primary">{log.time}</p>
-                                    <p className="text-[10px] font-black text-success uppercase tracking-widest mt-1">{log.status}</p>
-                                </div>
+                        {attendanceRecords.length === 0 ? (
+                            <div className="py-12 text-center">
+                                <p className="text-sm text-muted-foreground">No attendance logs for today yet.</p>
                             </div>
-                        ))}
+                        ) : (
+                            attendanceRecords.slice(0, 5).map((record, i) => (
+                                <div key={i} className="flex items-center justify-between group cursor-pointer p-2 rounded-xl hover:bg-primary/[0.02] transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-textSecondary border border-primary/5 text-xs">
+                                            {record.employeeName.split(' ').map(n => n[0]).join('')}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-textPrimary">{record.employeeName}</p>
+                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest opacity-40 mt-1">{record.work_location || 'Office'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-bold text-primary">{record.check_in_time ? record.check_in_time.slice(0, 5) : '--:--'}</p>
+                                        <p className={cn(
+                                            "text-xs font-black uppercase tracking-widest mt-1",
+                                            record.status === 'present' ? 'text-success' : 'text-primary'
+                                        )}>{record.status}</p>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </Card>
 
@@ -348,15 +387,15 @@ const CompanyDashboard = () => {
                     </div>
                 </Card>
 
-                <Card className="card-premium bg-primary text-white flex flex-col justify-between shadow-xl shadow-primary/30 border-none">
+                <Card className="card-premium bg-primary text-white flex flex-col justify-between border-none">
                     <div className="flex justify-between items-start">
                         <div className="p-2.5 bg-white/10 rounded-xl text-white">
                             <Wind size={20} />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Registry Health</span>
+                        <span className="text-xs font-black uppercase tracking-widest opacity-60">Registry Health</span>
                     </div>
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 mb-2">Cycle Status</p>
+                        <p className="text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-2">Cycle Status</p>
                         <h4 className="text-2xl font-bold tracking-tight">Q3 Pulse Safe</h4>
                         <p className="text-xs font-medium text-white/70 mt-3 leading-relaxed">Leave and attendance records are fully synchronized across core clusters.</p>
                     </div>
@@ -392,6 +431,11 @@ const CompanyDashboard = () => {
                 {currentView === 'policies' && <PoliciesView isAdmin={true} />}
             </main>
             <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+            <EmployeeViewModal
+                isOpen={!!viewingEmployee}
+                onClose={() => setViewingEmployee(null)}
+                employee={viewingEmployee}
+            />
             <EditEmployeeModal
                 isOpen={!!editingEmployee}
                 onClose={() => setEditingEmployee(null)}
@@ -414,7 +458,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     </div>
                     {trend && (
                         <div className={cn(
-                            "flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border",
+                            "flex items-center gap-1 text-xs font-black uppercase tracking-widest px-2 py-1 rounded-lg border",
                             positive ? "text-success bg-success/5 border-success/10" : "text-error bg-error/5 border-error/10"
                         )}>
                             {positive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
@@ -423,7 +467,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     )}
                 </div>
                 <div>
-                    <p className="text-[10px] font-black text-textSecondary uppercase tracking-[0.2em] mb-2 opacity-50">{title}</p>
+                    <p className="text-xs font-black text-textSecondary uppercase tracking-[0.2em] mb-2 opacity-50">{title}</p>
                     <p className="text-3xl font-bold text-textPrimary font-display tracking-tight leading-none">{value}</p>
                 </div>
             </div>
