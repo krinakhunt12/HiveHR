@@ -4,6 +4,7 @@
 
 @theme {
   --font-sans: "Inter", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "Inter", sans-serif;
 
   --text-xs: 0.875rem;
   /* 14px - Strict Minimum */
@@ -30,6 +31,13 @@
   --color-success: var(--tok-success);
   --color-error: var(--tok-error);
   --color-warning: var(--tok-warning);
+
+  /* New Minimal System Tokens */
+  --color-bg: var(--tok-background);
+  --color-main: var(--tok-text-primary);
+  --color-muted: var(--tok-text-secondary);
+  --color-dim: color-mix(in srgb, var(--tok-text-secondary), transparent 40%);
+  --color-soft: var(--tok-border);
 
   /* Shadcn compat */
   --color-card: hsl(var(--card));
