@@ -7,7 +7,7 @@ function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("animate-pulse rounded-2xl bg-slate-200/50 dark:bg-slate-800/50", className)}
+      className={cn("animate-pulse rounded-2xl bg-muted/50", className)}
       {...props}
     />
   )
@@ -90,12 +90,33 @@ function SkeletonTable({ rows = 5, columns = 4, className }: { rows?: number; co
   )
 }
 
+function SkeletonPageHeader() {
+  return (
+    <div className="space-y-2 mb-8">
+      <Skeleton className="h-8 w-48 rounded-md" />
+      <Skeleton className="h-4 w-64 rounded-md" />
+    </div>
+  )
+}
+
+function SkeletonList({ count = 3, className }: { count?: number; className?: string }) {
+  return (
+    <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6", className)}>
+      {Array.from({ length: count }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
+  )
+}
+
 export { 
   Skeleton, 
   SkeletonText, 
   SkeletonAvatar, 
   SkeletonButton, 
   SkeletonCard, 
-  SkeletonTable 
+  SkeletonTable,
+  SkeletonPageHeader,
+  SkeletonList
 }
 

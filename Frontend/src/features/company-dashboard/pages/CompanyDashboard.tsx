@@ -13,12 +13,15 @@ import {
     BarChart3,
     ArrowUpRight,
     ArrowDownRight,
-    FileText
+    FileText,
+    TrendingUp,
+    MapPin
 } from 'lucide-react';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
-import { Card } from '@/shared/ui/card';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
+import { Skeleton, SkeletonCard, SkeletonPageHeader } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
+import { Badge } from '@/shared/ui/badge';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
@@ -64,9 +67,6 @@ const CompanyDashboard = () => {
         });
     }, [attendance, employees]);
 
-    const isLoading = loadingEmployees;
-    const globalError = employeesError;
-
     const filteredEmployees = useMemo(() => {
         const normalized = query.trim().toLowerCase();
         if (!normalized) return employees;
@@ -76,11 +76,10 @@ const CompanyDashboard = () => {
         ));
     }, [employees, query]);
 
-    const activeEmployees = employees.filter((item: Employee) => item.status === 'active').length;
+    const activeEmployeesCount = employees.filter((item: Employee) => item.status === 'active').length;
 
     // --- ACTIONS ---
     const handleDeleteEmployee = async (id: string, name: string) => {
-        if (!window.confirm(`Are you sure you want to remove ${name}? This action cannot be undone.`)) return;
         try {
             await removeEmployee.mutateAsync(id);
             toast({ title: 'Member Offboarded', description: `${name} has been removed from the directory.`, type: 'success' });
@@ -91,11 +90,11 @@ const CompanyDashboard = () => {
 
     // --- UI CONFIG ---
     const navItems = [
-        { icon: <LayoutDashboard />, label: 'Overview', path: 'overview' },
-        { icon: <Users />, label: 'Directory', path: 'directory' },
-        { icon: <Clock />, label: 'Attendance', path: 'time' },
-        { icon: <Wind />, label: 'Leaves', path: 'leaves' },
-        { icon: <FileText />, label: 'Policies', path: 'policies' },
+        { icon: <LayoutDashboard size={18} />, label: 'Overview', path: 'overview' },
+        { icon: <Users size={18} />, label: 'Directory', path: 'directory' },
+        { icon: <Clock size={18} />, label: 'Attendance', path: 'time' },
+        { icon: <Wind size={18} />, label: 'Leaves', path: 'leaves' },
+        { icon: <FileText size={18} />, label: 'Policies', path: 'policies' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -104,132 +103,143 @@ const CompanyDashboard = () => {
     }));
 
     const renderOverview = () => {
-        if (globalError) {
+        if (employeesError) {
             return (
-                <div className="min-h-[600px] flex items-center justify-center">
+                <div className="p-8">
                     <ErrorState
-                        error={globalError as Error}
-                        onRetry={() => {
-                            refetchEmployees();
-                        }}
+                        error={employeesError as Error}
+                        onRetry={refetchEmployees}
+                        title="Operational Intelligence Offline"
+                        description="We encountered an issue while aggregating your enterprise data."
                     />
                 </div>
             );
         }
 
         return (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 text-left">
-                    <div className="text-left">
-                        <h1 className="text-2xl font-semibold tracking-tight">Operational Intel</h1>
+            <div className="p-6 md:p-8 space-y-10 animate-in fade-in duration-700 text-left">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight text-textPrimary">Operational Intel</h1>
                         <p className="text-sm font-medium text-textSecondary mt-1.5">Strategic overview for {session?.user?.email?.split('@')[1] || 'Enterprise'}.</p>
                     </div>
-                    <div className="flex gap-3">
-                        <Button variant="outline">
-                            <BarChart3 size={16} className="mr-2" /> Analytics
+                    <div className="flex gap-4">
+                        <Button variant="outline" size="lg" className="h-11 px-6 rounded-xl font-semibold gap-2 border-border hover:bg-surface transition-all">
+                            <BarChart3 size={18} /> Analytics
                         </Button>
-                        <Button onClick={() => setIsAddModalOpen(true)}>
-                            <UserPlus size={16} className="mr-2" /> Onboard Member
+                        <Button size="lg" className="h-11 px-6 rounded-xl font-bold gap-2 shadow-lg hover:shadow-xl transition-all" onClick={() => setIsAddModalOpen(true)}>
+                            <UserPlus size={18} /> Onboard Member
                         </Button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <StatCard title="Active Employees" value={String(activeEmployees)} icon={<Users />} trend="+4%" positive={true} />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <StatCard title="Active Personnel" value={String(activeEmployeesCount)} icon={<Users />} trend="+4.2%" positive={true} />
                     <StatCard
-                        title="Attendance Rate"
+                        title="Today's Attendance"
                         value={`${employees.length > 0 ? ((attendance.length / employees.length) * 100).toFixed(1) : "0"}%`}
                         icon={<Clock />}
-                        trend={`${attendance.length} checked in`}
+                        trend={`${attendance.length} members`}
                         positive={true}
                     />
-                    <StatCard title="Leave Utilization" value="08" icon={<Wind />} trend="-2" positive={true} />
+                    <StatCard title="Leave Velocity" value="08" icon={<Wind />} trend="-12.5%" positive={true} />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 card-premium p-8 bg-white text-left">
-                        <div className="flex items-center justify-between mb-10">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <Card className="lg:col-span-2 p-10 rounded-3xl border-border/40 shadow-sm bg-white overflow-hidden relative group">
+                        <div className="flex items-center justify-between mb-12">
                             <div>
-                                <h3 className="text-lg font-bold font-display text-textPrimary">Resource Velocity</h3>
-                                <p className="text-xs font-medium text-textSecondary mt-1">Personnel expansion metrics</p>
+                                <h3 className="text-xl font-bold text-textPrimary flex items-center gap-2">
+                                    <TrendingUp className="text-primary" size={20} /> Resource Velocity
+                                </h3>
+                                <p className="text-sm font-medium text-textSecondary mt-1.5">Personnel expansion metrics for the current fiscal year</p>
                             </div>
-                            <div className="flex items-center gap-4 text-xs font-bold text-textSecondary">
-                                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /> Projected</div>
-                                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary/20" /> Actual</div>
+                            <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2 text-xs font-bold text-textSecondary">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-primary" /> Projected
+                                </div>
+                                <div className="flex items-center gap-2 text-xs font-bold text-textSecondary">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-primary/20" /> Actual
+                                </div>
                             </div>
                         </div>
-                        <div className="h-56 flex items-end gap-4 px-2">
+                        <div className="h-64 flex items-end gap-5 px-2">
                             {[40, 70, 45, 95, 65, 85, 60, 80, 55, 90, 75, 85].map((h, i) => (
-                                <div key={i} className="flex-1 bg-primary/5 rounded-t-xl relative group transition-all duration-500 hover:bg-primary/10">
+                                <div key={i} className="flex-1 bg-primary/5 rounded-t-2xl relative group/bar transition-all duration-500 hover:bg-primary/10">
                                     <div
-                                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary to-primaryLight rounded-t-xl transition-all duration-1000 group-hover:brightness-110"
+                                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/80 to-primary rounded-t-2xl transition-all duration-1000 group-hover/bar:brightness-110 shadow-[0_0_15px_rgba(5,150,105,0.2)]"
                                         style={{ height: `${h}%` }}
                                     >
-                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-textPrimary text-xs font-bold text-white px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-[10px] font-bold text-white px-2 py-1 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-all transform scale-90 group-hover/bar:scale-100">
                                             {h}%
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <div className="flex justify-between mt-6 px-1 text-xs font-bold text-textSecondary">
-                            <span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Dec</span>
+                        <div className="flex justify-between mt-8 px-2 text-[10px] font-bold text-textSecondary uppercase tracking-widest">
+                            <span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
                         </div>
-                    </div>
+                    </Card>
 
-                    <div className="card-premium p-8 bg-gradient-to-br from-primary to-primaryDark text-white flex flex-col justify-between text-left border-none">
-                        <div>
-                            <div className="p-3 bg-white/10 w-fit rounded-xl mb-6">
-                                <Clock size={24} />
-                            </div>
-                            <h4 className="text-xl font-bold tracking-tight mb-2">Automated Registry</h4>
-                            <p className="text-sm font-medium text-white/70 leading-relaxed">System monitoring suggests high engagement across all field regions for the current cycle.</p>
+                    <Card className="rounded-3xl bg-slate-900 p-10 text-white border-none flex flex-col justify-between relative overflow-hidden group shadow-2xl">
+                        <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                            <Clock size={160} strokeWidth={0.5} />
                         </div>
-                        <Button className="w-full h-11 text-xs font-semibold text-white">
+                        <div className="relative z-10 space-y-8">
+                            <div className="p-4 bg-white/10 w-fit rounded-2xl border border-white/10 shadow-inner">
+                                <Clock size={28} className="text-primary" />
+                            </div>
+                            <div className="space-y-4">
+                                <h4 className="text-2xl font-bold tracking-tight">Automated Registry</h4>
+                                <p className="text-sm font-medium text-white/60 leading-relaxed">System monitoring suggests high engagement across all clusters for the current operational cycle.</p>
+                            </div>
+                        </div>
+                        <Button className="relative z-10 w-full h-12 rounded-xl font-bold bg-white text-slate-900 hover:bg-slate-100 border-none shadow-lg mt-10">
                             Audit Attendance Logs
                         </Button>
-                    </div>
+                    </Card>
                 </div>
             </div>
         );
     };
 
     const renderDirectory = () => (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
+        <div className="p-6 md:p-8 space-y-10 animate-in fade-in duration-700 text-left">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-2xl font-semibold tracking-tight">Personnel Registry</h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-textPrimary">Personnel Registry</h2>
                     <p className="text-sm font-medium text-textSecondary mt-1.5">Managing {employees.length} enterprise members.</p>
                 </div>
-                <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-primary/5 shadow-sm w-full md:w-[400px] focus-within:ring-4 focus-within:ring-primary/5 transition-all">
-                    <Search size={18} className="text-textSecondary" />
+                <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-border/60 shadow-sm w-full md:w-[450px] focus-within:ring-4 focus-within:ring-primary/5 transition-all">
+                    <Search size={20} className="text-textSecondary" />
                     <input
                         type="text"
-                        placeholder="Search by name, ID or role..."
-                        className="bg-transparent border-none outline-none text-sm font-bold w-full py-2.5 placeholder:text-textSecondary/30 text-textPrimary"
+                        placeholder="Search by name, ID or designation..."
+                        className="bg-transparent border-none outline-none text-sm font-bold w-full py-3 placeholder:text-textSecondary/40 text-textPrimary"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
                 </div>
             </div>
 
-            <div className="card-premium p-0 border border-primary/5 overflow-hidden bg-white min-h-[400px]">
+            <Card className="rounded-3xl overflow-hidden border-border/40 shadow-sm bg-white min-h-[500px]">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-primary/[0.02] border-b border-primary/5">
-                            <tr>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Member Info</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Designation</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Timeline</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Status</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary text-right">Actions</th>
+                        <thead>
+                            <tr className="bg-surface/50 border-b border-border/40">
+                                <th className="px-8 py-6 text-xs font-bold text-textSecondary uppercase tracking-widest">Resource</th>
+                                <th className="px-8 py-6 text-xs font-bold text-textSecondary uppercase tracking-widest">Designation</th>
+                                <th className="px-8 py-6 text-xs font-bold text-textSecondary uppercase tracking-widest">Timeline</th>
+                                <th className="px-8 py-6 text-xs font-bold text-textSecondary uppercase tracking-widest">Status</th>
+                                <th className="px-8 py-6 text-xs font-bold text-textSecondary uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-primary/5">
-                            {isLoading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
+                        <tbody className="divide-y divide-border/20">
+                            {loadingEmployees ? (
+                                Array.from({ length: 6 }).map((_, i) => (
                                     <tr key={i}>
-                                        <td className="px-8 py-6"><Skeleton className="h-10 w-48 rounded-xl" /></td>
+                                        <td className="px-8 py-6"><div className="flex gap-4"><Skeleton className="h-12 w-12 rounded-xl" /><div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-20" /></div></div></td>
                                         <td className="px-8 py-6"><Skeleton className="h-10 w-40 rounded-xl" /></td>
                                         <td className="px-8 py-6"><Skeleton className="h-10 w-28 rounded-xl" /></td>
                                         <td className="px-8 py-6"><Skeleton className="h-8 w-24 rounded-lg" /></td>
@@ -238,57 +248,59 @@ const CompanyDashboard = () => {
                                 ))
                             ) : filteredEmployees.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-8 py-20 text-center">
+                                    <td colSpan={5} className="px-8 py-24 text-center">
                                         <EmptyState
                                             title={query ? "No search results" : "Registry Empty"}
                                             description={query ? `No members match "${query}" in this organization.` : "Personnel records will appear here once onboarded."}
                                             icon={Users}
-                                            className="p-12"
+                                            className="border-none shadow-none p-0"
                                             action={!query && (
-                                                <Button onClick={() => setIsAddModalOpen(true)} className="px-6 h-11 text-xs font-bold uppercase tracking-[0.1em]">
-                                                    <UserPlus size={16} className="mr-2" /> Start Onboarding
+                                                <Button size="lg" onClick={() => setIsAddModalOpen(true)} className="h-11 px-8 rounded-xl font-bold gap-2">
+                                                    <UserPlus size={18} /> Start Onboarding
                                                 </Button>
                                             )}
                                         />
                                     </td>
                                 </tr>
                             ) : filteredEmployees.map((emp) => (
-                                <tr key={emp.id} className="group hover:bg-primary/[0.01] transition-all cursor-pointer">
-                                    <td className="px-8 py-5">
+                                <tr key={emp.id} className="group hover:bg-surface/50 transition-all cursor-pointer">
+                                    <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-11 h-11 rounded-2xl bg-primary/5 flex items-center justify-center font-bold text-primary text-sm border border-primary/10 group-hover:scale-110 transition-all shadow-sm">
+                                            <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center font-bold text-primary text-base border border-primary/10 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm">
                                                 {emp.full_name?.charAt(0) || '?'}
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{emp.full_name}</p>
-                                                <p className="text-xs text-textSecondary font-semibold mt-1.5">{emp.employee_code || '---'}</p>
+                                                <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1.5">{emp.employee_code || '---'}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <p className="text-sm font-bold text-textPrimary leading-none">{(emp as any).designation_name ?? emp.designation ?? '—'}</p>
-                                        <p className="text-xs text-textSecondary font-semibold mt-1.5">{emp.employment_type}</p>
+                                    <td className="px-8 py-6">
+                                        <p className="text-sm font-bold text-textPrimary">{(emp as any).designation_name ?? emp.designation ?? '—'}</p>
+                                        <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1.5">{emp.employment_type}</p>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-8 py-6">
                                         <p className="text-sm font-bold text-textPrimary">{emp.date_of_joining || '---'}</p>
-                                        <p className="text-xs text-textSecondary font-semibold mt-1.5">Onboarded</p>
+                                        <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1.5">Joined</p>
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <span className={cn(
-                                            "px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-[0.15em] border shadow-sm",
-                                            emp.status === 'active' ? 'bg-success/5 text-success border-success/10' : 'bg-background text-textSecondary border-primary/5'
-                                        )}>
+                                    <td className="px-8 py-6">
+                                        <Badge 
+                                            variant={emp.status === 'active' ? 'default' : 'secondary'}
+                                            className={cn(
+                                                "px-3 py-1 rounded-full font-bold uppercase tracking-wider text-[10px]",
+                                                emp.status === 'active' ? "bg-success/10 text-success border-success/20" : "bg-muted text-textSecondary border-border"
+                                            )}
+                                        >
                                             {emp.status}
-                                        </span>
+                                        </Badge>
                                     </td>
-                                    <td className="px-8 py-5 text-right">
-                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => setViewingEmployee(emp)}
-                                                className="h-10 w-10 text-textSecondary hover:text-primary hover:bg-primary/5 rounded-xl"
-                                                title="View Details"
+                                                className="h-10 w-10 text-textSecondary hover:text-primary hover:bg-primary/5 rounded-xl shadow-none"
                                             >
                                                 <Eye size={18} />
                                             </Button>
@@ -296,8 +308,7 @@ const CompanyDashboard = () => {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => setEditingEmployee(emp)}
-                                                className="h-10 w-10 text-textSecondary hover:text-primary hover:bg-primary/5 rounded-xl"
-                                                title="Edit Employee"
+                                                className="h-10 w-10 text-textSecondary hover:text-primary hover:bg-primary/5 rounded-xl shadow-none"
                                             >
                                                 <Edit3 size={18} />
                                             </Button>
@@ -305,8 +316,7 @@ const CompanyDashboard = () => {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDeleteEmployee(emp.id, emp.full_name)}
-                                                className="h-10 w-10 text-textSecondary hover:text-error hover:bg-error/5 rounded-xl"
-                                                title="Remove Employee"
+                                                className="h-10 w-10 text-textSecondary hover:text-error hover:bg-error/5 rounded-xl shadow-none"
                                             >
                                                 <Trash2 size={18} />
                                             </Button>
@@ -317,105 +327,117 @@ const CompanyDashboard = () => {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 
     const renderOperationsView = () => (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
+        <div className="p-6 md:p-8 space-y-10 animate-in fade-in duration-700 text-left">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-2xl font-semibold tracking-tight">Time & Operations</h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-textPrimary">Attendance Logs</h2>
                     <p className="text-sm font-medium text-textSecondary mt-1.5">Synchronized attendance and compute metrics.</p>
                 </div>
-                <div className="flex gap-3">
-                    <Button variant="outline" className="px-6 text-xs font-bold">Export Logs</Button>
-                    <Button variant="outline" className="px-6 text-xs font-bold">Shift Schedule</Button>
+                <div className="flex gap-4">
+                    <Button variant="outline" className="h-11 px-6 rounded-xl font-bold border-border">Export XML</Button>
+                    <Button variant="outline" className="h-11 px-6 rounded-xl font-bold border-border">Shift Planner</Button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <Card className="card-premium p-6 bg-white col-span-2">
-                    <div className="flex items-center justify-between mb-8">
-                        <h4 className="text-sm font-bold text-textSecondary uppercase">Real-time Attendance</h4>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-semibold tracking-widest">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
+                <Card className="lg:col-span-2 rounded-3xl overflow-hidden border-border/40 shadow-sm bg-white">
+                    <CardHeader className="py-6 px-8 border-b border-border/40 bg-surface/50 flex items-center justify-between">
+                        <CardTitle className="text-xs font-bold text-textSecondary uppercase tracking-widest">Real-time Check-ins</CardTitle>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-success/5 text-success rounded-full border border-success/10 text-[10px] font-bold tracking-widest uppercase">
                             <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
-                            Live Sync
+                            Live Cluster
                         </div>
-                    </div>
-                    <div className="space-y-6">
+                    </CardHeader>
+                    <CardContent className="p-0 min-h-[400px]">
                         {attendanceRecords.length === 0 ? (
-                            <div className="py-12 text-center">
-                                <p className="text-sm text-textSecondary">No attendance logs for today yet.</p>
+                            <div className="py-24 text-center">
+                                <EmptyState title="No logs today" description="Attendance records will populate once members check in." icon={Clock} className="border-none shadow-none" />
                             </div>
                         ) : (
-                            attendanceRecords.slice(0, 5).map((record, i) => (
-                                <div key={i} className="flex items-center justify-between group cursor-pointer p-2 rounded-xl hover:bg-primary/[0.02] transition-all">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center font-bold text-textSecondary border border-primary/5 text-xs">
-                                            {record.employeeName?.split(' ').map(n => n?.[0]).join('') || '?'}
+                            <div className="divide-y divide-border/20">
+                                {attendanceRecords.slice(0, 8).map((record, i) => (
+                                    <div key={i} className="flex items-center justify-between group p-6 hover:bg-surface/50 transition-all">
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-11 h-11 rounded-2xl bg-surface border border-border/40 flex items-center justify-center font-bold text-textSecondary text-xs shadow-inner">
+                                                {record.employeeName?.split(' ').map(n => n?.[0]).join('') || '?'}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{record.employeeName}</p>
+                                                <div className="flex items-center gap-2 mt-1.5">
+                                                    <MapPin size={10} className="text-textSecondary" />
+                                                    <p className="text-[10px] font-bold text-textSecondary uppercase tracking-widest">{record.work_location || 'Office'}</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-bold text-textPrimary">{record.employeeName}</p>
-                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1">{record.work_location || 'Office'}</p>
+                                        <div className="text-right space-y-1.5">
+                                            <p className="text-sm font-bold text-primary tracking-tight">{record.check_in_time ? record.check_in_time.slice(0, 5) : '--:--'}</p>
+                                            <Badge className={cn(
+                                                "text-[9px] font-bold uppercase tracking-widest border-none shadow-none",
+                                                record.status === 'present' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'
+                                            )}>{record.status}</Badge>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-sm font-bold text-primary">{record.check_in_time ? record.check_in_time.slice(0, 5) : '--:--'}</p>
-                                        <p className={cn(
-                                            "text-xs font-bold uppercase tracking-widest mt-1",
-                                            record.status === 'present' ? 'text-success' : 'text-primary'
-                                        )}>{record.status}</p>
-                                    </div>
-                                </div>
-                            ))
+                                ))}
+                            </div>
                         )}
-                    </div>
+                    </CardContent>
                 </Card>
 
-                <Card className="card-premium p-6 bg-white flex flex-col justify-between">
-                    <h4 className="text-sm font-bold text-textSecondary uppercase mb-6">Average Utilization</h4>
-                    <div className="flex flex-col items-center justify-center py-8">
-                        <div className="relative w-32 h-32 flex items-center justify-center">
+                <Card className="rounded-3xl p-10 bg-white border-border/40 shadow-sm flex flex-col justify-between overflow-hidden relative group">
+                    <div className="absolute -bottom-10 -right-10 opacity-5 group-hover:scale-110 transition-transform duration-700 text-primary">
+                        <TrendingUp size={200} />
+                    </div>
+                    <h4 className="text-xs font-bold text-textSecondary uppercase tracking-widest mb-10">Utilization Velocity</h4>
+                    <div className="flex flex-col items-center justify-center py-6">
+                        <div className="relative w-40 h-40 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">
-                                <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-primary/5" />
-                                <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={Math.PI * 2 * 58} strokeDashoffset={Math.PI * 2 * 58 * (1 - 0.88)} className="text-primary transition-all duration-1000" />
+                                <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="10" fill="transparent" className="text-primary/5" />
+                                <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="10" fill="transparent" strokeDasharray={Math.PI * 2 * 72} strokeDashoffset={Math.PI * 2 * 72 * (1 - 0.92)} className="text-primary transition-all duration-1000 ease-out" />
                             </svg>
-                            <span className="absolute text-2xl font-bold text-textPrimary">88%</span>
+                            <div className="absolute text-center">
+                                <span className="text-4xl font-bold text-textPrimary tracking-tighter">92%</span>
+                                <p className="text-[9px] font-bold text-textSecondary uppercase tracking-widest mt-1">Efficiency</p>
+                            </div>
                         </div>
-                        <p className="mt-6 text-xs font-semibold text-textSecondary">Efficiency Index</p>
                     </div>
+                    <p className="mt-10 text-[10px] font-bold text-textSecondary leading-relaxed text-center group-hover:text-textPrimary transition-colors">Your organization is performing <span className="text-success">above average</span> for this cycle.</p>
                 </Card>
 
-                <Card className="card-premium bg-primary text-white flex flex-col justify-between border-none">
-                    <div className="flex justify-between items-start">
-                        <div className="p-2.5 bg-white/10 rounded-xl text-white">
-                            <Wind size={20} />
-                        </div>
-                        <span className="text-xs font-bold">Registry Health</span>
+                <Card className="rounded-3xl bg-primary p-10 text-white border-none flex flex-col justify-between relative overflow-hidden group shadow-xl">
+                    <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
+                        <ShieldAlert size={140} strokeWidth={1} />
                     </div>
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-2">Cycle Status</p>
-                        <h4 className="text-2xl font-bold tracking-tight">Q3 Pulse Safe</h4>
-                        <p className="text-xs font-medium text-white/70 mt-3 leading-relaxed">Leave and attendance records are fully synchronized across core clusters.</p>
+                    <div className="relative z-10 space-y-6">
+                        <div className="p-4 bg-white/20 w-fit rounded-2xl border border-white/20 shadow-inner">
+                            <Wind size={24} />
+                        </div>
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">System Health</p>
+                            <h4 className="text-2xl font-bold tracking-tight">Sync Integrity</h4>
+                            <p className="text-sm font-medium text-white/80 leading-relaxed">Leave and attendance records are fully synchronized across core clusters.</p>
+                        </div>
                     </div>
                 </Card>
             </div>
         </div>
     );
 
-    if (isLoading) {
+    if (loadingEmployees) {
         return (
             <DashboardLayout navItems={customNavItems as any}>
-                <div className="space-y-12">
-                    <Skeleton className="h-14 w-80 rounded-2xl" />
-                    <div className="grid grid-cols-4 gap-8">
-                        <Skeleton className="h-36 rounded-3xl" />
-                        <Skeleton className="h-36 rounded-3xl" />
-                        <Skeleton className="h-36 rounded-3xl" />
-                        <Skeleton className="h-36 rounded-3xl" />
+                <div className="p-8 space-y-12">
+                    <SkeletonPageHeader />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <SkeletonCard className="h-40" />
+                        <SkeletonCard className="h-40" />
+                        <SkeletonCard className="h-40" />
                     </div>
-                    <Skeleton className="h-[500px] rounded-[3rem]" />
+                    <Skeleton className="h-[600px] rounded-[3rem]" />
                 </div>
             </DashboardLayout>
         );
@@ -423,7 +445,7 @@ const CompanyDashboard = () => {
 
     return (
         <DashboardLayout navItems={customNavItems as any}>
-            <main className="animate-in fade-in duration-500">
+            <main className="animate-in fade-in duration-500 min-h-[80vh]">
                 {currentView === 'overview' && renderOverview()}
                 {currentView === 'directory' && renderDirectory()}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={true} />}
@@ -447,33 +469,53 @@ const CompanyDashboard = () => {
 
 const StatCard = ({ title, value, icon, trend, positive }: any) => {
     return (
-        <div className="card-premium p-8 group relative overflow-hidden bg-white text-left">
-            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-125 group-hover:opacity-10 transition-all duration-700 text-primary">
-                {React.cloneElement(icon, { size: 64 })}
+        <Card className="rounded-3xl p-10 group relative overflow-hidden bg-white border-border/40 shadow-sm hover:shadow-lg transition-all duration-500 text-left">
+            <div className="absolute -bottom-8 -right-8 p-6 opacity-5 group-hover:scale-125 group-hover:opacity-10 transition-all duration-700 text-primary">
+                {React.cloneElement(icon, { size: 180 })}
             </div>
-            <div className="flex flex-col gap-8 relative z-10">
+            <div className="flex flex-col gap-10 relative z-10">
                 <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10 group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all shadow-sm">
-                        {React.cloneElement(icon, { size: 22 })}
+                    <div className="w-14 h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10 group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-sm">
+                        {React.cloneElement(icon, { size: 28 })}
                     </div>
                     {trend && (
                         <div className={cn(
-                            "flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg border",
-                            positive ? "text-success bg-success/5 border-success/10" : "text-error bg-error/5 border-error/10"
+                            "flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-full border shadow-sm",
+                            positive ? "text-success bg-success/5 border-success/20" : "text-error bg-error/5 border-error/20"
                         )}>
-                            {positive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+                            {positive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                             {trend}
                         </div>
                     )}
                 </div>
                 <div>
-                    <p className="text-xs font-bold text-textSecondary uppercase mb-2">{title}</p>
-                    <p className="text-2xl font-bold text-textPrimary font-display tracking-tight leading-none">{value}</p>
+                    <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mb-3">{title}</p>
+                    <p className="text-4xl font-bold text-textPrimary tracking-tighter leading-none">{value}</p>
                 </div>
             </div>
-        </div>
+        </Card>
     );
 };
+
+function ShieldAlert({ size = 24, strokeWidth = 2 }: { size?: number; strokeWidth?: number }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+    );
+}
 
 export default CompanyDashboard;
 

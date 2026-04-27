@@ -30,11 +30,12 @@ import {
   type ProfileUser,
   type Company,
   type Plan,
+  type Task,
   type ApiSuccessResponse,
 } from '../baseApi';
 
 // ─── Re-export Employee type for consumers ───────────────────────────────────
-export type { Employee, WorkPolicy, AttendanceRecord, LeaveType, LeaveBalance, LeaveRequest };
+export type { Employee, WorkPolicy, AttendanceRecord, LeaveType, LeaveBalance, LeaveRequest, Task };
 
 // ─── Helper: build query string ──────────────────────────────────────────────
 function qs(params: Record<string, any>): string {
@@ -672,6 +673,50 @@ export function useDepartmentMutations() {
   });
 
   return { create, update, remove };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  TASKS  (all roles, scoped by JWT)
+// ════════════════════════════════════════════════════════════════════════════
+
+export function useListTasks(params: any = {}, isAdmin: boolean = false) {
+    return useQuery({
+        queryKey: ['tasks', params, isAdmin],
+        queryFn: async () => {
+            const endpoint = isAdmin ? 'tasks' : 'tasks/my';
+            const res = await invokeApi<ApiSuccessResponse<Task[]>>(`${endpoint}${qs(params)}`);
+            return res.data ?? [];
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+}
+
+export function useTaskMutations(isAdmin: boolean = false) {
+    const qc = useQueryClient();
+    const invalidate = () => {
+        qc.invalidateQueries({ queryKey: ['tasks'] });
+        qc.invalidateQueries({ queryKey: ['dashboard'] });
+    };
+
+    const create = useMutation({
+        mutationFn: (payload: Partial<Task>) =>
+            invokeApi('tasks', { method: 'POST', body: payload }),
+        onSuccess: invalidate,
+    });
+
+    const update = useMutation({
+        mutationFn: ({ id, payload }: { id: string; payload: Partial<Task> }) =>
+            invokeApi(`tasks/${id}`, { method: 'PATCH', body: payload }),
+        onSuccess: invalidate,
+    });
+
+    const remove = useMutation({
+        mutationFn: (id: string) =>
+            invokeApi(`tasks/${id}`, { method: 'DELETE' }),
+        onSuccess: invalidate,
+    });
+
+    return { create, update, remove };
 }
 
 // ════════════════════════════════════════════════════════════════════════════

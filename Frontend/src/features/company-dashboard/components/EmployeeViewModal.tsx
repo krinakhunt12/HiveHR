@@ -8,14 +8,16 @@ import {
     Shield,
     Mail,
     Phone,
-    MapPin,
     Calendar,
     Building2,
     Clock,
     CircleDot,
     UserCheck,
+    Globe,
+    Zap
 } from 'lucide-react';
 import { cn } from '@/shared/utils/cn';
+import { Badge } from '@/shared/ui/badge';
 
 interface EmployeeViewModalProps {
     isOpen: boolean;
@@ -23,10 +25,10 @@ interface EmployeeViewModalProps {
     employee: Employee | null;
 }
 
-const statusConfig: Record<string, { label: string; color: string; dot: string }> = {
-    active: { label: 'Active', color: 'bg-emerald-50 text-emerald-700 border-emerald-100', dot: 'bg-emerald-500' },
-    inactive: { label: 'Inactive', color: 'bg-gray-50 text-gray-500 border-gray-200', dot: 'bg-gray-400' },
-    probation: { label: 'Probation', color: 'bg-amber-50 text-amber-700 border-amber-100', dot: 'bg-amber-500' },
+const statusConfig: Record<string, { label: string; variant: "outline"; className: string }> = {
+    active: { label: 'Active', variant: "outline", className: 'bg-success/5 text-success border-success/20' },
+    inactive: { label: 'Inactive', variant: "outline", className: 'bg-muted text-textSecondary border-border/40' },
+    probation: { label: 'Probation', variant: "outline", className: 'bg-warning/5 text-warning border-warning/20' },
 };
 
 const employmentTypeLabel: Record<string, string> = {
@@ -49,18 +51,18 @@ interface InfoRowProps {
 }
 
 const InfoRow = ({ icon, label, value, mono }: InfoRowProps) => (
-    <div className="flex items-start gap-4 py-3.5 border-b border-border/40 last:border-0">
-        <div className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 text-primary/60">
-            {icon}
+    <div className="flex items-start gap-5 py-4 border-b border-border/20 last:border-0 group/row">
+        <div className="w-9 h-9 rounded-xl bg-surface border border-border/40 flex items-center justify-center flex-shrink-0 mt-0.5 text-textSecondary group-hover/row:text-primary group-hover/row:border-primary/20 transition-all">
+            {React.cloneElement(icon as React.ReactElement, { size: 16 })}
         </div>
         <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-textSecondary mb-0.5">{label}</p>
+            <p className="text-[10px] font-bold text-textSecondary uppercase tracking-[0.2em] mb-1.5">{label}</p>
             <p className={cn(
-                'text-sm font-semibold text-textPrimary truncate',
-                mono && 'font-mono tracking-wide',
-                !value && 'text-textSecondary italic font-normal'
+                'text-sm font-bold text-textPrimary truncate transition-colors group-hover/row:text-primary',
+                mono && 'font-mono tracking-tight',
+                !value && 'text-textSecondary/40 italic font-medium'
             )}>
-                {value || 'Not provided'}
+                {value || 'Operational data missing'}
             </p>
         </div>
     </div>
@@ -75,7 +77,7 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
     const workLoc = workLocationLabel[(employee as any).work_location ?? ''] ?? (employee as any).work_location ?? '—';
     const joinDate = (employee as any).date_of_joining ?? (employee as any).joined_on ?? null;
     const formattedJoin = joinDate
-        ? new Date(joinDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+        ? new Date(joinDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
         : null;
 
     const initials = (employee.full_name || 'U')
@@ -86,100 +88,100 @@ export const EmployeeViewModal = ({ isOpen, onClose, employee }: EmployeeViewMod
         .slice(0, 2);
 
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} title="Employee Profile" className="max-w-2xl">
-            {/* Hero section */}
-            <div className="flex items-center gap-6 mb-10 pb-10 border-b border-border/40">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/15 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl font-bold text-primary tracking-tight">{initials}</span>
+        <Dialog isOpen={isOpen} onClose={onClose} title="Member Telemetry" className="max-w-2xl">
+            <div className="flex items-center gap-8 mb-10 pb-10 border-b border-border/20 text-left">
+                <div className="w-24 h-24 rounded-[2rem] bg-surface border-2 border-border/40 flex items-center justify-center flex-shrink-0 shadow-inner group/avatar">
+                    <span className="text-3xl font-bold text-primary tracking-tighter group-hover:scale-110 transition-transform">{initials}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h2 className="text-xl font-bold text-textPrimary tracking-tight truncate">{employee.full_name}</h2>
-                    <p className="text-sm font-semibold text-primary/70 mt-0.5 truncate">{designation}</p>
-                    <div className="flex items-center gap-3 mt-3 flex-wrap">
-                        {/* Status badge */}
-                        <span className={cn(
-                            'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border',
-                            status.color
-                        )}>
-                            <span className={cn('w-1.5 h-1.5 rounded-full', status.dot)} />
+                    <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-2xl font-bold text-textPrimary tracking-tight truncate">{employee.full_name}</h2>
+                        <Badge 
+                            variant={status.variant}
+                            className={cn("px-3 py-1 rounded-full font-bold uppercase tracking-widest text-[9px] shadow-none", status.className)}
+                        >
                             {status.label}
-                        </span>
-                        {/* Employee code badge */}
+                        </Badge>
+                    </div>
+                    <p className="text-sm font-bold text-primary/80 uppercase tracking-widest truncate">{designation}</p>
+                    <div className="flex items-center gap-4 mt-4">
                         {employee.employee_code && (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-50 text-gray-500 border border-gray-200">
-                                <Hash size={9} />
+                            <Badge variant="outline" className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-surface border-border/40 text-textSecondary flex gap-1.5 shadow-none">
+                                <Hash size={10} className="mt-0.5" />
                                 {employee.employee_code}
-                            </span>
+                            </Badge>
                         )}
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-textSecondary uppercase tracking-widest">
+                            <Globe size={10} />
+                            {workLoc}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Two-column grid of info sections */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
-                {/* Left column — Personal & Contact */}
-                <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-textSecondary mb-3 flex items-center gap-2">
-                        <User size={10} /> Personal & Contact
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-left">
+                <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary/60 mb-6 flex items-center gap-2">
+                        <User size={12} /> Contact Registry
                     </p>
-                    <InfoRow icon={<Mail size={14} />} label="Email" value={(employee as any).email} />
-                    <InfoRow icon={<Phone size={14} />} label="Phone" value={employee.phone} />
+                    <InfoRow icon={<Mail />} label="Secure Email" value={(employee as any).email} />
+                    <InfoRow icon={<Phone />} label="Communication Line" value={employee.phone} />
                     <InfoRow
-                        icon={<UserCheck size={14} />}
-                        label="Gender"
+                        icon={<UserCheck />}
+                        label="Identity Gender"
                         value={employee.gender && employee.gender.length > 0
                             ? employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1)
                             : null}
                     />
                     <InfoRow
-                        icon={<Calendar size={14} />}
-                        label="Date of Birth"
+                        icon={<Calendar />}
+                        label="Birth Chronology"
                         value={employee.date_of_birth
-                            ? new Date(employee.date_of_birth).toLocaleDateString('en-IN', {
+                            ? new Date(employee.date_of_birth).toLocaleDateString('en-US', {
                                 day: 'numeric', month: 'long', year: 'numeric'
                             })
                             : null}
                     />
-                    <InfoRow icon={<Shield size={14} />} label="Emergency Contact" value={(employee as any).emergency_contact} />
+                    <InfoRow icon={<Shield />} label="Emergency Protocol" value={(employee as any).emergency_contact} />
                 </div>
 
-                {/* Right column — Employment */}
-                <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-textSecondary mb-3 flex items-center gap-2">
-                        <Briefcase size={10} /> Employment Details
+                <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary/60 mb-6 flex items-center gap-2">
+                        <Briefcase size={12} /> Personnel Metrics
                     </p>
-                    <InfoRow icon={<Briefcase size={14} />} label="Designation" value={designation} />
-                    <InfoRow icon={<Building2 size={14} />} label="Employment Type" value={empType} />
-                    <InfoRow icon={<MapPin size={14} />} label="Work Location" value={workLoc} />
+                    <InfoRow icon={<Briefcase />} label="Current Designation" value={designation} />
+                    <InfoRow icon={<Building2 />} label="Employment Matrix" value={empType} />
+                    <InfoRow icon={<Zap />} label="System Permissions" value={employee.role === 'company_admin' ? 'Administrative' : 'Standard Access'} />
                     <InfoRow
-                        icon={<Calendar size={14} />}
-                        label="Date of Joining"
+                        icon={<Calendar />}
+                        label="Initialization Date"
                         value={formattedJoin}
                     />
                     <InfoRow
-                        icon={<Hash size={14} />}
-                        label="Employee Code"
+                        icon={<Hash />}
+                        label="Registry Index"
                         value={employee.employee_code}
                         mono
                     />
                 </div>
             </div>
 
-            {/* Status footer strip */}
-            <div className="mt-10 pt-6 border-t border-border/40 flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-textSecondary">
-                    <Clock size={10} />
+            <div className="mt-12 pt-8 border-t border-border/20 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3 text-[10px] font-bold text-textSecondary uppercase tracking-widest">
+                    <Clock size={12} className="text-primary/40" />
                     <span>
-                        Record created{' '}
-                        {new Date(employee.created_at).toLocaleDateString('en-IN', {
-                            day: 'numeric', month: 'short', year: 'numeric'
-                        })}
+                        Object created{' '}
+                        <span className="text-textPrimary">
+                            {new Date(employee.created_at).toLocaleDateString('en-US', {
+                                day: 'numeric', month: 'short', year: 'numeric'
+                            })}
+                        </span>
                     </span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                    <CircleDot size={10} className="text-primary/40" />
-                    <span className="text-xs font-bold text-textSecondary">
-                        Read-only view
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-surface rounded-lg border border-border/40">
+                    <CircleDot size={10} className="text-success animate-pulse" />
+                    <span className="text-[9px] font-bold text-textSecondary uppercase tracking-[0.2em]">
+                        Read-only telemetry
                     </span>
                 </div>
             </div>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     Calendar,
     CheckCircle2,
-    XCircle,
     ArrowRight,
     Filter,
     Search,
@@ -10,13 +9,16 @@ import {
     Wind,
     History,
     Settings,
-    Plus
+    Plus,
+    Clock
 } from 'lucide-react';
+import {Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
-import { Skeleton, SkeletonButton, SkeletonCard, SkeletonTable } from '@/shared/ui/skeleton';
+import { SkeletonCard, SkeletonTable, SkeletonPageHeader } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
+import { Separator } from '@/shared/ui/separator';
 import { cn } from '@/shared/utils/cn';
 import { useListLeaves, useLeaveMutations, useLeaveBalance } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
@@ -24,7 +26,6 @@ import { useAuthStore } from '@/shared/auth/store';
 import { detectRole } from '@/shared/utils/authUtils';
 import { LeaveRequestModal } from '../components/LeaveRequestModal';
 import { LeaveSettingsModal } from '../components/LeaveSettingsModal';
-import { Info } from 'lucide-react';
 
 interface LeaveManagementViewProps {
     isAdmin?: boolean;
@@ -68,43 +69,36 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
         }
     };
 
-    if (error) {
-        return (
-            <div className="min-h-[600px] flex items-center justify-center">
-                <ErrorState
-                    error={error as Error}
-                    onRetry={() => refetch()}
-                />
-            </div>
-        );
-    }
-
     if (isLoading) {
         return (
-            <div className="space-y-10 text-left">
-                <div className="flex justify-between items-center">
-                    <div className="space-y-2">
-                        <Skeleton className="h-8 w-64 rounded-xl" />
-                        <Skeleton className="h-4 w-96 rounded-md" />
-                    </div>
-                    <div className="flex gap-3">
-                        <SkeletonButton className="h-11 w-48" />
-                    </div>
-                </div>
+            <div className="p-6 md:p-8 space-y-10">
+                <SkeletonPageHeader />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
-                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
-                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
+                    <SkeletonCard hasHeader={false} className="h-44" />
+                    <SkeletonCard hasHeader={false} className="h-44" />
+                    <SkeletonCard hasHeader={false} className="h-44" />
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="lg:col-span-2">
                         <SkeletonTable rows={6} columns={4} />
                     </div>
                     <div className="space-y-8">
-                        <Skeleton className="h-[400px] rounded-[2rem]" />
-                        <Skeleton className="h-48 rounded-[2rem]" />
+                        <SkeletonCard className="h-[450px]" />
                     </div>
                 </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-12">
+                <ErrorState
+                    error={error as Error}
+                    onRetry={() => refetch()}
+                    title="Leave System Offline"
+                    description="We're having trouble retrieving attendance records."
+                />
             </div>
         );
     }
@@ -113,28 +107,30 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     const historyRequests = leaves.filter((r: any) => r.status !== 'pending');
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
+        <div className="p-6 md:p-8 space-y-10 animate-in fade-in duration-700 text-left">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">Time-Off Registry</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-textPrimary">Attendance & Leave</h1>
                     <p className="text-sm font-medium text-textSecondary mt-1.5">
                         {isAdmin ? 'Administrative control over enterprise leave logistics.' : 'Manage your personal attendance and leave allocations.'}
                     </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                     {isAdmin && (
                         <Button
                             variant="outline"
+                            size="lg"
                             onClick={() => setIsSettingsModalOpen(true)}
-                            className="gap-2 px-4 text-xs font-semibold border-primary/10 hover:bg-primary/5"
+                            className="h-11 px-6 rounded-xl font-semibold gap-2 border-border hover:bg-surface transition-all"
                         >
-                            <Settings size={18} /> Governance Policies
+                            <Settings size={18} /> Governance
                         </Button>
                     )}
                     {!isAdmin && (
                         <Button
+                            size="lg"
                             onClick={() => setIsRequestModalOpen(true)}
-                            className="gap-2 px-6 h-11 text-xs font-medium"
+                            className="h-11 px-8 rounded-xl font-bold gap-2 shadow-lg hover:shadow-xl transition-all"
                         >
                             <Plus size={18} /> Initiate Request
                         </Button>
@@ -142,17 +138,26 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 </div>
             </div>
 
+            <Separator className="bg-border/60" />
+
+            {/* Quotas Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {isPrivileged ? (
-                    <div className="col-span-full py-10 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col items-center justify-center text-center px-6">
-                        <Info className="text-primary mb-4" size={32} />
-                        <h3 className="text-lg font-bold text-textPrimary">{isSuperAdmin ? 'Platform Admin View' : 'Administrative Context'}</h3>
-                        <p className="text-sm text-textSecondary mt-2 max-w-md">
-                            {isSuperAdmin
-                                ? 'As a Super Admin, you are viewing the global dashboard. Leave quotas are scoped to individual employees.'
-                                : 'As an Administrator, personal leave quotas are hidden. You can manage and review member requests below.'}
-                        </p>
-                    </div>
+                    <Card className="col-span-full border-dashed border-primary/20 bg-primary/[0.02] rounded-3xl overflow-hidden">
+                        <CardContent className="flex flex-col items-center justify-center py-12 px-6 text-center space-y-4">
+                            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                                <ShieldAlert size={32} />
+                            </div>
+                            <div className="max-w-md">
+                                <h3 className="text-xl font-bold text-textPrimary">{isSuperAdmin ? 'Platform Administrator' : 'Company Executive'}</h3>
+                                <p className="text-sm font-medium text-textSecondary mt-2">
+                                    {isSuperAdmin
+                                        ? 'Global visibility enabled. Leave quotas are scoped to individual personnel profiles.'
+                                        : 'Administrative mode active. Personal quotas are suppressed in favor of team management views.'}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 ) : balances.length > 0 ? (
                     balances.map((b: any) => (
                         <QuotaProgress
@@ -164,64 +169,76 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         />
                     ))
                 ) : (
-                    <div className="col-span-full py-10 bg-surface rounded-2xl border border-dashed border-border flex flex-col items-center justify-center">
-                        <p className="text-sm font-bold text-textSecondary">No leave quotas assigned to your current policy.</p>
+                    <div className="col-span-full">
+                        <EmptyState 
+                            title="No Quotas Assigned" 
+                            description="Your current employment profile does not have any leave allocations." 
+                            icon={CalendarRange}
+                        />
                     </div>
                 )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-8">
-                    <Card className="card-premium overflow-hidden bg-white">
-                        <CardHeader className="py-6 px-8 border-b border-primary/5 bg-primary/[0.01] flex flex-row items-center justify-between">
-                            <CardTitle className="text-base font-bold text-textPrimary flex items-center gap-2">
-                                <History size={18} className="text-primary" /> Allocation History
+                {/* History Table */}
+                <div className="lg:col-span-2">
+                    <Card className="rounded-3xl overflow-hidden border-border/40 shadow-sm">
+                        <CardHeader className="py-6 px-8 border-b border-border/40 bg-surface/50 flex flex-row items-center justify-between">
+                            <CardTitle className="text-lg font-bold text-textPrimary flex items-center gap-3">
+                                <History size={20} className="text-primary" /> Allocation Registry
                             </CardTitle>
                             <div className="flex gap-2">
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-primary/10"><Filter size={14} /></Button>
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-primary/10"><Search size={14} /></Button>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl"><Search size={16} /></Button>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl"><Filter size={16} /></Button>
                             </div>
                         </CardHeader>
-                        <CardContent className="p-0 min-h-[300px]">
+                        <CardContent className="p-0">
                             {historyRequests.length === 0 ? (
                                 <EmptyState
                                     title="Registry Empty"
-                                    description="Historical leave records will appear here once processed."
-                                    icon={History}
-                                    className="py-20"
+                                    description="Processed leave records will appear here."
+                                    icon={Clock}
+                                    className="border-none shadow-none py-24"
                                 />
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
-                                        <thead className="bg-primary/[0.01]">
-                                            <tr>
-                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Resource</th>
-                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Duration</th>
-                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Status</th>
-                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em] text-right">Review</th>
+                                        <thead>
+                                            <tr className="bg-surface/30 border-b border-border/20">
+                                                <th className="px-8 py-5 text-xs font-bold text-textSecondary uppercase tracking-widest">Employee / Type</th>
+                                                <th className="px-8 py-5 text-xs font-bold text-textSecondary uppercase tracking-widest">Duration</th>
+                                                <th className="px-8 py-5 text-xs font-bold text-textSecondary uppercase tracking-widest">Status</th>
+                                                <th className="px-8 py-5 text-xs font-bold text-textSecondary uppercase tracking-widest text-right">Reference</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-primary/5">
+                                        <tbody className="divide-y divide-border/20">
                                             {historyRequests.map((req: any) => (
-                                                <tr key={req.id} className="hover:bg-primary/[0.01] transition-colors group">
-                                                    <td className="px-8 py-5">
-                                                        <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Individual'}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">{req.leave_type}</p>
+                                                <tr key={req.id} className="hover:bg-surface/50 transition-colors group">
+                                                    <td className="px-8 py-6">
+                                                        <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Staff Member'}</p>
+                                                        <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1.5">{req.leave_type}</p>
                                                     </td>
-                                                    <td className="px-8 py-5">
-                                                        <p className="text-sm font-bold text-textPrimary">{req.start_date} <ArrowRight size={12} className="inline mx-1 " /> {req.end_date}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">Standard Cycle</p>
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-2 text-sm font-bold text-textPrimary">
+                                                            <span>{req.start_date}</span>
+                                                            <ArrowRight size={14} className="text-textSecondary" />
+                                                            <span>{req.end_date}</span>
+                                                        </div>
+                                                        <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1.5">Standard Cycle</p>
                                                     </td>
-                                                    <td className="px-8 py-5">
-                                                        <span className={cn(
-                                                            "px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-[0.15em] border shadow-sm",
-                                                            req.status === 'approved' ? 'bg-success/5 text-success border-success/10' : 'bg-error/5 text-error border-error/10'
-                                                        )}>
+                                                    <td className="px-8 py-6">
+                                                        <Badge 
+                                                            variant={req.status === 'approved' ? 'default' : 'destructive'}
+                                                            className={cn(
+                                                                "px-3 py-1 rounded-full font-bold uppercase tracking-wider text-[10px]",
+                                                                req.status === 'approved' ? 'bg-success/10 text-success border-success/20' : 'bg-error/10 text-error border-error/20'
+                                                            )}
+                                                        >
                                                             {req.status}
-                                                        </span>
+                                                        </Badge>
                                                     </td>
-                                                    <td className="px-8 py-5 text-right">
-                                                        <p className="text-xs font-bold text-textSecondary italic">{req.admin_comment || 'No notes'}</p>
+                                                    <td className="px-8 py-6 text-right">
+                                                        <p className="text-xs font-bold text-textSecondary italic">{req.admin_comment || 'Internal'}</p>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -233,59 +250,58 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                     </Card>
                 </div>
 
+                {/* Pending Section */}
                 <div className="space-y-8">
-                    <Card className="card-premium bg-white overflow-hidden border-primary/10">
-                        <CardHeader className="py-6 px-8 border-b border-primary/5 bg-primary/[0.01]">
-                            <CardTitle className="text-sm font-semibold text-textSecondary uppercase">Pending Validation</CardTitle>
+                    <Card className="rounded-3xl overflow-hidden border-border/40 shadow-sm">
+                        <CardHeader className="py-6 px-8 border-b border-border/40 bg-surface/50">
+                            <CardTitle className="text-xs font-bold text-textSecondary uppercase tracking-widest">Pending Validation</CardTitle>
                         </CardHeader>
-                        <CardContent className="p-0 min-h-[300px]">
+                        <CardContent className="p-0">
                             {pendingRequests.length === 0 ? (
                                 <EmptyState
-                                    title="All Clear"
-                                    description="No pending leave requests require review."
+                                    title="Queue Empty"
+                                    description="No requests require immediate review."
                                     icon={CheckCircle2}
-                                    className="py-16"
+                                    className="border-none shadow-none py-20"
                                 />
                             ) : (
-                                <div className="divide-y divide-primary/5">
+                                <div className="divide-y divide-border/20">
                                     {pendingRequests.map((req: any) => (
-                                        <div key={req.id} className="p-8 hover:bg-primary/[0.02] transition-all group">
-                                            <div className="flex justify-between items-start mb-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold border border-primary/10">
-                                                        {req.employees?.full_name?.charAt(0) || 'U'}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Anonymous'}</p>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-textSecondary mt-1">{req.leave_type}</p>
-                                                    </div>
+                                        <div key={req.id} className="p-8 hover:bg-surface/30 transition-all group">
+                                            <div className="flex items-center gap-4 mb-6">
+                                                <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary font-bold border border-primary/10 text-lg shadow-inner">
+                                                    {req.employees?.full_name?.charAt(0) || 'S'}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Staff Member'}</p>
+                                                    <p className="text-xs font-bold uppercase tracking-widest text-textSecondary mt-1">{req.leave_type}</p>
                                                 </div>
                                             </div>
 
-                                            <div className="bg-primary/[0.02] p-4 rounded-xl border border-primary/5 mb-6">
-                                                <div className="flex items-center gap-3 text-textPrimary mb-3">
-                                                    <Calendar size={14} className="text-primary" />
+                                            <div className="bg-surface p-5 rounded-2xl border border-border/40 mb-6 space-y-3 shadow-sm">
+                                                <div className="flex items-center gap-3 text-textPrimary">
+                                                    <Calendar size={16} className="text-primary" />
                                                     <span className="text-xs font-bold">{req.start_date} – {req.end_date}</span>
                                                 </div>
-                                                <p className="text-xs text-textSecondary font-semibold leading-relaxed">{req.reason || 'No specific rationale provided.'}</p>
+                                                <p className="text-xs font-medium text-textSecondary leading-relaxed italic">"{req.reason || 'No specific rationale provided.'}"</p>
                                             </div>
 
                                             {isAdmin && (
-                                                <div className="grid grid-cols-2 gap-3">
+                                                <div className="grid grid-cols-2 gap-4">
                                                     <Button
-                                                        variant="outline"
+                                                        variant="ghost"
                                                         disabled={review.isPending}
                                                         onClick={() => handleAction(req.id, 'rejected')}
-                                                        className="h-10 text-xs font-bold uppercase tracking-widest border-error/20 text-error hover:bg-error/10"
+                                                        className="h-11 rounded-xl font-bold text-error hover:bg-error/5 hover:text-error transition-all"
                                                     >
-                                                        <XCircle size={14} className="mr-2" /> Decline
+                                                        Decline
                                                     </Button>
                                                     <Button
                                                         disabled={review.isPending}
                                                         onClick={() => handleAction(req.id, 'approved')}
-                                                        className="h-10 text-xs font-bold uppercase tracking-widest"
+                                                        className="h-11 rounded-xl font-bold shadow-md hover:shadow-lg transition-all"
                                                     >
-                                                        <CheckCircle2 size={14} className="mr-2" /> Approve
+                                                        Approve
                                                     </Button>
                                                 </div>
                                             )}
@@ -296,13 +312,20 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         </CardContent>
                     </Card>
 
-                    <Card className="card-premium bg-gradient-to-br from-primary to-primaryDark p-8 text-white border-none ">
-                        <div className="p-3 bg-white/10 w-fit rounded-xl mb-6"><Wind size={24} /></div>
-                        <h4 className="text-xl font-bold tracking-tight mb-2">Policy Overview</h4>
-                        <p className="text-xs font-medium text-white/70 leading-relaxed mb-6">Global leave parameters are optimized for enterprise stability. Review the updated handbook for Q3 guidelines.</p>
-                        <Button className="w-full h-11 text-xs font-semibold text-white">
-                            Download Handbook
-                        </Button>
+                    <Card className="rounded-3xl bg-slate-900 p-8 text-white border-none relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                            <Wind size={120} strokeWidth={1} />
+                        </div>
+                        <div className="relative z-10 space-y-6">
+                            <div className="p-3 bg-white/10 w-fit rounded-2xl"><Wind size={24} /></div>
+                            <div className="space-y-2">
+                                <h4 className="text-xl font-bold tracking-tight">Policy Insights</h4>
+                                <p className="text-sm font-medium text-white/60 leading-relaxed">Enterprise attendance parameters are optimized for operational stability. Review the Q3 Handbook.</p>
+                            </div>
+                            <Button className="w-full h-12 rounded-xl font-bold bg-white text-slate-900 hover:bg-slate-100 border-none">
+                                Download Registry PDF
+                            </Button>
+                        </div>
                     </Card>
                 </div>
             </div>
@@ -314,39 +337,62 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 };
 
 const QuotaProgress = ({ label, current, total, color }: { label: string, current: number, total: number, color: 'primary' | 'accent' }) => {
-    const percentage = (current / total) * 100;
+    const percentage = Math.min((current / total) * 100, 100);
     const isAccent = color === 'accent';
 
     return (
-        <Card className="card-premium p-8 bg-white text-left group">
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <p className="text-xs font-bold text-textSecondary mb-2">{label}</p>
-                    <p className="text-2xl font-bold text-textPrimary">{current}/{total} <span className="text-xs font-bold text-textSecondary ml-1">Days</span></p>
+        <Card className="rounded-3xl p-8 bg-white border-border/40 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+            <div className="flex items-center justify-between mb-10 relative z-10">
+                <div className="space-y-2">
+                    <p className="text-xs font-bold text-textSecondary uppercase tracking-widest">{label}</p>
+                    <div className="flex items-baseline gap-1.5">
+                        <p className="text-3xl font-bold text-textPrimary tracking-tight">{current}</p>
+                        <p className="text-sm font-bold text-textSecondary">/ {total} Days</p>
+                    </div>
                 </div>
                 <div className={cn(
-                    "p-3 rounded-xl border group-hover:scale-110 transition-transform",
+                    "w-14 h-14 rounded-2xl flex items-center justify-center border shadow-inner group-hover:scale-110 transition-transform duration-500",
                     isAccent ? "bg-accent/5 text-accent border-accent/10" : "bg-primary/5 text-primary border-primary/10"
                 )}>
-                    <CalendarRange size={20} />
+                    <CalendarRange size={24} />
                 </div>
             </div>
 
-            <div className="space-y-3">
-                <div className="h-2 bg-primary/5 rounded-full overflow-hidden">
+            <div className="space-y-4 relative z-10">
+                <div className="h-2.5 bg-muted/40 rounded-full overflow-hidden">
                     <div
                         className={cn(
-                            "h-full transition-all duration-1000",
-                            isAccent ? "bg-accent shadow-[0_0_12px_rgba(217,119,6,0.4)]" : "bg-primary shadow-[0_0_12px_rgba(5,150,105,0.4)]"
+                            "h-full transition-all duration-1000 rounded-full",
+                            isAccent ? "bg-accent shadow-[0_0_15px_rgba(217,119,6,0.3)]" : "bg-primary shadow-[0_0_15px_rgba(5,150,105,0.3)]"
                         )}
                         style={{ width: `${percentage}%` }}
                     />
                 </div>
-                <div className="flex justify-between text-xs font-bold text-textSecondary">
-                    <span>Utilization</span>
-                    <span>{Math.round(percentage)}%</span>
+                <div className="flex justify-between text-xs font-bold text-textSecondary tracking-wide">
+                    <span>Utilization Index</span>
+                    <span className={cn(isAccent ? "text-accent" : "text-primary")}>{Math.round(percentage)}%</span>
                 </div>
             </div>
         </Card>
     );
 };
+
+function ShieldAlert({ size = 24 }: { size?: number }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+    );
+}

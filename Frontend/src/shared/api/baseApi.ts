@@ -217,6 +217,19 @@ export interface Plan {
   created_at: string;
 }
 
+export interface Task {
+  id: string;
+  company_id: string;
+  title: string;
+  description: string | null;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: 'pending' | 'in_progress' | 'completed' | 'blocked';
+  due_date: string | null;
+  created_at: string;
+  employee_id: string | null;
+  employees?: { id: string; full_name: string } | null;
+}
+
 // ─── Token Helper ───────────────────────────────────────────────────────────
 
 function getAccessTokenFromStore(): string | null {

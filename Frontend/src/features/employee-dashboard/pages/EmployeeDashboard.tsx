@@ -6,15 +6,20 @@ import {
     AlertCircle,
     LayoutDashboard,
     Wind,
-    FileText
+    FileText,
+    Calendar,
+    ArrowRight,
+    TrendingUp,
+    ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-import { Skeleton, SkeletonButton, SkeletonCard } from '@/shared/ui/skeleton';
+import { Card, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
+import { Skeleton, SkeletonCard, SkeletonPageHeader } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
 import { useTodayAttendance, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
 import { ForcePasswordChangeModal } from '@/features/auth/components/ForcePasswordChangeModal';
-
 import { PoliciesView } from '@/features/policies/pages/PoliciesView';
 
 type View = 'dashboard' | 'leaves' | 'policies';
@@ -49,7 +54,6 @@ const EmployeeDashboard = () => {
     const canCheckIn = !hasAttendance;
     const canCheckOut = hasAttendance && !attendanceToday.check_out_time;
 
-    // Use check_in_at (ISO string built by hook) for elapsed time calculation
     const checkInTime = hasAttendance && attendanceToday.check_in_at ? new Date(attendanceToday.check_in_at).getTime() : null;
     const [elapsedMinutes, setElapsedMinutes] = useState(0);
 
@@ -65,13 +69,11 @@ const EmployeeDashboard = () => {
         };
 
         updateElapsed();
-        const interval = setInterval(updateElapsed, 30000); // Update every 30s
+        const interval = setInterval(updateElapsed, 30000);
 
         return () => clearInterval(interval);
     }, [checkInTime, attendanceToday?.check_out_at]);
 
-    // Break logic: Usually 60 mins. 
-    // We only deduct it if the user has been here for more than 4 hours (240 mins) or if they've checked out.
     const breakMinutes = attendanceToday?.break_minutes ?? 60;
 
     const displayMinutes = attendanceToday?.check_out_at
@@ -101,105 +103,155 @@ const EmployeeDashboard = () => {
     }));
 
     const renderDashboard = () => (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
+        <div className="p-6 md:p-8 space-y-10 animate-in fade-in duration-700 text-left">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">Welcome, {userName}</h1>
-                    <p className="text-sm font-medium text-textSecondary mt-1.5">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-textPrimary">Welcome, {userName}</h1>
+                    <div className="flex items-center gap-2 text-sm font-medium text-textSecondary mt-2">
+                        <Calendar size={14} className="text-primary" />
+                        {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    </div>
                 </div>
-                <div className="flex flex-col md:flex-row gap-4 items-center">
+                <div className="flex flex-col md:flex-row gap-6 items-center">
                     {hasAttendance && !attendanceToday.check_out_at && (
-                        <div className="text-right mr-4">
-                            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Target Punch Out (9h)</p>
-                            <p className="text-lg font-medium text-primary tracking-tight">{estimatedPunchOut}</p>
+                        <div className="text-center md:text-right">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-textSecondary mb-1.5">Target Punch Out (9h)</p>
+                            <Badge variant="outline" className="text-lg font-bold text-primary px-3 py-1 border-primary/20 bg-primary/5 rounded-xl shadow-none">
+                                {estimatedPunchOut}
+                            </Badge>
                         </div>
                     )}
-                    <div className="flex gap-3">
+                    <div className="flex gap-4">
                         <Button
                             variant="outline"
+                            size="lg"
                             onClick={() => setCurrentView('leaves')}
-                            className="px-5 py-2 text-sm font-medium h-10"
+                            className="h-11 px-6 rounded-xl font-bold border-border bg-white shadow-sm hover:shadow-md transition-all"
                         >
                             Request Leave
                         </Button>
                         <Button
+                            size="lg"
                             className={cn(
-                                "px-6 py-2 h-10 font-medium text-sm active:scale-[0.98]",
-                                canCheckIn
-                                    ? "bg-primary text-white"
-                                    : canCheckOut
-                                        ? "bg-warning text-white border-none"
-                                        : "bg-background text-textSecondary cursor-not-allowed"
+                                "h-11 px-8 rounded-xl font-bold shadow-lg transition-all",
+                                canCheckIn ? "bg-primary" : canCheckOut ? "bg-slate-900" : "bg-muted text-textSecondary"
                             )}
                             onClick={canCheckIn ? onCheckIn : onCheckOut}
-                            disabled={!canCheckIn && !canCheckOut}
-                            loading={isSavingAttendance}
+                            disabled={(!canCheckIn && !canCheckOut) || isSavingAttendance}
                         >
-                            {canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Done'}
+                            {isSavingAttendance ? (
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <>{canCheckIn ? 'Punch In' : canCheckOut ? 'Punch Out' : 'Operational'}</>
+                            )}
                         </Button>
                     </div>
                 </div>
             </div>
 
             {error && (
-                <div className="p-4 bg-error/10 border border-error/20 rounded-md flex items-center gap-3 text-error animate-pulse">
-                    <AlertCircle size={18} />
-                    <p className="text-sm font-medium uppercase tracking-widest">{error}</p>
-                </div>
+                <Card className="bg-error/5 border-error/20 p-4 rounded-2xl flex items-center gap-4 text-error animate-in zoom-in duration-300">
+                    <AlertCircle size={20} />
+                    <p className="text-xs font-bold uppercase tracking-widest">{error}</p>
+                </Card>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="card-premium p-6 border border-border flex flex-col justify-center bg-surface shadow-none overflow-hidden relative">
-                    <p className="text-sm font-medium text-textSecondary mb-4">Work Progress (8h)</p>
-                    <div className="flex items-center gap-4">
-                        <div className="flex-1 h-2 bg-background rounded-full overflow-hidden">
-                            <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${workProgress}%` }}></div>
-                        </div>
-                        <span className="text-sm font-medium text-textPrimary">{Math.round(workProgress)}%</span>
+                <Card className="rounded-3xl p-10 border-border/40 shadow-sm bg-white overflow-hidden relative group">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
+                        <TrendingUp size={100} />
                     </div>
-                    {workProgress >= 100 && <div className="absolute top-2 right-2 text-xs text-success font-bold uppercase tracking-tighter">Requirement Met</div>}
-                </div>
-                <StatCard title="Total Stay" value={`${Math.floor(totalStayMinutes / 60)}h ${totalStayMinutes % 60}m`} icon={<Clock />} theme={totalStayMinutes >= 540 ? "primary" : "warning"} />
-                <StatCard title="Work Minutes" value={String(displayMinutes)} icon={<Award />} theme="primary" />
+                    <p className="text-[10px] font-bold text-textSecondary uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <TrendingUp size={14} className="text-primary" /> Shift Completion
+                    </p>
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-3xl font-bold text-textPrimary tracking-tighter">{Math.round(workProgress)}%</span>
+                            <span className="text-[10px] font-bold text-textSecondary uppercase tracking-widest">Requirement: 8h</span>
+                        </div>
+                        <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-border/10">
+                            <div className="h-full bg-primary transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(5,150,105,0.3)]" style={{ width: `${workProgress}%` }} />
+                        </div>
+                    </div>
+                    {workProgress >= 100 && (
+                        <div className="mt-8 flex items-center gap-2 text-success">
+                            <ShieldCheck size={14} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Operational Quota Reached</span>
+                        </div>
+                    )}
+                </Card>
+
+                <StatCard 
+                    title="Total Stay" 
+                    value={`${Math.floor(totalStayMinutes / 60)}h ${totalStayMinutes % 60}m`} 
+                    icon={<Clock />} 
+                    theme={totalStayMinutes >= 540 ? "success" : "primary"} 
+                    trend="Sync Active"
+                />
+                
+                <StatCard 
+                    title="Work Minutes" 
+                    value={String(displayMinutes)} 
+                    icon={<Award />} 
+                    theme="primary" 
+                    trend="Verified"
+                />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="card-premium p-8 bg-gradient-to-br from-primary to-primaryDark text-white flex flex-col justify-between  text-left border-none">
-                    <div>
-                        <div className="p-3 bg-white/10 w-fit rounded-xl mb-6">
-                            <Wind size={24} />
-                        </div>
-                        <h4 className="text-xl font-bold tracking-tight mb-2">Leave Registry</h4>
-                        <p className="text-sm font-medium text-white/70 leading-relaxed">View your leave balance and track your request status in real-time within the enterprise cloud.</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <Card className="rounded-3xl bg-slate-900 p-10 text-white border-none overflow-hidden relative group shadow-2xl">
+                    <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                        <Wind size={160} strokeWidth={1} />
                     </div>
-                    <Button
-                        onClick={() => setCurrentView('leaves')}
-                        variant="secondary"
-                        className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs hover:bg-white/90 transition-colors border-none"
-                    >
-                        Check Balance
-                    </Button>
-                </div>
+                    <div className="relative z-10 space-y-10 flex flex-col justify-between h-full">
+                        <div className="space-y-6">
+                            <div className="p-4 bg-white/10 w-fit rounded-2xl border border-white/10 shadow-inner">
+                                <Wind size={28} className="text-primary" />
+                            </div>
+                            <div className="space-y-4">
+                                <h4 className="text-2xl font-bold tracking-tight">Leave Registry</h4>
+                                <p className="text-sm font-medium text-white/60 leading-relaxed">View your leave balance and track your request status in real-time within the enterprise cloud.</p>
+                            </div>
+                        </div>
+                        <Button
+                            onClick={() => setCurrentView('leaves')}
+                            className="w-full h-12 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-100 transition-all border-none shadow-lg gap-2"
+                        >
+                            Check Balance <ArrowRight size={16} />
+                        </Button>
+                    </div>
+                </Card>
 
-                <div className="card-premium p-8 bg-surface border border-border text-left">
-                    <h4 className="text-sm font-medium text-textSecondary mb-6">Operational Updates</h4>
-                    <div className="space-y-6">
-                        <div className="flex gap-4">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>
+                <Card className="rounded-3xl border-border/40 shadow-sm bg-white p-10 text-left overflow-hidden relative">
+                    <CardHeader className="p-0 mb-8">
+                        <CardTitle className="text-[10px] font-bold text-textSecondary uppercase tracking-widest flex items-center gap-2">
+                            <ShieldCheck size={14} className="text-primary" /> Operational Feed
+                        </CardTitle>
+                    </CardHeader>
+                    <div className="space-y-8">
+                        <div className="flex gap-5 group">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0 group-hover:scale-150 transition-transform"></div>
                             <div>
-                                <p className="text-sm font-bold text-textPrimary">Attendance Synchronization</p>
-                                <p className="text-xs text-textSecondary mt-1 leading-relaxed">Global attendance logs are being synchronized with the payroll cluster.</p>
+                                <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">Attendance Synchronization</p>
+                                <p className="text-xs font-medium text-textSecondary mt-2 leading-relaxed">Global attendance logs are being synchronized with the payroll cluster for the current cycle.</p>
                             </div>
                         </div>
-                        <div className="flex gap-4">
-                            <div className="w-1.5 h-1.5 rounded-full bg-success mt-2 shrink-0"></div>
+                        <div className="flex gap-5 group">
+                            <div className="w-1.5 h-1.5 rounded-full bg-success mt-1.5 shrink-0 group-hover:scale-150 transition-transform shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
                             <div>
-                                <p className="text-sm font-bold text-textPrimary">System Stability</p>
-                                <p className="text-xs text-textSecondary mt-1 leading-relaxed">Infrastructure reporting 100% uptime for the current operational cycle.</p>
+                                <p className="text-sm font-bold text-textPrimary group-hover:text-success transition-colors">System Stability</p>
+                                <p className="text-xs font-medium text-textSecondary mt-2 leading-relaxed">Infrastructure reporting 100% uptime for all core modules during this operational shift.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-5 group">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary/20 mt-1.5 shrink-0"></div>
+                            <div>
+                                <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">New Policy Update</p>
+                                <p className="text-xs font-medium text-textSecondary mt-2 leading-relaxed">Please review the updated remote work guidelines in the Policies section.</p>
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     );
@@ -207,25 +259,16 @@ const EmployeeDashboard = () => {
     if (isLoading) {
         return (
             <DashboardLayout navItems={customNavItems as any}>
-                <div className="space-y-12">
-                    <div className="flex justify-between items-end">
-                        <div className="space-y-2">
-                            <Skeleton className="h-8 w-48 rounded-xl" />
-                            <Skeleton className="h-4 w-64 rounded-md" />
-                        </div>
-                        <div className="flex gap-3">
-                            <SkeletonButton className="w-32" />
-                            <SkeletonButton className="w-32" />
-                        </div>
+                <div className="p-8 space-y-12">
+                    <SkeletonPageHeader />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <SkeletonCard className="h-44" />
+                        <SkeletonCard className="h-44" />
+                        <SkeletonCard className="h-44" />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
-                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
-                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <Skeleton className="h-64 rounded-[2rem]" />
-                        <Skeleton className="h-64 rounded-[2rem]" />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        <Skeleton className="h-80 rounded-[3rem]" />
+                        <Skeleton className="h-80 rounded-[3rem]" />
                     </div>
                 </div>
             </DashboardLayout>
@@ -234,7 +277,7 @@ const EmployeeDashboard = () => {
 
     return (
         <DashboardLayout navItems={customNavItems as any}>
-            <main className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <main className="animate-in fade-in duration-500 min-h-[80vh]">
                 {currentView === 'dashboard' && renderDashboard()}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={false} />}
                 {currentView === 'policies' && <PoliciesView isAdmin={false} />}
@@ -249,27 +292,33 @@ const EmployeeDashboard = () => {
 };
 
 const StatCard = ({ title, value, icon, trend, theme }: any) => {
-    const isPrimary = theme === 'primary';
-    const isWarning = theme === 'warning';
-
+    const isSuccess = theme === 'success';
+    
     return (
-        <div className="card-premium p-6 group border border-border transition-all bg-surface text-left">
-            <div className="flex flex-col gap-4 relative z-10">
-                <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
-                    isPrimary ? "bg-primary/10 text-primary" : isWarning ? "bg-warning/10 text-warning" : "bg-background text-textSecondary"
-                )}>
-                    {React.cloneElement(icon, { size: 18 })}
+        <Card className="rounded-3xl p-10 group relative overflow-hidden bg-white border-border/40 shadow-sm hover:shadow-lg transition-all duration-500 text-left">
+            <div className="absolute -bottom-8 -right-8 p-6 opacity-5 group-hover:scale-125 group-hover:opacity-10 transition-all duration-700 text-primary">
+                {React.cloneElement(icon, { size: 180 })}
+            </div>
+            <div className="flex flex-col gap-10 relative z-10">
+                <div className="flex items-center justify-between">
+                    <div className={cn(
+                        "w-14 h-14 rounded-2xl flex items-center justify-center border transition-all duration-500 shadow-sm",
+                        isSuccess ? "bg-success/5 text-success border-success/10 group-hover:bg-success group-hover:text-white" : "bg-primary/5 text-primary border-primary/10 group-hover:bg-primary group-hover:text-white"
+                    )}>
+                        {React.cloneElement(icon, { size: 28 })}
+                    </div>
+                    {trend && (
+                        <Badge variant="outline" className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest bg-surface border-border/40 shadow-none">
+                            {trend}
+                        </Badge>
+                    )}
                 </div>
                 <div>
-                    <p className="text-sm font-medium text-textSecondary mb-1">{title}</p>
-                    <div className="flex items-center gap-2">
-                        <p className="text-lg font-medium text-textPrimary tracking-tight">{value}</p>
-                        {trend && <span className="text-sm font-medium text-success bg-success/10 px-1.5 py-0.5 rounded-md">{trend}</span>}
-                    </div>
+                    <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mb-3">{title}</p>
+                    <p className="text-4xl font-bold text-textPrimary tracking-tighter leading-none">{value}</p>
                 </div>
             </div>
-        </div>
+        </Card>
     );
 };
 

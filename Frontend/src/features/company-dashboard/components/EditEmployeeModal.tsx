@@ -4,6 +4,7 @@ import { useEmployeeMutations, type Employee } from '@/shared/api/hooks/hrHooks'
 import { useToast } from '@/shared/ui/toast/useToast';
 import { User, Briefcase, Hash, Shield, Save } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 
 interface EditEmployeeModalProps {
     isOpen: boolean;
@@ -45,108 +46,107 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
         }
     };
 
-
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} title="Edit Employee">
-            <div className="mb-10">
-                <h3 className="text-xl font-semibold text-textPrimary mb-1">Refine Personnel Details</h3>
-                <p className="text-sm text-textSecondary">Modify the employee's core information and system status.</p>
+        <Dialog isOpen={isOpen} onClose={onClose} title="Refine Personnel">
+            <div className="mb-10 text-left">
+                <p className="text-sm font-medium text-textSecondary">Modify the employee's core telemetry and operational status.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="space-y-6">
-                    {/* Name Field */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">Full Name</label>
+            <form onSubmit={handleSubmit} className="space-y-10 text-left">
+                <div className="space-y-8">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-textSecondary uppercase tracking-[0.2em] ml-1">Full Name</label>
                         <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                                <User className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                                <User size={18} className="text-textSecondary/40 group-focus-within:text-primary transition-colors" />
                             </div>
-                            <input
+                            <Input
                                 required
                                 value={formData.full_name}
                                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                className="h-12 pl-12 rounded-xl bg-surface/50 border-border/60 focus:bg-white transition-all font-bold"
                                 placeholder="Stakeholder Name"
                             />
                         </div>
                     </div>
 
-                    {/* Role and ID Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-primary ml-1">Job Title</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-textSecondary uppercase tracking-[0.2em] ml-1">Job Title</label>
                             <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                                    <Briefcase className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                                    <Briefcase size={18} className="text-textSecondary/40 group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     value={formData.designation}
                                     onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                    className="h-12 pl-12 rounded-xl bg-surface/50 border-border/60 focus:bg-white transition-all font-bold"
                                     placeholder="Designation"
                                 />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-primary ml-1">Internal Code</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-textSecondary uppercase tracking-[0.2em] ml-1">Internal Code</label>
                             <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                                    <Hash className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                                    <Hash size={18} className="text-textSecondary/40 group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     value={formData.employee_code}
                                     onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                    className="h-12 pl-12 rounded-xl bg-surface/50 border-border/60 focus:bg-white transition-all font-bold"
                                     placeholder="ID Code"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    {/* Status Select */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">Account Status</label>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-textSecondary uppercase tracking-[0.2em] ml-1">Account Status</label>
                         <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                                <Shield className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                                <Shield size={18} className="text-textSecondary/40 group-focus-within:text-primary transition-colors" />
                             </div>
                             <select
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                className="w-full h-12 pl-12 pr-10 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none cursor-pointer"
+                                className="w-full h-12 pl-12 pr-10 bg-surface/50 border border-border/60 rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-white transition-all outline-none text-sm appearance-none cursor-pointer font-bold"
                             >
                                 <option value="active">Active Presence</option>
                                 <option value="inactive">Currently Inactive</option>
                                 <option value="on_leave">Extended Leave</option>
                                 <option value="terminated">Off-boarded</option>
                             </select>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary">
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-textSecondary/40">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-8 flex items-center justify-end gap-4 border-t border-border/40">
-                    <button
+                <div className="pt-10 flex items-center justify-end gap-6 border-t border-border/20">
+                    <Button
                         type="button"
+                        variant="ghost"
                         onClick={onClose}
-                        className="px-6 h-11 text-sm font-medium text-textSecondary hover:text-textPrimary transition-colors"
+                        className="h-11 px-6 text-sm font-bold text-textSecondary hover:text-textPrimary"
                     >
                         Dismiss
-                    </button>
+                    </Button>
                     <Button
                         type="submit"
-                        loading={update.isPending}
-                        className="px-8 h-11 rounded-xl"
+                        disabled={update.isPending}
+                        className="h-11 px-10 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all gap-2"
                     >
-                        <span>Save Changes</span>
-                        {!update.isPending && <Save size={16} className="ml-2" />}
+                        {update.isPending ? (
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <>Save Changes <Save size={16} /></>
+                        )}
                     </Button>
                 </div>
             </form>
