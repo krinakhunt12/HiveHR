@@ -34,6 +34,8 @@ const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
+import { CookieConsent } from "@/shared/components/CookieConsent";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -41,6 +43,7 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<LoadingState />}>
         <Outlet />
+        <CookieConsent />
       </Suspense>
     ),
     children: [

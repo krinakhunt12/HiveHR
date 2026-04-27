@@ -14,7 +14,7 @@ export const Footer = () => {
               <span className="text-xl font-bold text-textPrimary tracking-tight font-display">HiveHr</span>
             </Link>
             <p className="text-sm font-medium text-textSecondary leading-relaxed mb-8 max-w-xs">
-              Cultivating the future of organizational management. Empowering agri-enterprises with world-class HR infrastructure.
+              Building the future of team management. Empowering businesses with world-class HR tools.
             </p>
             <div className="flex gap-4">
               {[
@@ -37,12 +37,12 @@ export const Footer = () => {
           </div>
 
           <FooterCol
-            title="Ecosystem"
+            title="Product"
             links={[
-              { name: 'Growth Tools', href: '/#features' },
+              { name: 'Features', href: '/#features' },
               { name: 'Integrations', href: '/integrations' },
-              { name: 'Yields', href: '/pricing' },
-              { name: 'Field Notes', href: '#' }
+              { name: 'Plans', href: '/pricing' },
+              { name: 'Solutions', href: '/solutions' }
             ]}
           />
           <FooterCol
@@ -55,30 +55,30 @@ export const Footer = () => {
             ]}
           />
           <FooterCol
-            title="Culture"
+            title="Company"
             links={[
-              { name: 'Our Roots', href: '/#about' },
-              { name: 'Join the Herd', href: '#' },
-              { name: 'Manifesto', href: '/#about' },
-              { name: 'Governance', href: '#' }
+              { name: 'About Us', href: '/#about' },
+              { name: 'Careers', href: '#' },
+              { name: 'Our Vision', href: '/#about' },
+              { name: 'Security', href: '#' }
             ]}
           />
           <FooterCol
             title="Resources"
             links={[
-              { name: 'Knowledge Hub', href: '#' },
-              { name: 'Soil Status', href: '#' },
-              { name: 'Security Protocol', href: '#' },
+              { name: 'Help Center', href: '#' },
+              { name: 'System Status', href: '#' },
+              { name: 'Privacy Policy', href: '#' },
               { name: 'Contact', href: '/contact' }
             ]}
           />
         </div>
 
         <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs font-bold text-textSecondary uppercase tracking-[0.3em]">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
+          <p className="text-xs font-medium text-textSecondary">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
           <div className="flex gap-8">
-            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] hover:opacity-100">Privacy Policy</a>
-            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] hover:opacity-100">Cookie Policy</a>
+            <a href="#" className="text-xs font-medium text-textSecondary hover:text-primary transition-colors hover:opacity-100">Privacy Policy</a>
+            <a href="#" className="text-xs font-medium text-textSecondary hover:text-primary transition-colors hover:opacity-100">Cookie Policy</a>
           </div>
         </div>
       </div>
@@ -88,11 +88,11 @@ export const Footer = () => {
 
 const FooterCol = ({ title, links }: { title: string, links: { name: string, href: string }[] }) => (
   <div className="text-left">
-    <h4 className="text-xs font-bold uppercase tracking-[0.3em] text-textPrimary mb-8">{title}</h4>
+    <h4 className="text-base font-semibold text-textPrimary mb-8">{title}</h4>
     <ul className="space-y-4">
       {links.map((link) => (
         <li key={link.name}>
-          <Link to={link.href} className="text-sm font-bold text-textSecondary hover:text-primary transition-colors tracking-tight hover:opacity-100">{link.name}</Link>
+          <Link to={link.href} className="text-sm font-medium text-textSecondary hover:text-primary transition-colors hover:opacity-100">{link.name}</Link>
         </li>
       ))}
     </ul>

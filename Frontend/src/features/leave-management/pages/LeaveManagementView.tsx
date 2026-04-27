@@ -116,9 +116,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">Time-Off Registry</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight">Time Off</h1>
                     <p className="text-sm font-medium text-textSecondary mt-1.5">
-                        {isAdmin ? 'Administrative control over enterprise leave logistics.' : 'Manage your personal attendance and leave allocations.'}
+                        {isAdmin ? 'Manage leave requests for the whole team.' : 'Keep track of your time off and requests.'}
                     </p>
                 </div>
                 <div className="flex gap-3">
@@ -128,7 +128,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                             onClick={() => setIsSettingsModalOpen(true)}
                             className="gap-2 px-4 text-xs font-semibold border-primary/10 hover:bg-primary/5"
                         >
-                            <Settings size={18} /> Governance Policies
+                            <Settings size={18} /> Leave Rules
                         </Button>
                     )}
                     {!isAdmin && (
@@ -136,7 +136,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                             onClick={() => setIsRequestModalOpen(true)}
                             className="gap-2 px-6 h-11 text-xs font-medium"
                         >
-                            <Plus size={18} /> Initiate Request
+                            <Plus size={18} /> Request Time Off
                         </Button>
                     )}
                 </div>
@@ -146,11 +146,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 {isPrivileged ? (
                     <div className="col-span-full py-10 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col items-center justify-center text-center px-6">
                         <Info className="text-primary mb-4" size={32} />
-                        <h3 className="text-lg font-bold text-textPrimary">{isSuperAdmin ? 'Platform Admin View' : 'Administrative Context'}</h3>
+                        <h3 className="text-lg font-bold text-textPrimary">{isSuperAdmin ? 'Admin View' : 'Admin View'}</h3>
                         <p className="text-sm text-textSecondary mt-2 max-w-md">
                             {isSuperAdmin
-                                ? 'As a Super Admin, you are viewing the global dashboard. Leave quotas are scoped to individual employees.'
-                                : 'As an Administrator, personal leave quotas are hidden. You can manage and review member requests below.'}
+                                ? 'As a Super Admin, you are viewing the global dashboard. Leave limits are set for each employee.'
+                                : 'As an Admin, you can manage and review team requests below.'}
                         </p>
                     </div>
                 ) : balances.length > 0 ? (
@@ -175,7 +175,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                     <Card className="card-premium overflow-hidden bg-white">
                         <CardHeader className="py-6 px-8 border-b border-primary/5 bg-primary/[0.01] flex flex-row items-center justify-between">
                             <CardTitle className="text-base font-bold text-textPrimary flex items-center gap-2">
-                                <History size={18} className="text-primary" /> Allocation History
+                                <History size={18} className="text-primary" /> Past Requests
                             </CardTitle>
                             <div className="flex gap-2">
                                 <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-primary/10"><Filter size={14} /></Button>
@@ -185,8 +185,8 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                         <CardContent className="p-0 min-h-[300px]">
                             {historyRequests.length === 0 ? (
                                 <EmptyState
-                                    title="Registry Empty"
-                                    description="Historical leave records will appear here once processed."
+                                    title="No history yet"
+                                    description="Processed leave records will show up here."
                                     icon={History}
                                     className="py-20"
                                 />
@@ -195,10 +195,10 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                     <table className="w-full text-left">
                                         <thead className="bg-primary/[0.01]">
                                             <tr>
-                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Resource</th>
-                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Duration</th>
+                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Employee</th>
+                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Dates</th>
                                                 <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em]">Status</th>
-                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em] text-right">Review</th>
+                                                <th className="px-8 py-4 text-xs font-bold text-textSecondary uppercase tracking-[0.2em] text-right">Notes</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-primary/5">
@@ -210,7 +210,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary">{req.start_date} <ArrowRight size={12} className="inline mx-1 " /> {req.end_date}</p>
-                                                        <p className="text-xs text-textSecondary font-bold  mt-1">Standard Cycle</p>
+                                                        <p className="text-xs text-textSecondary font-bold  mt-1">Regular Leave</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <span className={cn(
@@ -236,12 +236,12 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 <div className="space-y-8">
                     <Card className="card-premium bg-white overflow-hidden border-primary/10">
                         <CardHeader className="py-6 px-8 border-b border-primary/5 bg-primary/[0.01]">
-                            <CardTitle className="text-sm font-semibold text-textSecondary uppercase">Pending Validation</CardTitle>
+                            <CardTitle className="text-sm font-semibold text-textSecondary uppercase">Waiting for Approval</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 min-h-[300px]">
                             {pendingRequests.length === 0 ? (
                                 <EmptyState
-                                    title="All Clear"
+                                    title="Nothing to do"
                                     description="No pending leave requests require review."
                                     icon={CheckCircle2}
                                     className="py-16"
@@ -267,7 +267,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                     <Calendar size={14} className="text-primary" />
                                                     <span className="text-xs font-bold">{req.start_date} – {req.end_date}</span>
                                                 </div>
-                                                <p className="text-xs text-textSecondary font-semibold leading-relaxed">{req.reason || 'No specific rationale provided.'}</p>
+                                                <p className="text-xs text-textSecondary font-semibold leading-relaxed">{req.reason || 'No reason given.'}</p>
                                             </div>
 
                                             {isAdmin && (
@@ -298,11 +298,8 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
                     <Card className="card-premium bg-gradient-to-br from-primary to-primaryDark p-8 text-white border-none ">
                         <div className="p-3 bg-white/10 w-fit rounded-xl mb-6"><Wind size={24} /></div>
-                        <h4 className="text-xl font-bold tracking-tight mb-2">Policy Overview</h4>
-                        <p className="text-xs font-medium text-white/70 leading-relaxed mb-6">Global leave parameters are optimized for enterprise stability. Review the updated handbook for Q3 guidelines.</p>
-                        <Button className="w-full h-11 text-xs font-semibold text-white">
-                            Download Handbook
-                        </Button>
+                        <h2 className="text-3xl lg:text-5xl font-semibold tracking-tight mb-6">Built for all teams.</h2>
+                        <p className="text-white/70 text-lg max-w-2xl">From startups to enterprises, HiveHr grows with you.</p>
                     </Card>
                 </div>
             </div>

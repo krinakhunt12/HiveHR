@@ -19,15 +19,15 @@ export const Navbar = () => {
 
           <div className="hidden md:flex items-center gap-10">
             {[
-              { name: 'Ecosystem', path: '/#features' },
-              { name: 'Yields', path: '/solutions' },
-              { name: 'Pricing', path: '/pricing' },
-              { name: 'Cultivate', path: '/contact' }
+              { name: 'Features', path: '/#features' },
+              { name: 'Solutions', path: '/solutions' },
+              { name: 'Plans', path: '/pricing' },
+              { name: 'Contact', path: '/contact' }
             ].map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className="text-xs font-bold uppercase tracking-[0.2em] text-textSecondary hover:text-primary transition-colors"
+                className="text-base font-medium text-textSecondary hover:text-primary transition-colors"
               >
                 {item.name}
               </Link>
@@ -35,10 +35,10 @@ export const Navbar = () => {
             <div className="h-4 w-[1px] bg-border"></div>
             <div className="flex items-center gap-4">
               <Link to="/login">
-                <Button variant="ghost" size="sm" className="font-bold text-xs uppercase tracking-[0.2em] text-textSecondary hover:text-primary">Login</Button>
+                <Button variant="ghost" size="sm" className="font-medium text-base text-textSecondary hover:text-primary">Login</Button>
               </Link>
               <Link to="/signup">
-                <Button size="sm" className="font-bold text-xs uppercase tracking-[0.2em] px-6 py-5 rounded-xl bg-primary text-surface shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">Get Started</Button>
+                <Button size="sm" className="font-medium text-base px-6 py-5 rounded-xl bg-primary text-surface shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">Get Started</Button>
               </Link>
             </div>
           </div>
@@ -55,10 +55,10 @@ export const Navbar = () => {
       {isMenuOpen && (
         <div className="min-h-screen bg-background border-b border-border px-6 py-8 space-y-5 animate-in slide-in-from-top-4 duration-300">
           {[
-            { name: 'Ecosystem', path: '/#features' },
-            { name: 'Yields', path: '/solutions' },
-            { name: 'Pricing', path: '/pricing' },
-            { name: 'Cultivate', path: '/contact' }
+            { name: 'Features', path: '/#features' },
+            { name: 'Solutions', path: '/solutions' },
+            { name: 'Plans', path: '/pricing' },
+            { name: 'Contact', path: '/contact' }
           ].map((item) => (
             <Link
               key={item.name}

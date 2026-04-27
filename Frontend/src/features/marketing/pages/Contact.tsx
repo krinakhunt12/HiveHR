@@ -1,5 +1,6 @@
 import MarketingLayout from '@/shared/layouts/MarketingLayout';
 import { Button } from '@/shared/ui/button';
+import { MapPin, Mail } from 'lucide-react';
 
 const Contact = () => {
   return (
@@ -10,18 +11,19 @@ const Contact = () => {
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mb-48 -mr-48"></div>
             <div className="relative z-10 flex flex-col lg:flex-row gap-16 items-center">
               <div className="lg:w-1/2 text-center lg:text-left">
-                <h2 className="text-3xl lg:text-5xl font-semibold mb-6 tracking-tight">Let's talk about your culture.</h2>
-                <p className="text-indigo-100 text-lg font-medium mb-10">Our consultants are ready to help you architect your organizational infrastructure.</p>
+
+                <h2 className="text-3xl lg:text-5xl font-semibold mb-6 tracking-tight">Let's build a better workplace.</h2>
+                <p className="text-indigo-100 text-lg font-medium mb-10">We're here to help you manage your team more effectively and grow your business.</p>
                 <div className="space-y-6">
                   <div className="flex items-center gap-4 justify-center lg:justify-start">
                     <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                      <span className="text-sm">📍</span>
+                      <MapPin size={18} className="text-white" />
                     </div>
-                    <span className="text-sm font-medium">San Francisco, CA & London, UK</span>
+                    <span className="text-sm font-medium">Available in San Francisco & London</span>
                   </div>
                   <div className="flex items-center gap-4 justify-center lg:justify-start">
                     <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                      <span className="text-sm">✉️</span>
+                      <Mail size={18} className="text-white" />
                     </div>
                     <span className="text-sm font-medium">hello@hivehr.io</span>
                   </div>

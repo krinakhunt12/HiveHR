@@ -14,21 +14,21 @@ const LandingPage = () => {
           <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
             <div className="lg:w-1/2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-sm font-semibold mb-8  border border-primary/10">
-                Secure & Scalable HR Suite
+                Safe and Simple HR Software
               </div>
               <h1 className="text-4xl lg:text-7xl font-bold text-textPrimary leading-[1.05] mb-6 tracking-tight font-display">
-                Modern teams need <span className="text-primary italic">modern culture.</span>
+                Build a better team with <span className="text-primary italic">better tools.</span>
               </h1>
               <p className="text-base lg:text-lg text-textSecondary mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-                Streamline global employee management, payroll, and performance with a minimal workspace designed for impact.
+                Manage your team, payroll, and performance all in one place with a simple workspace designed for impact.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link to="/signup">
-                  <Button size="lg" className="h-12 px-8 font-bold text-xs  group">
+                  <Button size="lg" className="h-12 px-8 font-medium text-sm group">
                     Start Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="h-12 px-8 font-bold text-xs  border-border hover:bg-primary/5">
+                <Button size="lg" variant="outline" className="h-12 px-8 font-medium text-sm  border-border hover:bg-primary/5">
                   Request a Demo
                 </Button>
               </div>
@@ -52,10 +52,10 @@ const LandingPage = () => {
       {/* Trust Section */}
       <section className="py-16 border-y border-border/50">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-xs font-bold text-textSecondary text-center mb-10">Trusted by 2,000+ scaling organizations</p>
+          <p className="text-sm font-medium text-textSecondary text-center mb-10">Trusted by 2,000+ scaling organizations</p>
           <div className="flex flex-wrap justify-center gap-x-12 gap-y-8  grayscale group hover:grayscale-0 transition-all duration-700">
             {['Acme', 'Sphere', 'Orbit', 'Locus', 'Nebula'].map((logo) => (
-              <span key={logo} className="text-xl font-bold tracking-tighter text-textSecondary uppercase">{logo}</span>
+              <span key={logo} className="text-xl font-medium text-textSecondary uppercase">{logo}</span>
             ))}
           </div>
         </div>
@@ -65,40 +65,40 @@ const LandingPage = () => {
       <section id="features" className="py-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-2xl text-center mx-auto mb-24">
-            <h2 className="text-3xl lg:text-5xl font-bold text-textPrimary mb-6 tracking-tight font-display">Everything you need, nothing you don't.</h2>
-            <p className="text-base text-textSecondary font-medium leading-relaxed ">We've removed the noise to focus on the essential artifacts that drive organizational success.</p>
+            <h2 className="text-3xl lg:text-5xl font-bold text-textPrimary mb-6 tracking-tight font-display">Everything you need to manage your team.</h2>
+            <p className="text-base text-textSecondary font-medium leading-relaxed ">We focus on the simple tools that help your team succeed.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
               icon={<Users className="w-4 h-4 text-white" />}
-              title="Global Directory"
-              description="A beautifully synchronized source of truth for global personnel deployment."
+              title="Team Directory"
+              description="One place to keep all your employee information up to date."
             />
             <FeatureCard
               icon={<Clock className="w-4 h-4 text-white" />}
-              title="Presence Layer"
-              description="Seamless time tracking that prioritizes employee autonomy and trust."
+              title="Time Tracking"
+              description="Easy time tracking that helps your team stay focused and productive."
             />
             <FeatureCard
               icon={<CreditCard className="w-4 h-4 text-white" />}
-              title="Automated Payroll"
-              description="Compliant, multi-currency payroll processing completed in seconds."
+              title="Simple Payroll"
+              description="Pay your team in any currency in just a few simple clicks."
             />
             <FeatureCard
               icon={<ShieldCheck className="w-4 h-4 text-white" />}
-              title="Unified Security"
-              description="Enterprise-grade SSO, encryption, and audit logs baked into the core."
+              title="Safe & Secure"
+              description="Secure login and data protection for your peace of mind."
             />
             <FeatureCard
               icon={<BarChart3 className="w-4 h-4 text-white" />}
-              title="Predictive Insights"
-              description="AI-driven churn analysis and hiring trajectory forecasting."
+              title="Smart Insights"
+              description="Insights to help you hire and keep great people on your team."
             />
             <FeatureCard
               icon={<Zap className="w-4 h-4 text-white" />}
-              title="Open Artifacts"
-              description="Extensible API to connect your entire enterprise stack effortlessly."
+              title="Easy Connect"
+              description="Connect with the tools you already use every single day."
             />
           </div>
         </div>
@@ -130,18 +130,18 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="lg:w-1/2 order-1 lg:order-2">
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6 block">Unified Infrastructure</span>
-              <h3 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight leading-[1.1] font-display">Measure the output, not the input.</h3>
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6 block">Complete Team View</span>
+              <h3 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight leading-[1.1] font-display">Focus on results, not hours.</h3>
               <p className="text-base lg:text-lg text-textSecondary font-medium leading-relaxed mb-10">
-                HiveHr provides the clarity managers need to make data-driven decisions without intruding on the workflow of individual contributors.
+                HiveHr gives you the clear info you need to lead your team without getting in their way.
               </p>
               <ul className="space-y-5">
                 {[
-                  'Automated performance benchmarks',
-                  'Zero-friction feedback loops',
-                  'Asynchronous goal tracking'
+                  'Automatic performance tracking',
+                  'Easy team feedback',
+                  'Track goals anytime'
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-4 text-sm font-bold text-textPrimary/70">
+                  <li key={item} className="flex items-center gap-4 text-sm font-medium text-textPrimary">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
                     <span>{item}</span>
                   </li>
@@ -156,7 +156,7 @@ const LandingPage = () => {
       <section className="py-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-3xl font-semibold tracking-tight">The new standard of HR.</h2>
+            <h2 className="text-3xl font-semibold tracking-tight">A better way to manage HR.</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-10">
             <Testimonial
@@ -183,13 +183,13 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto rounded-[3rem] bg-textPrimary p-12 lg:p-24 text-center relative overflow-hidden group border border-primary/10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
           <div className="relative z-10">
-            <h2 className="text-3xl lg:text-6xl font-bold text-surface mb-8 tracking-tight font-display">Ready to evolve your culture?</h2>
-            <p className="text-textSecondary mb-12 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams automating their operations today. Start your 14-day premium trial now.</p>
+            <h2 className="text-3xl lg:text-6xl font-bold text-surface mb-8 tracking-tight font-display">Ready to build a better team?</h2>
+            <p className="text-textSecondary mb-12 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams making their work easier today. Start your 14-day trial now.</p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/signup">
-                <Button size="lg" className="h-14 px-10 font-bold text-xs  bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
-                  Initialize Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                  <Button size="lg" className="h-14 px-10 font-bold text-xs  bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
+                    Start Your Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
               </Link>
               <span className="text-xs text-textSecondary font-bold ">No credit card required.</span>
             </div>
@@ -202,10 +202,10 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row items-center gap-24">
             <div className="lg:w-1/2">
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6 block">Connected Ecosystem</span>
-              <h2 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight font-display">Syncs with your stack.</h2>
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-6 block">Works With Your Tools</span>
+              <h2 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-8 tracking-tight font-display">Connects with what you use.</h2>
               <p className="text-base lg:text-lg text-textSecondary font-medium leading-relaxed mb-12">
-                Native integrations with the tools your team already uses. No more manual data entry or fragmented workflows.
+                Connect HiveHr with the tools your team already uses every day. No more manual data entry.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {[
@@ -240,8 +240,8 @@ const LandingPage = () => {
         </div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-24">
-            <h2 className="text-3xl lg:text-6xl font-bold tracking-tight mb-8 font-display leading-[1.1]">Built for every stage of growth.</h2>
-            <p className="text-textSecondary text-lg max-w-2xl mx-auto font-medium">From seed stage startups to global enterprises, HiveHr scales with your team's complexity.</p>
+            <h2 className="text-3xl lg:text-6xl font-bold tracking-tight mb-8 font-display leading-[1.1]">Built for teams of all sizes.</h2>
+            <p className="text-textSecondary text-lg max-w-2xl mx-auto font-medium">From small startups to large companies, HiveHr grows with your team.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -263,8 +263,8 @@ const LandingPage = () => {
       <section id="pricing" className="py-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-2xl text-center mx-auto mb-24">
-            <h2 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-6 tracking-tight font-display">Simple, predictable pricing.</h2>
-            <p className="text-base text-textSecondary font-medium leading-relaxed ">No hidden fees. No complex tiers. Just everything you need to manage your team.</p>
+            <h2 className="text-3xl lg:text-6xl font-bold text-textPrimary mb-6 tracking-tight font-display">Simple, clear pricing.</h2>
+            <p className="text-base text-textSecondary font-medium leading-relaxed ">No hidden fees. No complex plans. Just everything you need to manage your team.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-10">
             <PricingCard
@@ -294,9 +294,9 @@ const LandingPage = () => {
       <section id="about" className="py-32 bg-background/50 border-y border-border">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-10 block">Our Manifesto</span>
-          <h2 className="text-3xl lg:text-5xl font-bold text-textPrimary mb-10 tracking-tight italic font-display">"Software should get out of the way of the people it's designed to serve."</h2>
+          <h2 className="text-3xl lg:text-5xl font-bold text-textPrimary mb-10 tracking-tight italic font-display">"Software should make work easier, not harder."</h2>
           <p className="text-lg lg:text-xl text-textSecondary font-medium leading-[1.8] mb-12">
-            We founded HiveHr on the belief that modern organizational culture is built on trust, transparency, and clarity. Our tools are designed to provide the infrastructure that enables high-performance teams to thrive without the administrative friction of legacy systems.
+            We founded HiveHr because we believe great teams are built on trust and clear communication. Our tools help your team do their best work without the stress of old, complicated systems.
           </p>
           <div className="h-[1px] w-24 bg-primary/20 mx-auto"></div>
         </div>
@@ -309,11 +309,11 @@ const LandingPage = () => {
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[150px] -mb-48 -mr-48"></div>
             <div className="relative z-10 flex flex-col lg:flex-row gap-16 items-center">
               <div className="lg:w-1/2 text-center lg:text-left">
-                <h2 className="text-3xl lg:text-6xl font-bold mb-8 tracking-tight font-display leading-[1.1]">Let's talk about your culture.</h2>
-                <p className="text-surface/80 text-lg font-medium mb-12">Our consultants are ready to help you architect your organizational infrastructure.</p>
+                <h2 className="text-3xl lg:text-6xl font-bold mb-8 tracking-tight font-display">Let's build a better workplace.</h2>
+                <p className="text-surface/80 text-lg font-medium mb-12">We're here to help you manage your team more effectively and grow your business.</p>
                 <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
-                  <Button size="lg" className="bg-surface text-primary hover:bg-surface/90 font-bold text-xs  px-10 h-16  shadow-black/10">Schedule a Consultation</Button>
-                  <Button size="lg" variant="outline" className="border-white/30 text-surface hover:bg-white/10 font-bold text-xs  px-10 h-16">Email Sales</Button>
+                  <Button size="lg" className="w-1/2">Schedule a Consultation</Button>
+                  <Button size="lg" variant="outline">Email Sales</Button>
                 </div>
               </div>
               <div className="lg:w-1/2 w-full max-w-md">

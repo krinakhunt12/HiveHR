@@ -75,7 +75,7 @@ const AdminDashboard = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-textPrimary">Platform Overview</h1>
-                        <p className="text-sm font-semibold text-textSecondary mt-1">Cross-tenant performance and subscription telemetry.</p>
+                        <p className="text-sm font-semibold text-textSecondary mt-1">Check how the platform and subscriptions are doing.</p>
                     </div>
                 </div>
 
@@ -91,7 +91,7 @@ const AdminDashboard = () => {
                         <Card className="overflow-hidden card-premium bg-white">
                             <CardHeader className="flex flex-row items-center justify-between py-6 px-8 border-b border-primary/5 bg-primary/[0.02]">
                                 <CardTitle className="text-base font-bold text-textPrimary flex items-center gap-2">
-                                    <Building2 size={18} className="text-primary" /> Active Tenants
+                                    <Building2 size={18} className="text-primary" /> Active Companies
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-8">
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
                             <CardContent className="p-8 pb-10">
                                 <Zap size={24} className="mb-6" />
                                 <h3 className="text-xl font-bold mb-2">Platform Security</h3>
-                                <p className="text-sm font-medium text-white/70 leading-relaxed">Multi-tenant data isolation enforced via RLS on all 16 database tables.</p>
+                                <p className="text-sm font-medium text-white/70 leading-relaxed">All company data is kept separate and secure across all platform tables.</p>
                                 <div className="mt-8 flex items-center gap-2 text-xs font-bold text-white/60">
                                     <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                                     All systems operational
@@ -188,8 +188,8 @@ const AdminDashboard = () => {
         <div className="space-y-8 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
                 <div>
-                    <h2 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Company Registry</h2>
-                    <p className="text-sm font-semibold text-textSecondary mt-1">{companies.length} registered tenants.</p>
+                    <h2 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Company List</h2>
+                    <p className="text-sm font-semibold text-textSecondary mt-1">{companies.length} registered companies.</p>
                 </div>
                 <div className="flex gap-3">
                     <div className="relative">

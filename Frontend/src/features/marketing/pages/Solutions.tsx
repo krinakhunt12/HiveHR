@@ -10,15 +10,15 @@ const Solutions = () => {
         </div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
-            <h2 className="text-3xl lg:text-5xl font-semibold tracking-tight mb-6">Built for every stage of growth.</h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">From seed stage startups to global enterprises, HiveHr scales with your team's complexity.</p>
+            <h2 className="text-3xl lg:text-5xl font-semibold tracking-tight mb-6">Built for teams of all sizes.</h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">From small startups to large companies, HiveHr grows with you.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: 'Engineering', desc: 'Streamline technical onboarding and dev-ops culture.' },
-              { title: 'Product Teams', desc: 'Align design and product with organizational goals.' },
-              { title: 'Startups', desc: 'Move fast with lean HR infrastructure that grows with you.' },
-              { title: 'Enterprise', desc: 'Maintain compliance and security at global scale.' }
+              { title: 'Engineering', desc: 'Make it easy to bring on new team members and build a great culture.' },
+              { title: 'Product Teams', desc: 'Align design and product with your company goals.' },
+              { title: 'Startups', desc: 'Move fast with a simple HR setup that grows with you.' },
+              { title: 'Enterprise', desc: 'Stay secure and follow rules even as you grow across the world.' }
             ].map((sol) => (
               <div key={sol.title} className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
                 <h3 className="text-xl font-semibold mb-4 group-hover:text-indigo-400 transition-colors">{sol.title}</h3>
