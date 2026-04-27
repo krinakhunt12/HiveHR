@@ -178,7 +178,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                     </div>
 
                                     <h3 className="text-base font-bold text-textPrimary mb-1 truncate group-hover:text-primary transition-colors tracking-tight">{task.title}</h3>
-                                    <p className="text-sm text-textSecondary font-medium line-clamp-2 leading-relaxed mb-4 opacity-70">
+                                    <p className="text-sm text-textSecondary font-medium line-clamp-2 leading-relaxed mb-4">
                                         {task.description}
                                     </p>
 
@@ -193,7 +193,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                                         </div>
 
                                         <div className="flex items-center gap-4">
-                                            <div className="flex items-center gap-1.5 text-textSecondary font-bold text-xs opacity-50 uppercase tracking-widest">
+                                            <div className="flex items-center gap-1.5 text-textSecondary font-bold text-xs">
                                                 <Clock size={12} />
                                                 <span>{task.due_date || 'Ongoing'}</span>
                                             </div>

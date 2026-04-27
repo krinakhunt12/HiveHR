@@ -261,17 +261,17 @@ const CompanyDashboard = () => {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{emp.full_name}</p>
-                                                <p className="text-xs text-textSecondary font-semibold mt-1.5 opacity-50">{emp.employee_code || '---'}</p>
+                                                <p className="text-xs text-textSecondary font-semibold mt-1.5">{emp.employee_code || '---'}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
                                         <p className="text-sm font-bold text-textPrimary leading-none">{(emp as any).designation_name ?? emp.designation ?? '—'}</p>
-                                        <p className="text-xs text-textSecondary font-semibold mt-1.5 opacity-50">{emp.employment_type}</p>
+                                        <p className="text-xs text-textSecondary font-semibold mt-1.5">{emp.employment_type}</p>
                                     </td>
                                     <td className="px-8 py-5">
                                         <p className="text-sm font-bold text-textPrimary">{emp.date_of_joining || '---'}</p>
-                                        <p className="text-xs text-textSecondary font-semibold mt-1.5 opacity-50">Onboarded</p>
+                                        <p className="text-xs text-textSecondary font-semibold mt-1.5">Onboarded</p>
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
@@ -357,7 +357,7 @@ const CompanyDashboard = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold text-textPrimary">{record.employeeName}</p>
-                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest opacity-40 mt-1">{record.work_location || 'Office'}</p>
+                                            <p className="text-xs font-bold text-textSecondary uppercase tracking-widest mt-1">{record.work_location || 'Office'}</p>
                                         </div>
                                     </div>
                                     <div className="text-right">

@@ -12,6 +12,7 @@ import { cn } from '../utils/cn';
 import { useLogout } from '../api/hooks/authHooks';
 import { useGetMe } from '../api/hooks/hrHooks';
 import { detectRole } from '../utils/authUtils';
+import { Button } from '@/shared/ui/button';
 
 interface NavItem {
   icon: React.ReactNode;
@@ -146,7 +147,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </div>
           )}
 
-          <button
+          <Button
+            variant="ghost"
             onClick={() => logout()}
             className={cn(
               "flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-all duration-200 text-textSecondary hover:text-error hover:bg-error/10 active:scale-95 group",
@@ -155,7 +157,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           >
             <LogOut size={16} className="transition-transform" />
             {isSidebarExpanded && <span className="text-sm font-medium tracking-wide uppercase">Logout</span>}
-          </button>
+          </Button>
         </div>
       </aside>
 
@@ -170,12 +172,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           isSidebarExpanded ? "px-8" : "px-5"
         )}>
           <div className="flex items-center gap-4">
-            <button
+            <Button
               onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-              className="p-1 px-2 text-textSecondary hover:text-primary hover:bg-primary/10 rounded-md transition-all active:scale-95"
+              className="p-1 px-2"
+              variant={"ghost"}
             >
               {isSidebarExpanded ? <X size={16} /> : <Menu size={16} />}
-            </button>
+            </Button>
             <div className="h-4 w-[1px] bg-border hidden md:block"></div>
             <h2 className="text-sm font-medium text-textSecondary uppercase tracking-widest hidden md:block">Dashboard</h2>
           </div>
@@ -202,4 +205,3 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 };
 
 export default DashboardLayout;
-

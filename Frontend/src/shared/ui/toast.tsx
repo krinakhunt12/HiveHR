@@ -45,7 +45,7 @@ export const ToasterProvider: React.FC<{ children?: React.ReactNode }> = ({ chil
             )}
           >
             <div className="font-bold text-sm tracking-tight">{t.title}</div>
-            {t.description && <div className="text-sm font-medium opacity-80 leading-relaxed">{t.description}</div>}
+            {t.description && <div className="text-sm font-medium  leading-relaxed">{t.description}</div>}
           </div>
         ))}
       </div>

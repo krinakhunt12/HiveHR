@@ -83,7 +83,7 @@ const Login = () => {
             {login.error && (
               <div className="px-4 py-3 rounded-xl bg-error/5 border border-error/15 text-error text-sm font-medium animate-in fade-in slide-in-from-top-1 duration-300">
                 <div className="flex items-start gap-3">
-                  <AlertCircle size={15} className="mt-0.5 shrink-0 opacity-80" />
+                  <AlertCircle size={15} className="mt-0.5 shrink-0" />
                   <div className="space-y-1">
                     {Array.isArray((login.error as any)?.errors) ? (
                       <ul className="list-disc list-inside space-y-0.5">

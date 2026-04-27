@@ -75,7 +75,7 @@ const AdminDashboard = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Platform Overview</h1>
-                        <p className="text-sm font-semibold text-textSecondary mt-1 opacity-70">Cross-tenant performance and subscription telemetry.</p>
+                        <p className="text-sm font-semibold text-textSecondary mt-1">Cross-tenant performance and subscription telemetry.</p>
                     </div>
                 </div>
 
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs uppercase tracking-widest text-textSecondary font-bold opacity-40 mt-1">
+                                                        <p className="text-xs uppercase tracking-widest text-textSecondary font-bold mt-1">
                                                             {company.plans?.name ?? 'No Plan'} · {company.employee_count ?? 0} employees
                                                         </p>
                                                     </div>
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
 
                     <div className="space-y-6">
                         <Card className="card-premium bg-gradient-to-br from-primary to-primaryDark text-white border-none overflow-hidden relative">
-                            <div className="absolute -right-4 -bottom-4 opacity-10"><Shield size={120} /></div>
+                            <div className="absolute -right-4 -bottom-4"><Shield size={120} /></div>
                             <CardContent className="p-8 pb-10">
                                 <Zap size={24} className="mb-6" />
                                 <h3 className="text-xl font-bold tracking-tight mb-2">Platform Security</h3>
@@ -174,7 +174,7 @@ const AdminDashboard = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-xs text-textSecondary opacity-50 text-center py-4">No plan data available</p>
+                                    <p className="text-xs text-textSecondary text-center py-4">No plan data available</p>
                                 )}
                             </CardContent>
                         </Card>
@@ -189,7 +189,7 @@ const AdminDashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
                 <div>
                     <h2 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Company Registry</h2>
-                    <p className="text-sm font-semibold text-textSecondary mt-1 opacity-70">{companies.length} registered tenants.</p>
+                    <p className="text-sm font-semibold text-textSecondary mt-1">{companies.length} registered tenants.</p>
                 </div>
                 <div className="flex gap-3">
                     <div className="relative">
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1 opacity-50">{company.email}</p>
+                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">{company.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -328,7 +328,7 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
     const isAccent = color === 'accent';
     return (
         <Card className="hover:border-primary/20 transition-all duration-300 card-premium bg-white group relative overflow-hidden text-left shadow-none border border-primary/5">
-            <div className={cn("absolute -right-4 -top-4 w-24 h-24 blur-3xl opacity-5 transition-opacity duration-700 group-hover:opacity-20", isAccent ? "bg-accent" : "bg-primary")} />
+            <div className={cn("absolute -right-4 -top-4 w-24 h-24 blur-3xl opacity-5 transition-opacity duration-700", isAccent ? "bg-accent" : "bg-primary")} />
             <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-8">
                     <div className={cn("p-3 rounded-xl transition-all duration-300 shadow-sm", isAccent ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>

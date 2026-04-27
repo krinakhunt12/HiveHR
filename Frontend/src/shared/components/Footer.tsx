@@ -13,7 +13,7 @@ export const Footer = () => {
               </div>
               <span className="text-xl font-bold text-textPrimary tracking-tight font-display">HiveHr</span>
             </Link>
-            <p className="text-sm font-medium text-textSecondary leading-relaxed mb-8 max-w-xs opacity-70">
+            <p className="text-sm font-medium text-textSecondary leading-relaxed mb-8 max-w-xs">
               Cultivating the future of organizational management. Empowering agri-enterprises with world-class HR infrastructure.
             </p>
             <div className="flex gap-4">
@@ -75,10 +75,10 @@ export const Footer = () => {
         </div>
 
         <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs font-bold text-textSecondary uppercase tracking-[0.3em] opacity-40">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
+          <p className="text-xs font-bold text-textSecondary uppercase tracking-[0.3em]">© 2026 HiveHr Agriculture Infrastructure Inc.</p>
           <div className="flex gap-8">
-            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] opacity-40 hover:opacity-100">Privacy Policy</a>
-            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] opacity-40 hover:opacity-100">Cookie Policy</a>
+            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] hover:opacity-100">Privacy Policy</a>
+            <a href="#" className="text-xs font-bold text-textSecondary hover:text-primary transition-colors uppercase tracking-[0.2em] hover:opacity-100">Cookie Policy</a>
           </div>
         </div>
       </div>
@@ -92,7 +92,7 @@ const FooterCol = ({ title, links }: { title: string, links: { name: string, hre
     <ul className="space-y-4">
       {links.map((link) => (
         <li key={link.name}>
-          <Link to={link.href} className="text-sm font-bold text-textSecondary hover:text-primary transition-colors tracking-tight opacity-70 hover:opacity-100">{link.name}</Link>
+          <Link to={link.href} className="text-sm font-bold text-textSecondary hover:text-primary transition-colors tracking-tight hover:opacity-100">{link.name}</Link>
         </li>
       ))}
     </ul>

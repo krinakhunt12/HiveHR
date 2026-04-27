@@ -182,7 +182,7 @@ const EmployeeDashboard = () => {
                 </div>
 
                 <div className="card-premium p-8 bg-surface border border-border text-left">
-                    <h4 className="text-sm font-medium text-textSecondary mb-6 font-sans uppercase tracking-[0.2em] opacity-50">Operational Updates</h4>
+                    <h4 className="text-sm font-medium text-textSecondary mb-6">Operational Updates</h4>
                     <div className="space-y-6">
                         <div className="flex gap-4">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></div>

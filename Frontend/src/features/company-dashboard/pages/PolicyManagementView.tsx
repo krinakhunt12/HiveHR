@@ -38,13 +38,13 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const payload = { 
-                title, 
-                category: type, 
+            const payload = {
+                title,
+                category: type,
                 content: rules,
                 is_mandatory: false // Default for now
             };
-            
+
             if (initialData) {
                 await update.mutateAsync({ id: initialData.id, payload });
                 toast({ title: 'Policy Updated', description: 'The corporate policy has been modified.', type: 'success' });
@@ -163,9 +163,9 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
     if (error) {
         return (
             <div className="min-h-[500px] flex items-center justify-center">
-                <ErrorState 
-                    error={error as Error} 
-                    onRetry={() => refetch()} 
+                <ErrorState
+                    error={error as Error}
+                    onRetry={() => refetch()}
                 />
             </div>
         );
@@ -218,8 +218,8 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
 
             {filteredPolicies.length === 0 ? (
                 <div className="min-h-[400px] flex items-center justify-center">
-                    <EmptyState 
-                        title={searchQuery ? "No search results" : "Handbook empty"} 
+                    <EmptyState
+                        title={searchQuery ? "No search results" : "Handbook empty"}
                         description={searchQuery ? `No policies match "${searchQuery}".` : "The corporate handbook has no active policies yet."}
                         icon={FileText}
                         action={isAdmin && !searchQuery && (
@@ -262,7 +262,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                                 </div>
                                 <div className="space-y-1">
                                     <CardTitle className="text-base font-medium text-textPrimary leading-tight">{p.title}</CardTitle>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-textSecondary opacity-80">{p.category}</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-textSecondary">{p.category}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="pt-2">

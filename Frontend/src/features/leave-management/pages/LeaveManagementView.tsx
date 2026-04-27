@@ -165,7 +165,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                     ))
                 ) : (
                     <div className="col-span-full py-10 bg-surface rounded-2xl border border-dashed border-border flex flex-col items-center justify-center">
-                        <p className="text-sm font-bold text-textSecondary opacity-40">No leave quotas assigned to your current policy.</p>
+                        <p className="text-sm font-bold text-textSecondary">No leave quotas assigned to your current policy.</p>
                     </div>
                 )}
             </div>
@@ -206,11 +206,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                 <tr key={req.id} className="hover:bg-primary/[0.01] transition-colors group">
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Individual'}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1 opacity-50">{req.leave_type}</p>
+                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">{req.leave_type}</p>
                                                     </td>
                                                     <td className="px-8 py-5">
-                                                        <p className="text-sm font-bold text-textPrimary">{req.start_date} <ArrowRight size={12} className="inline mx-1 opacity-30" /> {req.end_date}</p>
-                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1 opacity-50">Standard Cycle</p>
+                                                        <p className="text-sm font-bold text-textPrimary">{req.start_date} <ArrowRight size={12} className="inline mx-1 " /> {req.end_date}</p>
+                                                        <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">Standard Cycle</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <span className={cn(
@@ -257,7 +257,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Anonymous'}</p>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-textSecondary opacity-50 mt-1">{req.leave_type}</p>
+                                                        <p className="text-xs font-bold uppercase tracking-widest text-textSecondary mt-1">{req.leave_type}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -267,7 +267,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                     <Calendar size={14} className="text-primary" />
                                                     <span className="text-xs font-bold">{req.start_date} – {req.end_date}</span>
                                                 </div>
-                                                <p className="text-xs text-textSecondary font-semibold leading-relaxed opacity-80">{req.reason || 'No specific rationale provided.'}</p>
+                                                <p className="text-xs text-textSecondary font-semibold leading-relaxed">{req.reason || 'No specific rationale provided.'}</p>
                                             </div>
 
                                             {isAdmin && (
@@ -321,8 +321,8 @@ const QuotaProgress = ({ label, current, total, color }: { label: string, curren
         <Card className="card-premium p-8 bg-white text-left group">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <p className="text-xs font-bold text-textSecondary uppercase tracking-[0.2em] opacity-40 mb-2">{label}</p>
-                    <p className="text-2xl font-bold text-textPrimary font-display tracking-tight">{current}/{total} <span className="text-xs font-bold text-textSecondary opacity-40 ml-1">Days</span></p>
+                    <p className="text-xs font-bold text-textSecondary mb-2">{label}</p>
+                    <p className="text-2xl font-bold text-textPrimary">{current}/{total} <span className="text-xs font-bold text-textSecondary ml-1">Days</span></p>
                 </div>
                 <div className={cn(
                     "p-3 rounded-xl border group-hover:scale-110 transition-transform",
@@ -342,7 +342,7 @@ const QuotaProgress = ({ label, current, total, color }: { label: string, curren
                         style={{ width: `${percentage}%` }}
                     />
                 </div>
-                <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-textSecondary opacity-40">
+                <div className="flex justify-between text-xs font-bold text-textSecondary">
                     <span>Utilization</span>
                     <span>{Math.round(percentage)}%</span>
                 </div>

@@ -4,7 +4,7 @@ const Solutions = () => {
   return (
     <MarketingLayout>
       <section className="py-32 bg-slate-900 text-white overflow-hidden relative min-h-[60vh] flex items-center">
-        <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500 rounded-full blur-[120px]"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500 rounded-full blur-[120px]"></div>
         </div>

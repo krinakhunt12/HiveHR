@@ -10,17 +10,17 @@ export const FeatureCard = ({ icon, title, description }: any) => (
         {icon}
       </div>
       <h3 className="text-xl font-bold text-textPrimary mb-3 tracking-tight transition-colors group-hover:text-primary font-display">{title}</h3>
-      <p className="text-sm text-textSecondary leading-relaxed font-medium opacity-70">{description}</p>
+      <p className="text-sm text-textSecondary leading-relaxed font-medium">{description}</p>
     </CardContent>
   </Card>
 );
 
 export const Testimonial = ({ quote, author, role }: any) => (
   <div className="relative p-8 rounded-3xl bg-surface border border-border/50 shadow-sm">
-    <p className="text-lg font-medium italic text-textSecondary leading-relaxed mb-8 opacity-80">"{quote}"</p>
+    <p className="text-lg font-medium italic text-textSecondary leading-relaxed mb-8">"{quote}"</p>
     <div>
       <p className="text-sm font-bold text-textPrimary font-display">{author}</p>
-      <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1 opacity-40">{role}</p>
+      <p className="text-xs text-textSecondary font-bold uppercase tracking-widest mt-1">{role}</p>
     </div>
   </div>
 );
@@ -34,12 +34,12 @@ export const PricingCard = ({ name, price, desc, features, featured = false }: a
       <div className="absolute top-0 right-0 bg-primary text-surface text-xs font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-bl-xl shadow-lg">Most Popular</div>
     )}
     <CardContent className="p-10">
-      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-textSecondary opacity-40 mb-2">{name}</h3>
+      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-textSecondary mb-2">{name}</h3>
       <div className="flex items-baseline gap-1 mb-8">
         <span className="text-4xl font-bold tracking-tight text-textPrimary font-display">{price === 'Custom' ? '' : '$'}{price}</span>
-        {price !== 'Custom' && <span className="text-textSecondary text-xs font-bold uppercase tracking-widest ml-1 opacity-40">/mo</span>}
+        {price !== 'Custom' && <span className="text-textSecondary text-xs font-bold uppercase tracking-widest ml-1">/mo</span>}
       </div>
-      <p className="text-sm text-textSecondary font-medium mb-10 leading-relaxed opacity-70">{desc}</p>
+      <p className="text-sm text-textSecondary font-medium mb-10 leading-relaxed">{desc}</p>
       <ul className="space-y-5 mb-12">
         {features.map((f: string) => (
           <li key={f} className="flex items-center gap-4 text-sm font-bold text-textPrimary/80">

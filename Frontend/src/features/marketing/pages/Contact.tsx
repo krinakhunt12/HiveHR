@@ -11,7 +11,7 @@ const Contact = () => {
             <div className="relative z-10 flex flex-col lg:flex-row gap-16 items-center">
               <div className="lg:w-1/2 text-center lg:text-left">
                 <h2 className="text-3xl lg:text-5xl font-semibold mb-6 tracking-tight">Let's talk about your culture.</h2>
-                <p className="text-indigo-100 text-lg font-medium opacity-80 mb-10">Our consultants are ready to help you architect your organizational infrastructure.</p>
+                <p className="text-indigo-100 text-lg font-medium mb-10">Our consultants are ready to help you architect your organizational infrastructure.</p>
                 <div className="space-y-6">
                   <div className="flex items-center gap-4 justify-center lg:justify-start">
                     <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">

@@ -67,7 +67,7 @@
 }
 
 .btn-primary {
-  @apply bg-primary text-white font-medium h-10 px-5 rounded-md hover:bg-primaryLight transition-colors shadow-none active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2;
+  @apply bg-primary text-white font-medium h-10 px-5 rounded-md hover:bg-primaryLight transition-colors shadow-none active:scale-[0.98] disabled: flex items-center justify-center gap-2;
 }
 
 .input-premium {
