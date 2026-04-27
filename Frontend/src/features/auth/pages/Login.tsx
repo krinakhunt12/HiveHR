@@ -112,7 +112,7 @@ const Login = () => {
         </CardContent>
       </Card>
 
-      <div className="mt-10 text-sm font-medium text-dim uppercase tracking-widest text-center flex items-center gap-3">
+      <div className="mt-10 text-sm font-medium text-dim text-center flex items-center gap-3">
         <span>© 2026 HIVEHR</span>
         <span className="w-1 h-1 bg-border rounded-full"></span>
         <span>Secure Infrastructure</span>
