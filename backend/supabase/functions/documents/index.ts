@@ -84,36 +84,50 @@ Deno.serve(async (req: Request) => {
     // POST /:id/acknowledge — Acknowledge a policy (all roles)
     // ═══════════════════════════════════════════════════════
     if (method === "POST" && resourceId && subAction === "acknowledge") {
-      // Resolve employee_id from user_id (employees table links via user_id)
-      let employeeId: string | null = ctx.employeeId ?? null;
+      // 1. Verify policy exists and belongs to company
+      const { data: policy, error: policyErr } = await svcClient
+        .from("company_policies")
+        .select("id, company_id")
+        .eq("id", resourceId)
+        .single();
+      
+      if (policyErr || !policy) 
+        return jsonRes(404, { success: false, code: "NOT_FOUND", message: "Policy not found" });
+      
+      if (policy.company_id !== companyId)
+        return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Forbidden" });
 
-      if (!employeeId) {
-        // For company_admin users who may also be employees
-        const { data: empRecord } = await svcClient
-          .from("employees")
-          .select("id")
-          .eq("user_id", ctx.userId)
-          .eq("company_id", companyId)
-          .maybeSingle();
-        employeeId = empRecord?.id ?? null;
-      }
+      // 2. Resolve employee_id from user_id and company_id (fresh lookup)
+      const { data: empRecord, error: empError } = await svcClient
+        .from("employees")
+        .select("id")
+        .eq("user_id", ctx.userId)
+        .eq("company_id", companyId)
+        .maybeSingle();
 
-      if (!employeeId)
+      if (empError) throw empError;
+      
+      if (!empRecord) {
         return jsonRes(400, {
           success: false,
           code: "BAD_REQUEST",
-          message: "No employee record found for acknowledgement",
+          message: "No employee record found for acknowledgement. Only registered employees can acknowledge policies.",
         });
+      }
 
-      const { error } = await svcClient
+      // 3. Perform acknowledgement
+      const { error: ackError } = await svcClient
         .from("policy_acknowledgements")
         .upsert({
           policy_id: resourceId,
-          employee_id: employeeId,
+          employee_id: empRecord.id,
+          acknowledged_at: new Date().toISOString(),
         }, { onConflict: "policy_id,employee_id" });
 
-      if (error) throw error;
-      return successRes("Policy acknowledged");
+      if (ackError) throw ackError;
+      
+      await logAction(svcClient, ctx, "ACKNOWLEDGE_POLICY", "company_policies", resourceId, { employee_id: empRecord.id });
+      return successRes("Policy acknowledged successfully");
     }
 
     // ── Writes (create/update/delete) require company_admin ──

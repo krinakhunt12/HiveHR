@@ -110,7 +110,7 @@ const EmployeeDashboard = () => {
                 <div className="flex flex-col md:flex-row gap-4 items-center">
                     {hasAttendance && !attendanceToday.check_out_at && (
                         <div className="text-right mr-4">
-                            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">Target Punch Out (9h)</p>
+                            <p className="text-xs text-slate-400 font-medium mb-1">Target Punch Out (9h)</p>
                             <p className="text-lg font-medium text-primary tracking-tight">{estimatedPunchOut}</p>
                         </div>
                     )}

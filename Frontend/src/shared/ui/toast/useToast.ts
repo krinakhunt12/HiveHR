@@ -1,11 +1,22 @@
+import { toast as hotToast } from 'react-hot-toast';
+
 /**
  * --- USE TOAST REDIRECT ---
- * This file acts as a bridge to your existing Toast provider.
+ * This file acts as a bridge to react-hot-toast.
  */
-import { useToast as useToastHook } from '../toast';
-
 export const useToast = () => {
-  const toast = useToastHook();
+  const toast = (t: { title: string; description?: string; type?: 'success' | 'error' | 'info' }) => {
+    const message = t.description ? `${t.title}: ${t.description}` : t.title;
+    
+    if (t.type === 'success') {
+      hotToast.success(message);
+    } else if (t.type === 'error') {
+      hotToast.error(message);
+    } else {
+      hotToast(message);
+    }
+  };
+
   return { toast };
 };
 

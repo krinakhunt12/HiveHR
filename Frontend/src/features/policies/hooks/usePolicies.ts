@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { invokeApi, invokeAndUnwrap } from '@/shared/api/baseApi';
+import { invokeAndUnwrap } from '@/shared/api/baseApi';
+import toast from 'react-hot-toast';
 
 export interface CompanyPolicy {
   id: string;
@@ -36,34 +37,50 @@ export function usePolicyMutations() {
 
   const acknowledge = useMutation({
     mutationFn: (id: string) => 
-      invokeApi(`documents/${id}/acknowledge`, { method: 'POST' }),
+      invokeAndUnwrap(`documents/${id}/acknowledge`, { method: 'POST' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
+      toast.success('Policy acknowledged successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to acknowledge policy');
     }
   });
 
   const create = useMutation({
     mutationFn: (payload: Partial<CompanyPolicy>) =>
-      invokeApi('documents', { method: 'POST', body: payload }),
+      invokeAndUnwrap('documents', { method: 'POST', body: payload }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
+      toast.success('Policy created successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create policy');
     }
   });
 
   const update = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: Partial<CompanyPolicy> }) =>
-      invokeApi(`documents/${id}`, { method: 'PUT', body: payload }),
+      invokeAndUnwrap(`documents/${id}`, { method: 'PUT', body: payload }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
       qc.invalidateQueries({ queryKey: ['company-policy'] });
+      toast.success('Policy updated successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update policy');
     }
   });
 
   const remove = useMutation({
     mutationFn: (id: string) =>
-      invokeApi(`documents/${id}`, { method: 'DELETE' }),
+      invokeAndUnwrap(`documents/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
+      toast.success('Policy deleted successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete policy');
     }
   });
 
