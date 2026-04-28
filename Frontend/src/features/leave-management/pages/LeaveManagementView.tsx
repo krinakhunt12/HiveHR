@@ -165,7 +165,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                     ))
                 ) : (
                     <div className="col-span-full py-10 bg-surface rounded-2xl border border-dashed border-border flex flex-col items-center justify-center">
-                        <p className="text-sm font-bold text-textSecondary">No leave quotas assigned to your current policy.</p>
+                        <p className="text-sm font-semibold text-textSecondary">No leave quotas assigned to your current policy.</p>
                     </div>
                 )}
             </div>

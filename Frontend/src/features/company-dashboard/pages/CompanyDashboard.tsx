@@ -337,7 +337,7 @@ const CompanyDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <Card className="card-premium p-6 bg-white col-span-2">
                     <div className="flex items-center justify-between mb-8">
-                        <h4 className="text-sm font-bold text-textSecondary uppercase">Real-time Attendance</h4>
+                        <h4 className="text-sm font-semibold text-textSecondary uppercase">Real-time Attendance</h4>
                         <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/5 text-success rounded-lg border border-success/10 text-xs font-semibold">
                             <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
                             Live Sync
@@ -374,7 +374,7 @@ const CompanyDashboard = () => {
                 </Card>
 
                 <Card className="card-premium p-6 bg-white flex flex-col justify-between">
-                    <h4 className="text-sm font-bold text-textSecondary uppercase mb-6">Average Utilization</h4>
+                    <h4 className="text-sm font-semibold text-textSecondary uppercase mb-6">Average Utilization</h4>
                     <div className="flex flex-col items-center justify-center py-8">
                         <div className="relative w-32 h-32 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">

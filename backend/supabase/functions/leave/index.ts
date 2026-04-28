@@ -304,16 +304,27 @@ Deno.serve(async (req: Request) => {
       if (!leaveType)
         return jsonRes(404, { success: false, code: "NOT_FOUND", message: "Leave type not found or inactive" });
 
-      // Check min notice days
-      const today = new Date();
-      const fromDateObj = new Date(from_date);
-      const noticeDays = Math.ceil((fromDateObj.getTime() - today.getTime()) / 86400000);
-      if (noticeDays < leaveType.min_notice_days)
-        return jsonRes(400, {
-          success: false,
-          code: "VALIDATION_ERROR",
-          message: `This leave type requires at least ${leaveType.min_notice_days} days notice`,
-        });
+      // Check min notice days (Admins bypass notice rules)
+      if (ctx.role === "employee") {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const fromDateObj = new Date(from_date);
+        fromDateObj.setHours(0, 0, 0, 0);
+
+        const noticeDays = Math.floor((fromDateObj.getTime() - today.getTime()) / 86400000);
+        
+        if (noticeDays < leaveType.min_notice_days) {
+          const msg = noticeDays < 0 
+            ? "Back-dated leave requests are not allowed for this leave type"
+            : `This leave type requires at least ${leaveType.min_notice_days} days advance notice`;
+
+          return jsonRes(400, {
+            success: false,
+            code: "VALIDATION_ERROR",
+            message: msg,
+          });
+        }
+      }
 
       // Check if employee already has leave on these dates
       const { data: overlapping } = await svcClient
