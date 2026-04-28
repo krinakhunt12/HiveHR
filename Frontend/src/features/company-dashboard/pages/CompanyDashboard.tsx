@@ -275,7 +275,7 @@ const CompanyDashboard = () => {
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
-                                            "px-3 py-1.5 rounded-lg text-xs font-semibold border shadow-sm",
+                                            "px-3 py-1.5 rounded-lg text-xs font-semibold border",
                                             emp.status === 'active' ? 'bg-success/5 text-success border-success/10' : 'bg-background text-textSecondary border-primary/5'
                                         )}>
                                             {emp.status}
@@ -458,7 +458,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     </div>
                     {trend && (
                         <div className={cn(
-                            "flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg border",
+                            "flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg border",
                             positive ? "text-success bg-success/5 border-success/10" : "text-error bg-error/5 border-error/10"
                         )}>
                             {positive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}

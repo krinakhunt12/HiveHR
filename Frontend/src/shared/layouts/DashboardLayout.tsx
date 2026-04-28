@@ -111,7 +111,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
             if (item.onClick) {
               return (
-                <Button variant="ghost" className={cn(className, "flex-col items-start")}
+                <Button variant="ghost" className={cn(className, isSidebarExpanded ? "flex flex-col items-start" : "justify-center")}
                   key={item.label} onClick={() => handleNavClick(item)}>
                   {Content}
                 </Button>

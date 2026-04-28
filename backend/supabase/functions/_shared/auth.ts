@@ -5,7 +5,7 @@ import {
 
 export interface UserContext {
   userId: string;
-  role: "super_admin" | "company_admin" | "employee";
+  role: "admin" | "company_admin" | "employee";
   companyId: string | null;
   employeeId: string | null;
   fullName: string;
@@ -49,9 +49,9 @@ export async function getUserContext(
     return null;
   }
 
-  // Resolve employee record for all non-super_admin roles
+  // Resolve employee record for all non-admin roles
   let employeeId: string | null = null;
-  if (profile.role !== "super_admin" && profile.company_id) {
+  if (profile.role !== "admin" && profile.company_id) {
     const { data: emp } = await adminClient
       .from("employees")
       .select("id")

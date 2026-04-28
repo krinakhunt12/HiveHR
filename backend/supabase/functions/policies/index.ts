@@ -76,16 +76,16 @@ Deno.serve(async (req: Request) => {
       return successRes("Policy fetched", data);
     }
 
-    // ── Writes require company_admin or super_admin (super_admin reads only) ──
+    // ── Writes require company_admin or admin (admin reads only) ──
     if (method !== "GET" && ctx.role === "employee")
       return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Company Admin access required" });
 
     // Super Admin cannot create/modify work policies — this is company territory
-    if (method !== "GET" && ctx.role === "super_admin")
+    if (method !== "GET" && ctx.role === "admin")
       return jsonRes(403, {
         success: false,
         code: "FORBIDDEN",
-        message: "Super Admin cannot modify work policies. This is a Company Admin responsibility.",
+        message: "Admin cannot modify work policies. This is a Company Admin responsibility.",
       });
 
     if (!companyId)

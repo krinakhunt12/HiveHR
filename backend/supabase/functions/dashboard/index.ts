@@ -4,7 +4,7 @@
  * Returns role-appropriate dashboard stats in a single call.
  *
  * GET /   — returns stats based on the caller's role:
- *           super_admin   → platform-wide stats
+ *           admin   → platform-wide stats
  *           company_admin → company-level stats
  *           employee      → personal summary
  */
@@ -41,7 +41,7 @@ Deno.serve(async (req: Request) => {
     // ═══════════════════════════════════════════════════════
     // SUPER ADMIN DASHBOARD
     // ═══════════════════════════════════════════════════════
-    if (ctx.role === "super_admin") {
+    if (ctx.role === "admin") {
       const [
         { count: totalCompanies },
         { count: activeCompanies },

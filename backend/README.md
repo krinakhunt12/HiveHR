@@ -4,16 +4,16 @@ Multi-tenant SaaS HR Platform backend built on Supabase Edge Functions + Postgre
 
 ## Architecture
 
-**3 Roles:** `super_admin` → `company_admin` → `employee`
+**3 Roles:** `admin` → `company_admin` → `employee`
 
 **Edge Functions (10):**
 - `auth` — signup, login, logout, update-password
-- `admin` — super_admin: companies, plans, dashboard, logs
+- `admin` — admin: companies, plans, dashboard, logs
 - `company` — company info, departments, designations, holidays
 - `employee` — full employee CRUD with plan limit enforcement
 - `attendance` — check-in/out, manual entry, summaries
 - `leave` — apply, approve, reject, types, balances
-- `policies` — work policy CRUD (company_admin only; super_admin read-only)
+- `policies` — work policy CRUD (company_admin only; admin read-only)
 - `departments` — standalone department CRUD
 - `profile` — own profile + work policy (all roles)
 - `dashboard` — role-scoped dashboard stats
@@ -64,7 +64,7 @@ All endpoints return:
 1. `holidays` table — was missing from schema, referenced in leave working-day calculation
 2. `config.toml` — `documents` function not registered for deployment
 3. `auth/index.ts` — login response missing `employee_id` and `is_first_login` fields
-4. `auth/index.ts` — `super_admin` redirect URL was `/dashboard/super-admin` (route doesn't exist), fixed to `/dashboard/admin`
+4. `auth/index.ts` — `admin` redirect URL was `/dashboard/super-admin` (route doesn't exist), fixed to `/dashboard/admin`
 5. `employee/index.ts` — `.on("conflict")` invalid Supabase JS syntax caused leave balance seeding to silently fail on every new employee
 6. `leave/index.ts` — multi-tenancy security: `company_id` was read from request body instead of JWT context
 7. `documents/index.ts` — `employee_id` used `ctx.userId` (auth UUID) instead of resolving `employees.id`

@@ -8,7 +8,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppRole = 'super_admin' | 'admin' | 'company_admin' | 'employee';
+export type AppRole = 'admin' | 'company_admin' | 'employee';
 
 export interface SessionUser {
   id: string;

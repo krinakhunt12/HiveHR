@@ -43,7 +43,7 @@ export class ApiError extends Error {
 
 // ─── Domain Types (matches rebuilt Supabase schema) ─────────────────────────
 
-export type UserRole = 'super_admin' | 'admin' | 'company_admin' | 'employee';
+export type UserRole = 'admin' | 'admin' | 'company_admin' | 'employee';
 
 export interface Employee {
   id: string;

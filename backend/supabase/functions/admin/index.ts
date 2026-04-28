@@ -1,7 +1,7 @@
 /**
  * /functions/v1/admin
  *
- * Accessible ONLY by super_admin role.
+ * Accessible ONLY by admin role.
  * Super Admin CANNOT edit work policies — that is company_admin territory.
  *
  * GET    /companies            — list all companies
@@ -49,7 +49,7 @@ Deno.serve(async (req: Request) => {
 
     const ctx = await getUserContext(req);
     if (!ctx) return jsonRes(401, { success: false, code: "UNAUTHORIZED", message: "Unauthorized" });
-    if (ctx.role !== "super_admin")
+    if (ctx.role !== "admin")
       return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Super Admin access required" });
 
     const url = new URL(req.url);

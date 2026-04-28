@@ -38,7 +38,7 @@ Deno.serve(async (req: Request) => {
     if (ctx.role === "employee")
       return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Company Admin access required" });
 
-    const companyId = ctx.role === "super_admin" ? null : ctx.companyId;
+    const companyId = ctx.role === "admin" ? null : ctx.companyId;
     if (ctx.role === "company_admin" && !companyId)
       return jsonRes(400, {
         success: false,

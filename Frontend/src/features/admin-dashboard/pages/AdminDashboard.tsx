@@ -107,14 +107,14 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs text-textSecondary font-bold mt-1">
+                                                        <p className="text-xs text-textSecondary font-semibold mt-1">
                                                             {company.plans?.name ?? 'No Plan'} · {company.employee_count ?? 0} employees
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
                                                     <span className={cn(
-                                                        "text-xs font-bold px-2 py-1 rounded-lg border",
+                                                        "text-xs font-semibold px-2 py-1 rounded-lg border",
                                                         company.plan_status === 'active' ? 'bg-success/5 text-success border-success/10' :
                                                             company.plan_status === 'suspended' ? 'bg-error/5 text-error border-error/10' :
                                                                 'bg-warning/5 text-warning border-warning/10'
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
                                         {Object.entries(stats.plan_distribution).map(([plan, count]: any) => (
                                             <div key={plan} className="flex justify-between items-center">
                                                 <span className="text-xs font-bold text-textSecondary">{plan}</span>
-                                                <span className="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-lg">{count} companies</span>
+                                                <span className="text-xs font-semibold text-primary bg-primary/5 px-2 py-1 rounded-lg">{count} companies</span>
                                             </div>
                                         ))}
                                     </div>
@@ -240,12 +240,12 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs text-textSecondary font-bold mt-1">{company.email}</p>
+                                                        <p className="text-xs text-textSecondary font-semibold mt-1">{company.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-5">
-                                                <span className="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-lg">
+                                                <span className="text-xs font-semibold text-primary bg-primary/5 px-2 py-1 rounded-lg">
                                                     {company.plans?.name ?? 'No Plan'}
                                                 </span>
                                             </td>
@@ -254,7 +254,7 @@ const AdminDashboard = () => {
                                             </td>
                                             <td className="px-8 py-5">
                                                 <span className={cn(
-                                                    "px-3 py-1.5 rounded-lg text-xs font-semibold border shadow-sm",
+                                                    "px-3 py-1.5 rounded-lg text-xs font-semibold border",
                                                     company.plan_status === 'active' ? 'bg-success/5 text-success border-success/10' :
                                                         company.plan_status === 'suspended' ? 'bg-error/5 text-error border-error/10' :
                                                             'bg-warning/5 text-warning border-warning/10'
@@ -334,7 +334,7 @@ const StatBox = ({ title, value, icon, trend, color }: any) => {
                     <div className={cn("p-3 rounded-xl transition-all duration-300 shadow-sm", isAccent ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
                         {React.cloneElement(icon, { size: 20 })}
                     </div>
-                    <span className={cn("text-xs font-bold  px-2 py-1 rounded-lg", isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary")}>
+                    <span className={cn("text-xs font-semibold  px-2 py-1 rounded-lg", isAccent ? "bg-accent/5 text-accent" : "bg-primary/5 text-primary")}>
                         {trend}
                     </span>
                 </div>

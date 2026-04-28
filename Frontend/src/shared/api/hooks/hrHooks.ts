@@ -13,7 +13,7 @@
  *   /policies       → work policy CRUD + assignment
  *   /departments    → department CRUD
  *   /company        → company info + settings
- *   /admin          → super_admin: companies, plans
+ *   /admin          → admin: companies, plans
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -212,7 +212,7 @@ export function useListAttendance(params: AttendanceParams = {}) {
         (record as any).check_out_at = record.check_out_time ? `${baseDate}T${record.check_out_time}Z` : null;
         (record as any).work_minutes = record.net_work_minutes;
       });
-      
+
       return data;
     },
     staleTime: 2 * 60 * 1000,
@@ -309,9 +309,9 @@ export function useAttendanceMutations() {
       status?: string;
       reason: string;
     }) => {
-      const res = await invokeApi<ApiSuccessResponse<AttendanceRecord>>('attendance/manual', { 
-        method: 'POST', 
-        body: payload 
+      const res = await invokeApi<ApiSuccessResponse<AttendanceRecord>>('attendance/manual', {
+        method: 'POST',
+        body: payload
       });
       const record = res.data;
       if (record) {
@@ -549,7 +549,7 @@ export function useLeaveMutations() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  WORK POLICIES  (company_admin — super_admin blocked on writes)
+//  WORK POLICIES  (company_admin — admin blocked on writes)
 // ════════════════════════════════════════════════════════════════════════════
 
 export function useListPolicies() {
@@ -699,7 +699,7 @@ export function useCompanyMutations() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  ADMIN — COMPANIES  (super_admin only)
+//  ADMIN — COMPANIES  (admin only)
 // ════════════════════════════════════════════════════════════════════════════
 
 export function useListCompanies(
@@ -751,7 +751,7 @@ export function useCompanyAdminMutations() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  ADMIN — PLANS  (super_admin only)
+//  ADMIN — PLANS  (admin only)
 // ════════════════════════════════════════════════════════════════════════════
 
 export function useListPlans() {
@@ -788,7 +788,7 @@ export function usePlanMutations() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  ADMIN — DASHBOARD STATS  (super_admin)
+//  ADMIN — DASHBOARD STATS  (admin)
 // ════════════════════════════════════════════════════════════════════════════
 
 export function useAdminDashboard() {

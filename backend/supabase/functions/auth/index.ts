@@ -280,7 +280,7 @@ Deno.serve(async (req: Request) => {
       });
 
       const redirectMap: Record<string, string> = {
-        super_admin: "/dashboard/admin",
+        admin: "/dashboard/admin",
         company_admin: "/dashboard/company",
         employee: "/dashboard/employee",
       };
@@ -330,10 +330,10 @@ Deno.serve(async (req: Request) => {
 
       const { error: updateErr } = await svcClient.auth.admin.updateUserById(user.id, {
         password: new_password,
-        user_metadata: { 
-          ...user.user_metadata, 
+        user_metadata: {
+          ...user.user_metadata,
           force_password_reset: false,
-          is_first_login: false 
+          is_first_login: false
         },
       });
       if (updateErr) throw updateErr;

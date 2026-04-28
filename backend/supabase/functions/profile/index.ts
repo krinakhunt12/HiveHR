@@ -186,7 +186,7 @@ Deno.serve(async (req: Request) => {
       const body = await req.json();
 
       // Nobody can elevate themselves
-      if (ctx.role !== "super_admin") {
+      if (ctx.role !== "admin") {
         delete body.role;
         delete body.company_id;
       }
