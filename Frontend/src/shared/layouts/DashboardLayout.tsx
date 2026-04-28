@@ -181,7 +181,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               {isSidebarExpanded ? <X size={16} /> : <Menu size={16} />}
             </Button>
             <div className="h-4 w-[1px] bg-border hidden md:block"></div>
-            <h2 className="text-sm font-medium text-textSecondary  hidden md:block">Dashboard</h2>
+            <h2 className="text-sm font-medium text-textSecondary uppercase hidden md:block">Dashboard</h2>
           </div>
 
           <div className="flex items-center gap-3">

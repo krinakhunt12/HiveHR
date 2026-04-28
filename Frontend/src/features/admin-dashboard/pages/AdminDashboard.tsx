@@ -75,7 +75,7 @@ const AdminDashboard = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-textPrimary">Platform Overview</h1>
-                        <p className="text-sm font-semibold text-textSecondary mt-1">Check how the platform and subscriptions are doing.</p>
+                        <p className="text-sm font-medium text-textSecondary mt-1">Check how the platform and subscriptions are doing.</p>
                     </div>
                 </div>
 
@@ -189,7 +189,7 @@ const AdminDashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
                 <div>
                     <h2 className="text-2xl font-bold text-textPrimary tracking-tight font-display">Company List</h2>
-                    <p className="text-sm font-semibold text-textSecondary mt-1">{companies.length} registered companies.</p>
+                    <p className="text-sm font-medium text-textSecondary mt-1">{companies.length} registered companies.</p>
                 </div>
                 <div className="flex gap-3">
                     <div className="relative">
