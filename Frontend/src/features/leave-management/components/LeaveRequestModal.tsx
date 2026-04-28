@@ -91,6 +91,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                     required
                                     disabled={submit.isPending}
                                     type="date"
+                                    min={new Date().toISOString().split('T')[0]}
                                     value={formData.start_date}
                                     onChange={e => setFormData({ ...formData, start_date: e.target.value })}
                                     className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -107,6 +108,7 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                     required
                                     disabled={submit.isPending}
                                     type="date"
+                                    min={formData.start_date || new Date().toISOString().split('T')[0]}
                                     value={formData.end_date}
                                     onChange={e => setFormData({ ...formData, end_date: e.target.value })}
                                     className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary disabled:opacity-50 disabled:cursor-not-allowed"

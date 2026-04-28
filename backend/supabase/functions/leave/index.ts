@@ -256,18 +256,26 @@ Deno.serve(async (req: Request) => {
     // POST / — apply for leave
     // ═══════════════════════════════════════════════════════
     if (method === "POST" && !firstSeg) {
-      const body = await req.json();
+      const body = await req.json().catch(() => ({}));
       const { leave_type_id, from_date, to_date, reason, document_url } = body;
 
       const errors: string[] = [];
       if (!leave_type_id) errors.push("leave_type_id is required");
       if (!from_date) errors.push("from_date is required");
       if (!to_date) errors.push("to_date is required");
-      if (new Date(to_date) < new Date(from_date)) errors.push("to_date must be on or after from_date");
+      
+      const fromDateObj = new Date(from_date);
+      const toDateObj = new Date(to_date);
+
+      if (isNaN(fromDateObj.getTime())) errors.push("Invalid from_date format");
+      if (isNaN(toDateObj.getTime())) errors.push("Invalid to_date format");
+      if (!isNaN(fromDateObj.getTime()) && !isNaN(toDateObj.getTime()) && toDateObj < fromDateObj) {
+        errors.push("Conclusion date must be on or after commencement date");
+      }
+
       if (errors.length > 0)
         return jsonRes(400, { success: false, code: "VALIDATION_ERROR", message: errors[0], errors });
 
-      // SECURITY: company_id always comes from JWT context, never from request body
       const targetCompanyId = ctx.companyId;
       if (!targetCompanyId)
         return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No company associated with your account" });
@@ -278,11 +286,10 @@ Deno.serve(async (req: Request) => {
           return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "No employee record found" });
         employeeId = ctx.employeeId;
       } else {
-        // company_admin applying on behalf of an employee
         employeeId = body.employee_id ?? null;
         if (!employeeId)
           return jsonRes(400, { success: false, code: "BAD_REQUEST", message: "employee_id is required" });
-        // Verify employee belongs to this company
+        
         const { data: empCheck } = await svcClient
           .from("employees")
           .select("id")
@@ -293,14 +300,15 @@ Deno.serve(async (req: Request) => {
           return jsonRes(403, { success: false, code: "FORBIDDEN", message: "Employee does not belong to your company" });
       }
 
-      // Validate leave type belongs to this company
-      const { data: leaveType } = await svcClient
+      const { data: leaveType, error: ltError } = await svcClient
         .from("leave_types")
         .select("*")
         .eq("id", leave_type_id)
         .eq("company_id", targetCompanyId)
         .eq("is_active", true)
-        .single();
+        .maybeSingle();
+
+      if (ltError) throw ltError;
       if (!leaveType)
         return jsonRes(404, { success: false, code: "NOT_FOUND", message: "Leave type not found or inactive" });
 
@@ -308,15 +316,14 @@ Deno.serve(async (req: Request) => {
       if (ctx.role === "employee") {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const fromDateObj = new Date(from_date);
         fromDateObj.setHours(0, 0, 0, 0);
 
         const noticeDays = Math.floor((fromDateObj.getTime() - today.getTime()) / 86400000);
         
         if (noticeDays < leaveType.min_notice_days) {
           const msg = noticeDays < 0 
-            ? "Back-dated leave requests are not allowed for this leave type"
-            : `This leave type requires at least ${leaveType.min_notice_days} days advance notice`;
+            ? "You cannot apply for leave on a past date. Please select today or a future date, or contact HR for assistance."
+            : `This leave type requires advance planning. Please submit your request at least ${leaveType.min_notice_days} days before the start date.`;
 
           return jsonRes(400, {
             success: false,
@@ -326,8 +333,7 @@ Deno.serve(async (req: Request) => {
         }
       }
 
-      // Check if employee already has leave on these dates
-      const { data: overlapping } = await svcClient
+      const { data: overlapping, error: ovError } = await svcClient
         .from("leave_requests")
         .select("id")
         .eq("employee_id", employeeId)
@@ -335,6 +341,8 @@ Deno.serve(async (req: Request) => {
         .lte("from_date", to_date)
         .gte("to_date", from_date)
         .maybeSingle();
+
+      if (ovError) throw ovError;
       if (overlapping)
         return jsonRes(409, {
           success: false,
@@ -342,18 +350,18 @@ Deno.serve(async (req: Request) => {
           message: "You already have a leave request overlapping with these dates",
         });
 
-      // Calculate working days
       const totalDays = await countWorkingDays(svcClient, targetCompanyId, from_date, to_date);
 
-      // Check leave balance
       const year = fromDateObj.getFullYear();
-      const { data: balance } = await svcClient
+      const { data: balance, error: balError } = await svcClient
         .from("leave_balances")
         .select("*")
         .eq("employee_id", employeeId)
         .eq("leave_type_id", leave_type_id)
         .eq("year", year)
         .maybeSingle();
+
+      if (balError) throw balError;
 
       if (balance) {
         const available = balance.quota + balance.carry_forward - balance.taken - balance.pending;
@@ -364,14 +372,14 @@ Deno.serve(async (req: Request) => {
             message: `Insufficient leave balance. Available: ${available} days, Requested: ${totalDays} days`,
           });
 
-        // Reserve pending balance
-        await svcClient
+        const { error: updError } = await svcClient
           .from("leave_balances")
           .update({ pending: balance.pending + totalDays })
           .eq("id", balance.id);
+        if (updError) throw updError;
       }
 
-      const { data, error } = await svcClient
+      const { data, error: insError } = await svcClient
         .from("leave_requests")
         .insert({
           employee_id: employeeId,
@@ -386,7 +394,8 @@ Deno.serve(async (req: Request) => {
         })
         .select()
         .single();
-      if (error) throw error;
+
+      if (insError) throw insError;
 
       await logAction(svcClient, ctx, "APPLY_LEAVE", "leave_requests", data.id, { from_date, to_date, totalDays });
       return createdRes("Leave application submitted", data);

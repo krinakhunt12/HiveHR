@@ -36,17 +36,40 @@ export function createdRes<T>(message: string, data: T): Response {
   });
 }
 
+const FRIENDLY_ERROR_MAP: Record<string, string> = {
+  "23505": "A record with this information already exists. Please check for duplicates.",
+  "23503": "This action cannot be completed because a related record is missing or was deleted.",
+  "23502": "Required information is missing. Please fill in all fields.",
+  "42P01": "Database configuration error. Please contact system support.",
+  "PGRST116": "We couldn't find the requested information.",
+  "42703": "The system encountered a technical configuration error. Please contact support.",
+  "VALIDATION_ERROR": "Some information is missing or incorrect. Please review the form.",
+  "PLAN_LIMIT_EXCEEDED": "You've reached the limit for your current plan. Please upgrade to add more.",
+  "INSUFFICIENT_BALANCE": "You do not have enough leave balance for this request.",
+  "UNAUTHORIZED": "Your session has expired. Please log in again.",
+  "FORBIDDEN": "You don't have permission to perform this action.",
+  "CONFLICT": "This action conflicts with existing records. Please review your data.",
+  "INTERNAL_ERROR": "Something went wrong on our end. Our team has been notified."
+};
+
 export function errorRes(err: unknown, prefix = "Service"): Response {
   console.error(`[${prefix}]`, err);
   const e = err as Record<string, unknown>;
-  const message =
-    (e?.message as string) ?? "An unexpected error occurred";
-  const status =
-    typeof e?.status === "number" ? e.status : 500;
+  
+  const code = (e?.code as string) ?? "INTERNAL_ERROR";
+  const status = typeof e?.status === "number" ? e.status : 500;
+  let message = (e?.message as string) ?? "An unexpected error occurred";
+
+  // If we have a friendly mapping for this code, use it to override cryptic messages
+  if (FRIENDLY_ERROR_MAP[code]) {
+    message = FRIENDLY_ERROR_MAP[code];
+  } else if (status === 500) {
+    message = FRIENDLY_ERROR_MAP["INTERNAL_ERROR"];
+  }
 
   return jsonRes(status, {
     success: false,
-    code: (e?.code as string) ?? "INTERNAL_ERROR",
+    code,
     message,
     errors: (e?.errors as unknown[]) ?? null,
     timestamp: new Date().toISOString(),
