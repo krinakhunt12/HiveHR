@@ -261,17 +261,17 @@ const CompanyDashboard = () => {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{emp.full_name}</p>
-                                                <p className="text-xs text-textSecondary font-semibold mt-1.5">{emp.employee_code || '---'}</p>
+                                                <p className="text-xs text-textSecondary font-medium mt-1.5">{emp.employee_code || '---'}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
                                         <p className="text-sm font-bold text-textPrimary leading-none">{(emp as any).designation_name ?? emp.designation ?? '—'}</p>
-                                        <p className="text-xs text-textSecondary font-semibold mt-1.5">{emp.employment_type}</p>
+                                        <p className="text-xs text-textSecondary font-medium mt-1.5">{emp.employment_type}</p>
                                     </td>
                                     <td className="px-8 py-5">
                                         <p className="text-sm font-bold text-textPrimary">{emp.date_of_joining || '---'}</p>
-                                        <p className="text-xs text-textSecondary font-semibold mt-1.5">Onboarded</p>
+                                        <p className="text-xs text-textSecondary font-medium mt-1.5">Onboarded</p>
                                     </td>
                                     <td className="px-8 py-5">
                                         <span className={cn(
@@ -458,7 +458,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     </div>
                     {trend && (
                         <div className={cn(
-                            "flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg border",
+                            "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg border",
                             positive ? "text-success bg-success/5 border-success/10" : "text-error bg-error/5 border-error/10"
                         )}>
                             {positive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}

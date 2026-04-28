@@ -107,14 +107,14 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs text-textSecondary font-semibold mt-1">
+                                                        <p className="text-xs text-textSecondary font-medium mt-1">
                                                             {company.plans?.name ?? 'No Plan'} · {company.employee_count ?? 0} employees
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
                                                     <span className={cn(
-                                                        "text-xs font-semibold px-2 py-1 rounded-lg border",
+                                                        "text-xs font-medium px-2 py-1 rounded-lg border",
                                                         company.plan_status === 'active' ? 'bg-success/5 text-success border-success/10' :
                                                             company.plan_status === 'suspended' ? 'bg-error/5 text-error border-error/10' :
                                                                 'bg-warning/5 text-warning border-warning/10'
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-textPrimary">{company.name}</p>
-                                                        <p className="text-xs text-textSecondary font-semibold mt-1">{company.email}</p>
+                                                        <p className="text-xs text-textSecondary font-medium mt-1">{company.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
