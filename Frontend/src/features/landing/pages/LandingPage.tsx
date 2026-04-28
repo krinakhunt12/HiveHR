@@ -22,18 +22,18 @@ const LandingPage = () => {
               <p className="text-base lg:text-lg text-textSecondary mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                 Manage your team, payroll, and performance all in one place with a simple workspace designed for impact.
               </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                  <Link to="/signup">
-                    <Button size="lg" className="h-12 px-8 font-medium text-sm group">
-                      Start Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                  <Link to="/contact">
-                    <Button size="lg" variant="outline" className="h-12 px-8 font-medium text-sm  border-border hover:bg-primary/5">
-                      Request a Demo
-                    </Button>
-                  </Link>
-                </div>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                <Link to="/signup">
+                  <Button size="lg" className="h-12 px-8 font-medium text-sm group">
+                    Start Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link to="/contact">
+                  <Button size="lg" variant="outline" className="h-12 px-8 font-medium text-sm  border-border hover:bg-primary/5">
+                    Request a Demo
+                  </Button>
+                </Link>
+              </div>
             </div>
             <div className="lg:w-1/2 relative group">
               <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-3xl group-hover:bg-primary/20 transition-all duration-500"></div>
@@ -143,7 +143,7 @@ const LandingPage = () => {
                   'Easy team feedback',
                   'Track goals anytime'
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-4 text-sm font-medium text-textPrimary">
+                  <li key={item} className="flex items-center gap-4 text-base font-medium text-textPrimary">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
                     <span>{item}</span>
                   </li>
@@ -189,11 +189,11 @@ const LandingPage = () => {
             <p className="text-textSecondary mb-12 text-lg max-w-xl mx-auto font-medium leading-relaxed">Join 2,000+ teams making their work easier today. Start your 14-day trial now.</p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/signup">
-                  <Button size="lg" className="h-14 px-10 font-bold text-xs  bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
-                    Start Your Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                <Button size="lg" className="h-14 px-10 font-bold text-xs  bg-surface text-textPrimary hover:bg-surface/90 border-0 group ">
+                  Start Your Free Trial <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </Link>
-              <span className="text-xs text-textSecondary font-bold ">No credit card required.</span>
+              <span className="text-xs text-textSecondary font-medium ">No credit card required.</span>
             </div>
           </div>
         </div>
@@ -217,8 +217,8 @@ const LandingPage = () => {
                   { name: 'Google Workspace', desc: 'Identity & SSO' }
                 ].map((item) => (
                   <div key={item.name} className="p-5 rounded-2xl border border-border bg-background/50 group hover:border-primary/30 transition-all">
-                    <p className="text-sm font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">{item.name}</p>
-                    <p className="text-xs text-textSecondary font-bold ">{item.desc}</p>
+                    <p className="text-base font-bold text-textPrimary mb-1 group-hover:text-primary transition-colors">{item.name}</p>
+                    <p className="text-xs text-textSecondary font-medium ">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -254,7 +254,7 @@ const LandingPage = () => {
             ].map((sol) => (
               <div key={sol.title} className="p-10 rounded-[2.5rem] bg-surface/5 border border-surface/10 hover:bg-surface/10 transition-all group hover:-translate-y-2">
                 <h3 className="text-xl font-bold mb-5 group-hover:text-primary transition-colors">{sol.title}</h3>
-                <p className="text-sm text-textSecondary leading-relaxed font-bold">{sol.desc}</p>
+                <p className="text-sm text-textSecondary leading-relaxed font-medium">{sol.desc}</p>
               </div>
             ))}
           </div>

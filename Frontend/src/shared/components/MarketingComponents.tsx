@@ -20,7 +20,7 @@ export const Testimonial = ({ quote, author, role }: any) => (
     <p className="text-lg font-medium italic text-textSecondary leading-relaxed mb-8">"{quote}"</p>
     <div>
       <p className="text-sm font-bold text-textPrimary font-display">{author}</p>
-      <p className="text-xs text-textSecondary font-bold  mt-1">{role}</p>
+      <p className="text-xs text-textSecondary font-medium  mt-1">{role}</p>
     </div>
   </div>
 );

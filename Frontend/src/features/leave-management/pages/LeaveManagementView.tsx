@@ -206,11 +206,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                 <tr key={req.id} className="hover:bg-primary/[0.01] transition-colors group">
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary group-hover:text-primary transition-colors">{req.employees?.full_name || 'Individual'}</p>
-                                                        <p className="text-xs text-textSecondary font-bold  mt-1">{req.leave_type}</p>
+                                                        <p className="text-xs text-textSecondary font-medium  mt-1">{req.leave_type}</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <p className="text-sm font-bold text-textPrimary">{req.start_date} <ArrowRight size={12} className="inline mx-1 " /> {req.end_date}</p>
-                                                        <p className="text-xs text-textSecondary font-bold  mt-1">Regular Leave</p>
+                                                        <p className="text-xs text-textSecondary font-medium  mt-1">Regular Leave</p>
                                                     </td>
                                                     <td className="px-8 py-5">
                                                         <span className={cn(
