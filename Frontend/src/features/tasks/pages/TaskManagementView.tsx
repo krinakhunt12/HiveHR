@@ -17,7 +17,7 @@ import { useToast } from '@/shared/ui/toast/useToast';
 import { cn } from '@/shared/utils/cn';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { CardSkeleton } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { TaskModal } from '../components/TaskModal';
@@ -184,9 +184,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {isLoading ? (
-                            Array(4).fill(0).map((_, i) => (
-                                <Skeleton key={i} className="h-48 rounded-2xl" />
-                            ))
+                            <CardSkeleton count={4} />
                         ) : tasks.length === 0 ? (
                             <div className="col-span-full flex items-center justify-center p-12 bg-background border-2 border-dashed border-border rounded-3xl">
                                 <EmptyState

@@ -15,7 +15,7 @@ import {
 } from '@/features/policies/hooks/usePolicies';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { Button } from '@/shared/ui/button';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { CardSkeleton } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 
@@ -117,7 +117,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
                     </div>
 
                     <div className="flex gap-4 pt-4">
-                        <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                        <Button variant="outline" type="button" onClick={onClose} className="gap-2">
                             Cancel
                         </Button>
                         <Button
@@ -174,16 +174,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map(i => (
-                    <Card key={i} className="card-premium border-border bg-surface h-64 flex flex-col p-6 space-y-4">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="space-y-2">
-                            <Skeleton className="h-6 w-3/4" />
-                            <Skeleton className="h-4 w-1/4" />
-                        </div>
-                        <Skeleton className="h-20 w-full" />
-                    </Card>
-                ))}
+                <CardSkeleton count={3} />
             </div>
         );
     }

@@ -133,20 +133,12 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
 
                         <Button
                             type="submit"
-                            disabled={updatePassword.isPending}
+                            loading={updatePassword.isPending}
+                            loadingText="Securing Account..."
                             className="w-full h-12 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 group flex items-center justify-center gap-2 mt-4"
                         >
-                            {updatePassword.isPending ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>Securing Account...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>Update Password</span>
-                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
+                            <span>Update Password</span>
+                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                         </Button>
                     </form>
                 </div>

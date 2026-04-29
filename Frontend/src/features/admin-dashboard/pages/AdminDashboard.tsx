@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { Skeleton, CardSkeleton, TableSkeleton } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
@@ -315,13 +315,13 @@ const AdminDashboard = () => {
                     <div className="flex justify-between items-center">
                         <div className="space-y-3">
                             <Skeleton className="h-10 w-80 rounded-2xl" />
-                            <Skeleton className="h-5 w-64 rounded-xl" />
+                            <Skeleton className="h-5 w-64 rounded-xl opacity-60" />
                         </div>
                     </div>
                     <div className="grid grid-cols-4 gap-6">
-                        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+                        <CardSkeleton count={4} hasHeader={false} className="h-32" />
                     </div>
-                    <Skeleton className="h-[500px] rounded-[2rem]" />
+                    <TableSkeleton rows={10} columns={5} />
                 </div>
             </DashboardLayout>
         );

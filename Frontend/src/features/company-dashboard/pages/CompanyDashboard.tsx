@@ -20,7 +20,7 @@ import {
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
 import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
 import { Card } from '@/shared/ui/card';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { Skeleton, CardSkeleton, TableSkeleton } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
@@ -423,12 +423,9 @@ const CompanyDashboard = () => {
                 <div className="space-y-12">
                     <Skeleton className="h-14 w-80 rounded-2xl" />
                     <div className="grid grid-cols-4 gap-8">
-                        <Skeleton className="h-36 rounded-3xl" />
-                        <Skeleton className="h-36 rounded-3xl" />
-                        <Skeleton className="h-36 rounded-3xl" />
-                        <Skeleton className="h-36 rounded-3xl" />
+                        <CardSkeleton count={4} hasHeader={false} className="h-36" />
                     </div>
-                    <Skeleton className="h-[500px] rounded-[3rem]" />
+                    <TableSkeleton rows={8} columns={5} />
                 </div>
             </DashboardLayout>
         );

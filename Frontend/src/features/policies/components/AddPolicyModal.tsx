@@ -5,7 +5,7 @@ import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { usePolicyMutations } from '../hooks/usePolicies';
-import { Save, X } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 interface AddPolicyModalProps {
   isOpen: boolean;
@@ -87,10 +87,10 @@ export const AddPolicyModal = ({ isOpen, onClose }: AddPolicyModalProps) => {
 
         <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline" type="button" onClick={onClose} className="gap-2">
-            <X className="h-4 w-4" /> Cancel
+            Cancel
           </Button>
-          <Button type="submit" className="gap-2" disabled={create.isPending}>
-            <Save className="h-4 w-4" /> {create.isPending ? 'Saving...' : 'Save Policy'}
+          <Button type="submit" className="gap-2" loading={create.isPending} loadingText="Saving...">
+            <Save className="h-4 w-4" /> Save Policy
           </Button>
         </div>
       </form>

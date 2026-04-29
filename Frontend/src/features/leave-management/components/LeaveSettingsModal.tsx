@@ -2,14 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@/shared/ui/dialog';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { useLeaveConfigurations, useLeaveConfigMutations } from '@/shared/api/hooks/hrHooks';
-import { Save, Plus, Trash2, ShieldCheck, ArrowRight, Loader2, Lock } from 'lucide-react';
+import { Save, Plus, Trash2, ShieldCheck, Lock } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { useAuthStore } from '@/shared/auth/store';
 import { detectRole } from '@/shared/utils/authUtils';
+import { FormSkeleton } from '@/shared/ui/skeleton';
 
 interface LeaveSettingsModalProps {
     isOpen: boolean;
     onClose: () => void;
+    mode?: 'add' | 'edit';
 }
 
 // id is present for existing types fetched from server; absent for newly added rows
@@ -19,7 +21,7 @@ interface Configuration {
     annual_allowance: number;
 }
 
-export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps) => {
+export const LeaveSettingsModal = ({ isOpen, onClose, mode = 'edit' }: LeaveSettingsModalProps) => {
     const { toast } = useToast();
     const { session } = useAuthStore();
     const role = detectRole(session?.user);
@@ -34,20 +36,25 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
     const seededRef = useRef(false);
 
     useEffect(() => {
-        if (isOpen && !seededRef.current && initialConfigs) {
-            setConfigs(initialConfigs.map(c => ({
-                id: c.id,
-                leave_type: c.leave_type,
-                annual_allowance: c.annual_allowance,
-            })));
-            setDeletedIds([]);
-            seededRef.current = true;
+        if (isOpen && !seededRef.current) {
+            if (mode === 'add') {
+                setConfigs([{ leave_type: '', annual_allowance: 10 }]);
+                setDeletedIds([]);
+                seededRef.current = true;
+            } else if (initialConfigs) {
+                setConfigs(initialConfigs.map(c => ({
+                    id: c.id,
+                    leave_type: c.leave_type,
+                    annual_allowance: c.annual_allowance,
+                })));
+                setDeletedIds([]);
+                seededRef.current = true;
+            }
         }
         if (!isOpen) {
-            // Reset seed flag so next open re-seeds fresh data
             seededRef.current = false;
         }
-    }, [isOpen, initialConfigs]);
+    }, [isOpen, initialConfigs, mode]);
 
     const handleAdd = () => {
         setConfigs(prev => [...prev, { leave_type: '', annual_allowance: 10 }]);
@@ -113,10 +120,12 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
     const isSaving = update.isPending || remove.isPending;
 
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} title="Leave Policy Settings">
+        <Dialog isOpen={isOpen} onClose={onClose} title={mode === 'add' ? "Add New Leave Rule" : "Leave Policy Settings"}>
             <div className="mb-10 text-left">
                 <p className="text-sm font-medium text-textSecondary font-sans leading-relaxed">
-                    Define the annual leave allowances for your company. These limits apply per employee per calendar year.
+                    {mode === 'add'
+                        ? "Define a new leave type and its annual allowance for your company."
+                        : "Define the annual leave allowances for your company. These limits apply per employee per calendar year."}
                 </p>
             </div>
 
@@ -133,10 +142,7 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                             </p>
                         </div>
                     ) : loading && configs.length === 0 ? (
-                        <div className="py-10 flex items-center justify-center gap-3 text-textSecondary">
-                            <Loader2 size={18} className="animate-spin text-primary" />
-                            <span className="text-sm font-medium">Loading current policies...</span>
-                        </div>
+                        <FormSkeleton fields={3} className="border-none shadow-none p-0" />
                     ) : configs.length === 0 ? (
                         <div className="py-12 border-2 border-dashed border-soft rounded-2xl flex flex-col items-center justify-center text-center space-y-4">
                             <div className="w-12 h-12 bg-primary/5 rounded-full flex items-center justify-center text-primary">
@@ -211,13 +217,7 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                     )}
 
                     <div className="flex gap-4">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={onClose}
-                            disabled={isSaving}
-                            className="text-textSecondary hover:text-error"
-                        >
+                        <Button variant="outline" type="button" onClick={onClose} className="gap-2">
                             Cancel
                         </Button>
                         {!isSuperAdmin && (
@@ -228,7 +228,6 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                             >
                                 <Save size={18} />
                                 {isSaving ? 'Saving...' : 'Save Policies'}
-                                {!isSaving && <ArrowRight size={16} className="ml-1" />}
                             </Button>
                         )}
                     </div>

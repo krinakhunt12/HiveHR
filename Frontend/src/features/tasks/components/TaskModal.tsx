@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Textarea } from '@/shared/ui/textarea';
 import { useListEmployees, useTaskMutations, type Task } from '@/shared/api/hooks/hrHooks';
-import { Save, X, Calendar, User, Flag } from 'lucide-react';
+import { Save, Calendar, User, Flag } from 'lucide-react';
 import { useToast } from '@/shared/ui/toast/useToast';
 
 interface TaskFormData {
@@ -71,16 +71,16 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task }) =
     };
 
     return (
-        <Dialog 
-            isOpen={isOpen} 
-            onClose={onClose} 
+        <Dialog
+            isOpen={isOpen}
+            onClose={onClose}
             title={task ? 'Edit Task' : 'Assign New Task'}
         >
             <form onSubmit={handleSubmit} className="space-y-6 pt-4">
                 <div className="space-y-4">
                     <div className="space-y-2 text-left">
                         <label className="text-sm font-medium text-textSecondary">Task Title</label>
-                        <Input 
+                        <Input
                             required
                             placeholder="e.g. Q2 Performance Reviews"
                             value={formData.title}
@@ -129,7 +129,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task }) =
                         <label className="text-sm font-medium text-textSecondary flex items-center gap-2">
                             <Calendar size={14} /> Due Date
                         </label>
-                        <Input 
+                        <Input
                             type="date"
                             value={formData.due_date}
                             onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
@@ -140,7 +140,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task }) =
 
                     <div className="space-y-2 text-left">
                         <label className="text-sm font-medium text-textSecondary">Description</label>
-                        <Textarea 
+                        <Textarea
                             placeholder="Add details about the task..."
                             className="min-h-[120px]"
                             value={formData.description}
@@ -151,11 +151,16 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task }) =
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-border">
                     <Button variant="outline" type="button" onClick={onClose} className="gap-2">
-                        <X className="h-4 w-4" /> Cancel
+                        Cancel
                     </Button>
-                    <Button type="submit" className="gap-2" disabled={create.isPending || update.isPending}>
-                        <Save className="h-4 w-4" /> 
-                        {create.isPending || update.isPending ? 'Saving...' : (task ? 'Update Task' : 'Create Task')}
+                    <Button
+                        type="submit"
+                        className="gap-2"
+                        loading={create.isPending || update.isPending}
+                        loadingText="Saving..."
+                    >
+                        <Save className="h-4 w-4" />
+                        {task ? 'Update Task' : 'Create Task'}
                     </Button>
                 </div>
             </form>

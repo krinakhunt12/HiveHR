@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
-import { Skeleton, SkeletonButton, SkeletonCard, SkeletonTable } from '@/shared/ui/skeleton';
+import { Skeleton, SkeletonButton, CardSkeleton, TableSkeleton } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
@@ -33,6 +33,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
     const { toast } = useToast();
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+    const [settingsModalMode, setSettingsModalMode] = useState<'add' | 'edit'>('edit');
 
     const { session } = useAuthStore();
     const role = detectRole(session?.user);
@@ -85,24 +86,22 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 <div className="flex justify-between items-center">
                     <div className="space-y-2">
                         <Skeleton className="h-8 w-64 rounded-xl" />
-                        <Skeleton className="h-4 w-96 rounded-md" />
+                        <Skeleton className="h-4 w-96 rounded-md opacity-60" />
                     </div>
                     <div className="flex gap-3">
                         <SkeletonButton className="h-11 w-48" />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
-                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
-                    <SkeletonCard hasHeader={false} lines={2} className="h-40" />
+                    <CardSkeleton count={3} hasHeader={false} className="h-40" />
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="lg:col-span-2">
-                        <SkeletonTable rows={6} columns={4} />
+                        <TableSkeleton rows={6} columns={4} />
                     </div>
                     <div className="space-y-8">
                         <Skeleton className="h-[400px] rounded-[2rem]" />
-                        <Skeleton className="h-48 rounded-[2rem]" />
+                        <CardSkeleton count={1} hasHeader={false} className="h-48" />
                     </div>
                 </div>
             </div>
@@ -123,7 +122,10 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 </div>
                 <div className="flex gap-3">
                     {isAdmin && (
-                        <Button onClick={() => setIsSettingsModalOpen(true)}>
+                        <Button onClick={() => {
+                            setSettingsModalMode('add');
+                            setIsSettingsModalOpen(true);
+                        }}>
                             <Plus size={16} /> Add Leave Rules
                         </Button>
                     )}
@@ -154,7 +156,10 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                 <Button 
                                     variant="outline" 
                                     size="sm" 
-                                    onClick={() => setIsSettingsModalOpen(true)}
+                                    onClick={() => {
+                                        setSettingsModalMode('edit');
+                                        setIsSettingsModalOpen(true);
+                                    }}
                                 >
                                     <Settings size={14} /> Edit Configuration
                                 </Button>
@@ -163,7 +168,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
                         {loadingConfigs ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+                                <CardSkeleton count={4} hasHeader={false} className="h-20" />
                             </div>
                         ) : configs.length === 0 ? (
                             <div className="py-10 text-center border-2 border-dashed border-primary/5 rounded-2xl">
@@ -342,7 +347,11 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             </div>
 
             <LeaveRequestModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
-            <LeaveSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
+            <LeaveSettingsModal 
+                isOpen={isSettingsModalOpen} 
+                onClose={() => setIsSettingsModalOpen(false)} 
+                mode={settingsModalMode}
+            />
         </div>
     );
 };

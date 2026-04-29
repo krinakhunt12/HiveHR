@@ -11,7 +11,7 @@ import {
     Activity
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-import { Skeleton, SkeletonButton, SkeletonCard } from '@/shared/ui/skeleton';
+import { Skeleton, SkeletonButton, CardSkeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
 import { useTodayAttendance, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
@@ -232,13 +232,10 @@ const EmployeeDashboard = () => {
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
-                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
-                        <SkeletonCard hasHeader={false} lines={2} className="h-32" />
+                        <CardSkeleton count={3} hasHeader={false} className="h-32" />
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <Skeleton className="h-64 rounded-[2rem]" />
-                        <Skeleton className="h-64 rounded-[2rem]" />
+                        <CardSkeleton count={2} hasHeader={false} className="h-64" />
                     </div>
                 </div>
             </DashboardLayout>

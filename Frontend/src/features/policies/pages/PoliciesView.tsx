@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Input } from '@/shared/ui/input';
 import { Separator } from '@/shared/ui/separator';
-import { SkeletonCard } from '@/shared/ui/skeleton';
+import { Skeleton, CardSkeleton } from '@/shared/ui/skeleton';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { usePolicies, usePolicyMutations, type CompanyPolicy } from '../hooks/usePolicies';
@@ -35,18 +35,22 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
 
   if (isLoading) {
     return (
-      <div>
+      <div className="space-y-6">
         <div className="space-y-2">
-          <div className="h-8 w-48 bg-muted animate-pulse rounded-md" />
-          <div className="h-4 w-64 bg-muted animate-pulse rounded-md" />
+          <Skeleton className="h-8 w-48 rounded-md" />
+          <Skeleton className="h-4 w-64 rounded-md opacity-60" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="space-y-4">
-            <SkeletonCard hasHeader={false} lines={5} />
-          </div>
-          <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
-          </div>
+          <aside className="space-y-4">
+            <div className="p-4 rounded-[2rem] border border-primary/5 bg-white space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full rounded-xl" />
+              ))}
+            </div>
+          </aside>
+          <main className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <CardSkeleton count={4} hasHeader={false} />
+          </main>
         </div>
       </div>
     );
@@ -55,9 +59,9 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <ErrorState 
-          error={error as Error} 
-          onRetry={() => refetch()} 
+        <ErrorState
+          error={error as Error}
+          onRetry={() => refetch()}
           title="Failed to load policies"
         />
       </div>
@@ -186,7 +190,8 @@ const PolicyCard = ({ policy, onView, isAdmin }: { policy: CompanyPolicy, onView
             variant="outline"
             size="sm"
             className="flex-1"
-            disabled={acknowledge.isPending}
+            loading={acknowledge.isPending}
+            loadingText="Acknowledging..."
             onClick={() => acknowledge.mutate(policy.id)}
           >
             Acknowledge
@@ -199,7 +204,7 @@ const PolicyCard = ({ policy, onView, isAdmin }: { policy: CompanyPolicy, onView
 
 const PolicyDetail = ({ policy, onBack }: { policy: CompanyPolicy, onBack: () => void }) => {
   // const { acknowledge } = usePolicyMutations();
-  
+
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-4">
       <Button variant="ghost" size="sm" onClick={onBack} className="gap-2 -ml-2">
@@ -224,15 +229,9 @@ const PolicyDetail = ({ policy, onBack }: { policy: CompanyPolicy, onBack: () =>
         <CardFooter className="p-6 mt-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">Last updated {new Date(policy.updated_at).toLocaleDateString()}</p>
           <div className="flex gap-2 w-full sm:w-auto">
-            <Button variant="ghost" size="sm" onClick={onBack}>Cancel</Button>
-            {/* <Button
-              variant="default"
-              size="sm"
-              disabled={acknowledge.isPending}
-              onClick={() => acknowledge.mutate(policy.id)}
-            >
-              {acknowledge.isPending ? 'Acknowledging...' : 'Acknowledge Policy'}
-            </Button> */}
+            <Button variant="outline" type="button" onClick={onBack} className="gap-2">
+              Cancel
+            </Button>
           </div>
         </CardFooter>
       </Card>
