@@ -6,6 +6,7 @@ import { Input } from '@/shared/ui/input';
 import { Separator } from '@/shared/ui/separator';
 import { SkeletonCard } from '@/shared/ui/skeleton';
 import { useToast } from '@/shared/ui/toast/useToast';
+import { ErrorState } from '@/shared/ui/ErrorState';
 import { usePolicies, usePolicyMutations, type CompanyPolicy } from '../hooks/usePolicies';
 import { Search, ChevronLeft, BookOpen, Clock, Laptop, Users, Lock, Plus, Trash2 } from 'lucide-react';
 import { AddPolicyModal } from '../components/AddPolicyModal';
@@ -19,7 +20,7 @@ const CATEGORIES = [
 ];
 
 export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
-  const { data: policies = [], isLoading } = usePolicies();
+  const { data: policies = [], isLoading, error, refetch } = usePolicies();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewingPolicy, setViewingPolicy] = useState<CompanyPolicy | null>(null);
@@ -47,6 +48,18 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
             <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <ErrorState 
+          error={error as Error} 
+          onRetry={() => refetch()} 
+          title="Failed to load policies"
+        />
       </div>
     );
   }
@@ -141,7 +154,7 @@ const PolicyCard = ({ policy, onView, isAdmin }: { policy: CompanyPolicy, onView
       await remove.mutateAsync(policy.id);
       toast({ title: 'Policy Deleted', description: 'The policy has been removed.', type: 'success' });
     } catch (err: any) {
-      toast({ title: 'Delete Failed', description: err.message, type: 'error' });
+      // Error handled by QueryProvider
     }
   };
 
@@ -185,8 +198,8 @@ const PolicyCard = ({ policy, onView, isAdmin }: { policy: CompanyPolicy, onView
 };
 
 const PolicyDetail = ({ policy, onBack }: { policy: CompanyPolicy, onBack: () => void }) => {
-  const { acknowledge } = usePolicyMutations();
-
+  // const { acknowledge } = usePolicyMutations();
+  
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-4">
       <Button variant="ghost" size="sm" onClick={onBack} className="gap-2 -ml-2">
@@ -212,14 +225,14 @@ const PolicyDetail = ({ policy, onBack }: { policy: CompanyPolicy, onBack: () =>
           <p className="text-xs text-muted-foreground">Last updated {new Date(policy.updated_at).toLocaleDateString()}</p>
           <div className="flex gap-2 w-full sm:w-auto">
             <Button variant="ghost" size="sm" onClick={onBack}>Cancel</Button>
-            <Button
+            {/* <Button
               variant="default"
               size="sm"
               disabled={acknowledge.isPending}
               onClick={() => acknowledge.mutate(policy.id)}
             >
               {acknowledge.isPending ? 'Acknowledging...' : 'Acknowledge Policy'}
-            </Button>
+            </Button> */}
           </div>
         </CardFooter>
       </Card>

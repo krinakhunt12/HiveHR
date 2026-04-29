@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { invokeAndUnwrap } from '@/shared/api/baseApi';
-import toast from 'react-hot-toast';
 
 export interface CompanyPolicy {
   id: string;
@@ -40,11 +39,7 @@ export function usePolicyMutations() {
       invokeAndUnwrap(`documents/${id}/acknowledge`, { method: 'POST' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
-      toast.success('Policy acknowledged successfully');
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to acknowledge policy');
-    }
   });
 
   const create = useMutation({
@@ -52,11 +47,7 @@ export function usePolicyMutations() {
       invokeAndUnwrap('documents', { method: 'POST', body: payload }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
-      toast.success('Policy created successfully');
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to create policy');
-    }
   });
 
   const update = useMutation({
@@ -65,11 +56,7 @@ export function usePolicyMutations() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
       qc.invalidateQueries({ queryKey: ['company-policy'] });
-      toast.success('Policy updated successfully');
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to update policy');
-    }
   });
 
   const remove = useMutation({
@@ -77,11 +64,7 @@ export function usePolicyMutations() {
       invokeAndUnwrap(`documents/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['company-policies'] });
-      toast.success('Policy deleted successfully');
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete policy');
-    }
   });
 
   return { acknowledge, create, update, remove };

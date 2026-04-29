@@ -19,6 +19,7 @@ interface NavItem {
   label: string;
   path: string;
   onClick?: () => void;
+  isActive?: boolean;
 }
 
 interface DashboardLayoutProps {
@@ -79,9 +80,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           isSidebarExpanded ? "px-4 md:px-8" : "px-4"
         )}>
           {navItems.map((item) => {
-            const isActive = item.onClick
-              ? (activeInternalTab === item.path || (!activeInternalTab && navItems.indexOf(item) === 0))
-              : location.pathname === item.path;
+            const isActive = item.isActive !== undefined 
+              ? item.isActive 
+              : item.onClick
+                ? (activeInternalTab === item.path || (!activeInternalTab && navItems.indexOf(item) === 0))
+                : location.pathname === item.path || location.pathname.startsWith(item.path + '/');
 
             const Content = (
               <>

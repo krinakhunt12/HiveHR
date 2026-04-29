@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import {
     Users,
@@ -33,7 +34,15 @@ import { PoliciesView } from '@/features/policies/pages/PoliciesView';
 type View = 'overview' | 'directory' | 'time' | 'leaves' | 'policies';
 
 const CompanyDashboard = () => {
-    const [currentView, setCurrentView] = useState<View>('overview');
+    const location = useLocation();
+    const navigate = useNavigate();
+    
+    // Determine current view from URL: /dashboard/company/policies -> policies
+    const pathSegments = location.pathname.split('/');
+    const lastSegment = pathSegments[pathSegments.length - 1];
+    const views: View[] = ['overview', 'directory', 'time', 'leaves', 'policies'];
+    const currentView = (views.includes(lastSegment as View) ? lastSegment : 'overview') as View;
+    
     const [query, setQuery] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -100,7 +109,8 @@ const CompanyDashboard = () => {
 
     const customNavItems = navItems.map(item => ({
         ...item,
-        onClick: () => setCurrentView(item.path as View)
+        isActive: currentView === item.path,
+        onClick: () => navigate(`/dashboard/company/${item.path}`)
     }));
 
     const renderOverview = () => {
@@ -201,12 +211,12 @@ const CompanyDashboard = () => {
                     <h2 className="text-2xl font-semibold tracking-tight">Personnel Registry</h2>
                     <p className="text-sm font-medium text-textSecondary mt-1.5">Managing {employees.length} enterprise members.</p>
                 </div>
-                <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-primary/5 shadow-sm w-full md:w-[400px] focus-within:ring-4 focus-within:ring-primary/5 transition-all">
+                <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-primary/5 w-full md:w-[400px] shadow-sm">
                     <Search size={18} className="text-textSecondary" />
                     <input
                         type="text"
                         placeholder="Search by name, ID or role..."
-                        className="bg-transparent border-none outline-none text-sm font-bold w-full py-2.5 placeholder:text-textSecondary/30 text-textPrimary"
+                        className="bg-transparent border-none outline-none text-sm font-medium w-full py-2.5 placeholder:text-textSecondary/30 text-textPrimary"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />

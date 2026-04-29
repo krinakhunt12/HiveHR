@@ -55,7 +55,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
             onSuccess();
             onClose();
         } catch (err: any) {
-            toast({ title: 'Action Failed', description: err.message || 'Failed to save policy', type: 'error' });
+            // Error handled globally
         }
     };
 
@@ -156,7 +156,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
             await remove.mutateAsync(id);
             toast({ title: 'Policy Deleted', description: 'The policy has been removed from the handbook.', type: 'success' });
         } catch (err: any) {
-            toast({ title: 'Deletion Failed', description: err.message || 'Failed to delete policy', type: 'error' });
+            // Error handled globally
         }
     };
 

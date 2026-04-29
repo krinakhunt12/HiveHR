@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import {
     Building2, Users, Activity, Search, Filter,
@@ -16,7 +17,15 @@ import { useToast } from '@/shared/ui/toast/useToast';
 type AdminTab = 'pulse' | 'directory';
 
 const AdminDashboard = () => {
-    const [currentTab, setCurrentTab] = useState<AdminTab>('pulse');
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Determine current tab from URL: /dashboard/admin/directory -> directory
+    const pathSegments = location.pathname.split('/');
+    const lastSegment = pathSegments[pathSegments.length - 1];
+    const tabs: AdminTab[] = ['pulse', 'directory'];
+    const currentTab = (tabs.includes(lastSegment as AdminTab) ? lastSegment : 'pulse') as AdminTab;
+
     const [query, setQuery] = React.useState('');
     const { toast } = useToast();
 
@@ -43,7 +52,7 @@ const AdminDashboard = () => {
             await suspend.mutateAsync(id);
             toast({ title: 'Company Suspended', description: `${name} has been suspended.`, type: 'success' });
         } catch (err: any) {
-            toast({ title: 'Action Failed', description: err.message, type: 'error' });
+            // Error handled globally
         }
     };
 
@@ -52,14 +61,18 @@ const AdminDashboard = () => {
             await activate.mutateAsync(id);
             toast({ title: 'Company Activated', description: `${name} is now active.`, type: 'success' });
         } catch (err: any) {
-            toast({ title: 'Action Failed', description: err.message, type: 'error' });
+            // Error handled globally
         }
     };
 
     const navItems = [
         { icon: <Activity />, label: 'Pulse', path: 'pulse' },
         { icon: <Users />, label: 'Companies', path: 'directory' },
-    ].map(item => ({ ...item, onClick: () => setCurrentTab(item.path as AdminTab) }));
+    ].map(item => ({ 
+        ...item, 
+        isActive: currentTab === item.path,
+        onClick: () => navigate(`/dashboard/admin/${item.path}`) 
+    }));
 
     const renderPulse = () => {
         if (error) {

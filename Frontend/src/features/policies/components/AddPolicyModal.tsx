@@ -30,9 +30,7 @@ export const AddPolicyModal = ({ isOpen, onClose }: AddPolicyModalProps) => {
         onClose();
         setFormData({ title: '', content: '', category: 'HR', is_mandatory: false });
       },
-      onError: (err: any) => {
-        toast({ title: 'Creation Failed', description: err.message, type: 'error' });
-      }
+
     });
   };
 
@@ -42,7 +40,7 @@ export const AddPolicyModal = ({ isOpen, onClose }: AddPolicyModalProps) => {
         <div className="space-y-4">
           <div className="space-y-2 text-left">
             <label className="text-sm font-medium">Policy Title</label>
-            <Input 
+            <Input
               required
               placeholder="e.g. Remote Work Guidelines"
               value={formData.title}
@@ -66,7 +64,7 @@ export const AddPolicyModal = ({ isOpen, onClose }: AddPolicyModalProps) => {
 
           <div className="space-y-2 text-left">
             <label className="text-sm font-medium">Content</label>
-            <Textarea 
+            <Textarea
               required
               placeholder="Enter detailed policy text..."
               className="min-h-[200px]"
@@ -76,7 +74,7 @@ export const AddPolicyModal = ({ isOpen, onClose }: AddPolicyModalProps) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <input 
+            <input
               type="checkbox"
               id="mandatory"
               checked={formData.is_mandatory}

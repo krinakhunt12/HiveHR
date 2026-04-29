@@ -40,7 +40,7 @@ export const TaskManagementView: React.FC<TaskManagementViewProps> = ({ isAdmin 
                 type: 'success'
             });
         } catch (err: any) {
-            toast({ title: 'Update Failed', description: err.message || 'Could not update task', type: 'error' });
+            // Error handled globally
         }
     };
 

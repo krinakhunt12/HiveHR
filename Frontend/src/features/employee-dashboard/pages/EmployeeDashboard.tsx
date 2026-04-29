@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import {
     Clock,
@@ -20,7 +21,15 @@ import { PoliciesView } from '@/features/policies/pages/PoliciesView';
 type View = 'dashboard' | 'leaves' | 'policies';
 
 const EmployeeDashboard = () => {
-    const [currentView, setCurrentView] = useState<View>('dashboard');
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Determine current view from URL: /dashboard/employee/policies -> policies
+    const pathSegments = location.pathname.split('/');
+    const lastSegment = pathSegments[pathSegments.length - 1];
+    const views: View[] = ['dashboard', 'leaves', 'policies'];
+    const currentView = (views.includes(lastSegment as View) ? lastSegment : 'dashboard') as View;
+
     const { data: user, refetch: refetchMe } = useGetMe();
     const userName = user?.full_name?.split(' ')[0] || 'User';
 
@@ -97,7 +106,8 @@ const EmployeeDashboard = () => {
 
     const customNavItems = navItems.map(item => ({
         ...item,
-        onClick: () => setCurrentView(item.path as View)
+        isActive: currentView === item.path,
+        onClick: () => navigate(`/dashboard/employee/${item.path}`)
     }));
 
     const renderDashboard = () => (
@@ -117,7 +127,7 @@ const EmployeeDashboard = () => {
                     <div className="flex gap-3">
                         <Button
                             variant="outline"
-                            onClick={() => setCurrentView('leaves')}
+                            onClick={() => navigate('/dashboard/employee/leaves')}
                             className="px-5 py-2 text-sm font-medium h-10"
                         >
                             Request Leave
@@ -173,7 +183,7 @@ const EmployeeDashboard = () => {
                         <p className="text-sm font-medium text-white/70 leading-relaxed">View your leave balance and track your request status in real-time within the enterprise cloud.</p>
                     </div>
                     <Button
-                        onClick={() => setCurrentView('leaves')}
+                        onClick={() => navigate('/dashboard/employee/leaves')}
                         variant="secondary"
                         className="w-fit px-8 py-2.5 bg-white text-primary rounded-lg mt-8 font-bold text-xs hover:bg-white/90 transition-colors border-none"
                     >

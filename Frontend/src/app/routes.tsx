@@ -90,6 +90,11 @@ export const router = createBrowserRouter([
                 <AdminDashboard />
               </RequireRole>
             ),
+            children: [
+              { index: true, element: <Navigate to="pulse" replace /> },
+              { path: "pulse", element: null },
+              { path: "directory", element: null },
+            ]
           },
           {
             path: "company",
@@ -98,6 +103,14 @@ export const router = createBrowserRouter([
                 <CompanyDashboard />
               </RequireRole>
             ),
+            children: [
+              { index: true, element: <Navigate to="overview" replace /> },
+              { path: "overview", element: null },
+              { path: "directory", element: null },
+              { path: "time", element: null },
+              { path: "leaves", element: null },
+              { path: "policies", element: null },
+            ]
           },
           {
             path: "employee",
@@ -106,6 +119,12 @@ export const router = createBrowserRouter([
                 <EmployeeDashboard />
               </RequireRole>
             ),
+            children: [
+              { index: true, element: <Navigate to="dashboard" replace /> },
+              { path: "dashboard", element: null },
+              { path: "leaves", element: null },
+              { path: "policies", element: null },
+            ]
           },
         ],
       },
