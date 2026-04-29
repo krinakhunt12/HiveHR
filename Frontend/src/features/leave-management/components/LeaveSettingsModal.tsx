@@ -158,7 +158,7 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                                 className="flex flex-col sm:flex-row items-end gap-4 p-5 rounded-2xl bg-background/50 border border-soft group transition-all hover:bg-surface hover:border-primary/20"
                             >
                                 <div className="flex-1 space-y-2 text-left w-full">
-                                    <label className="text-xs font-bold text-primary ml-0.5">
+                                    <label className="text-sm font-medium text-textSecondary">
                                         Leave Type
                                     </label>
                                     <input
@@ -171,7 +171,7 @@ export const LeaveSettingsModal = ({ isOpen, onClose }: LeaveSettingsModalProps)
                                     />
                                 </div>
                                 <div className="w-full sm:w-40 space-y-2 text-left">
-                                    <label className="text-xs font-bold text-primary ml-0.5">
+                                    <label className="text-sm font-medium text-textSecondary">
                                         Annual Days
                                     </label>
                                     <input

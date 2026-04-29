@@ -29,7 +29,7 @@ const LandingPage = () => {
                   </Button>
                 </Link>
                 <Link to="/contact">
-                  <Button size="lg" variant="outline" className="h-12 px-8 font-medium text-sm  border-border hover:bg-primary/5">
+                  <Button size="lg" variant="outline">
                     Request a Demo
                   </Button>
                 </Link>
@@ -315,10 +315,10 @@ const LandingPage = () => {
                 <p className="text-surface/80 text-lg font-medium mb-12">We're here to help you manage your team more effectively and grow your business.</p>
                 <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
                   <Link to="/contact">
-                    <Button size="lg" className="w-full sm:w-auto px-10">Schedule a Consultation</Button>
+                    <Button size="lg">Schedule a Consultation</Button>
                   </Link>
                   <a href="mailto:sales@hivehr.io">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto px-10">Email Sales</Button>
+                    <Button size="lg" variant="outline">Email Sales</Button>
                   </a>
                 </div>
               </div>

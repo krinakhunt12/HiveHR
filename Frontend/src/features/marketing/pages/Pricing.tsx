@@ -8,7 +8,7 @@ const Pricing = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-2xl text-center mx-auto mb-20">
             <h2 className="text-3xl lg:text-5xl font-semibold text-[var(--color-text-main)] mb-4 tracking-tight">Simple, predictable pricing.</h2>
-            <p className="text-lg text-slate-500 font-medium leading-relaxed">Join 2,000+ teams automating their operations today.</p>
+            <p className="text-lg text-textSecondary font-medium leading-relaxed">Join 2,000+ teams automating their operations today.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <PricingCard 
@@ -46,8 +46,8 @@ const Pricing = () => {
                { q: 'Do you offer discount for non-profits?', a: 'Absolutely. Contact our sales team for more information on our social impact pricing.' }
              ].map(faq => (
                <div key={faq.q}>
-                 <h4 className="font-semibold text-slate-900 mb-2">{faq.q}</h4>
-                 <p className="text-slate-500 text-sm">{faq.a}</p>
+                 <h4 className="font-semibold text-textSecondary mb-2">{faq.q}</h4>
+                 <p className="text-textSecondary text-sm">{faq.a}</p>
                </div>
              ))}
            </div>

@@ -71,10 +71,10 @@ export const Navbar = () => {
           ))}
           <div className="pt-4 flex flex-col gap-4">
             <Link to="/login" className="w-full">
-              <Button variant="outline" className="w-full text-xs font-bold uppercase tracking-[0.2em] h-14 rounded-xl border-border">Login</Button>
+              <Button variant="outline">Login</Button>
             </Link>
             <Link to="/signup" className="w-full">
-              <Button className="w-full text-xs font-bold uppercase tracking-[0.2em] h-14 rounded-xl bg-primary text-surface shadow-lg shadow-primary/20">Get Started</Button>
+              <Button>Get Started</Button>
             </Link>
           </div>
         </div>

@@ -14,6 +14,7 @@
  *   /departments    → department CRUD
  *   /company        → company info + settings
  *   /admin          → admin: companies, plans
+ *   /tasks          → task management
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -30,11 +31,12 @@ import {
   type ProfileUser,
   type Company,
   type Plan,
+  type Task,
   type ApiSuccessResponse,
 } from '../baseApi';
 
-// ─── Re-export Employee type for consumers ───────────────────────────────────
-export type { Employee, WorkPolicy, AttendanceRecord, LeaveType, LeaveBalance, LeaveRequest };
+// ─── Re-export types for consumers ───────────────────────────────────
+export type { Employee, WorkPolicy, AttendanceRecord, LeaveType, LeaveBalance, LeaveRequest, Task };
 
 // ─── Helper: build query string ──────────────────────────────────────────────
 function qs(params: Record<string, any>): string {
@@ -363,7 +365,7 @@ export function useLeaveTypes(options: { enabled?: boolean } = {}) {
  */
 export function useLeaveConfigurations(options: { enabled?: boolean } = {}) {
   return useQuery({
-    queryKey: ['leave-types'],
+    queryKey: ['leave-configurations'],
     queryFn: async () => {
       const types = await invokeAndUnwrap<LeaveType[]>('leave/types');
       return types.map((t) => ({
@@ -392,7 +394,10 @@ export interface CreateLeaveTypePayload {
 
 export function useLeaveConfigMutations() {
   const qc = useQueryClient();
-  const invalidate = () => qc.invalidateQueries({ queryKey: ['leave-types'] });
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ['leave-types'] });
+    qc.invalidateQueries({ queryKey: ['leave-configurations'] });
+  };
 
   const create = useMutation({
     mutationFn: (payload: CreateLeaveTypePayload) =>
@@ -696,6 +701,59 @@ export function useCompanyMutations() {
   });
 
   return { update };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  TASKS  (all roles, scoped by JWT)
+// ════════════════════════════════════════════════════════════════════════════
+
+interface ListTasksParams {
+  status?: string;
+  assigned_to?: string;
+  priority?: string;
+  page?: number;
+  limit?: number;
+}
+
+export function useListTasks(params: ListTasksParams = {}, _isAdmin: boolean = false) {
+  return useQuery({
+    queryKey: ['tasks', params],
+    queryFn: async () => {
+      const res = await invokeApi<ApiSuccessResponse<Task[]>>(
+        `tasks${qs(params)}`
+      );
+      return res.data ?? [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useTaskMutations(_isAdmin: boolean = false) {
+  const qc = useQueryClient();
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ['tasks'] });
+    qc.invalidateQueries({ queryKey: ['dashboard'] });
+  };
+
+  const create = useMutation({
+    mutationFn: (payload: Partial<Task>) =>
+      invokeApi('tasks', { method: 'POST', body: payload }),
+    onSuccess: invalidate,
+  });
+
+  const update = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<Task> }) =>
+      invokeApi(`tasks/${id}`, { method: 'PATCH', body: payload }),
+    onSuccess: invalidate,
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) =>
+      invokeApi(`tasks/${id}`, { method: 'DELETE' }),
+    onSuccess: invalidate,
+  });
+
+  return { create, update, remove };
 }
 
 // ════════════════════════════════════════════════════════════════════════════

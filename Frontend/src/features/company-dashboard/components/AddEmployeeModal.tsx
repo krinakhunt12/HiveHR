@@ -50,7 +50,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     {/* Name Field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">Full Name</label>
+                        <label className="text-sm font-medium text-textSecondary">Full Name</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <UserPlus className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -67,7 +67,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Email Field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">Email Address</label>
+                        <label className="text-sm font-medium text-textSecondary">Email Address</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Mail className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -85,7 +85,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Role / Designation Field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">Job Title</label>
+                        <label className="text-sm font-medium text-textSecondary">Job Title</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Briefcase className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -102,7 +102,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Employee ID Field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">Internal Code</label>
+                        <label className="text-sm font-medium text-textSecondary">Internal Code</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Hash className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -119,7 +119,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Permissions / Role Select */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">System Role</label>
+                        <label className="text-sm font-medium text-textSecondary">System Role</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Shield className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -142,7 +142,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
 
                     {/* Join Date Field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-primary ml-1">Joining Date</label>
+                        <label className="text-sm font-medium text-textSecondary">Joining Date</label>
                         <div className="relative group">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />

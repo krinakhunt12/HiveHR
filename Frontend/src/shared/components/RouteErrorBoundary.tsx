@@ -23,7 +23,7 @@ export function RouteErrorBoundary() {
         </CardHeader>
         <CardContent>
           {import.meta.env.DEV && (
-            <div className="p-3 bg-muted rounded-md text-xs font-mono overflow-auto max-h-40 text-left">
+            <div className="p-3 bg-white shadow-sm rounded-md text-xs font-mono overflow-auto max-h-40 text-left">
               {error?.message || error?.statusText || 'Unknown Error'}
             </div>
           )}

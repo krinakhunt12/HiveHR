@@ -11,7 +11,7 @@ const Solutions = () => {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-3xl lg:text-5xl font-semibold tracking-tight mb-6">Built for teams of all sizes.</h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">From small startups to large companies, HiveHr grows with you.</p>
+            <p className="text-textSecondary text-lg max-w-2xl mx-auto">From small startups to large companies, HiveHr grows with you.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -22,7 +22,7 @@ const Solutions = () => {
             ].map((sol) => (
               <div key={sol.id} id={sol.id} className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
                 <h3 className="text-xl font-semibold mb-4 group-hover:text-indigo-400 transition-colors">{sol.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed font-medium">{sol.desc}</p>
+                <p className="text-sm text-textSecondary leading-relaxed font-medium">{sol.desc}</p>
               </div>
             ))}
           </div>
@@ -34,12 +34,12 @@ const Solutions = () => {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl font-semibold mb-6">Designed for impact.</h2>
-              <p className="text-slate-500 text-lg mb-8 leading-relaxed">
+              <p className="text-textSecondary text-lg mb-8 leading-relaxed">
                 We've spent thousands of hours researching how modern teams work. HiveHr is the result of that research—a tool that empowers employees while giving leadership the data they need.
               </p>
               <ul className="space-y-4">
                 {['Advanced Permission Layers', 'Global Compliance Engine', 'Real-time Talent Insights'].map(item => (
-                  <li key={item} className="flex items-center gap-3 text-sm font-medium text-slate-600">
+                  <li key={item} className="flex items-center gap-3 text-sm font-medium text-textSecondary">
                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
                     {item}
                   </li>

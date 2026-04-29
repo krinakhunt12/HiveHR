@@ -4,7 +4,7 @@ import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { ShieldCheck, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-    
+
 interface ForcePasswordChangeModalProps {
     isOpen: boolean;
     onSuccess: () => void;
@@ -90,7 +90,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                     <form onSubmit={handleSubmit} className="space-y-6 text-left">
                         {/* New Password Field */}
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-primary ml-1">New Password</label>
+                            <label className="text-sm font-medium text-textSecondary">New Password</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
@@ -108,7 +108,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
 
                         {/* Confirm Password Field */}
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-primary ml-1">Confirm Password</label>
+                            <label className="text-sm font-medium text-textSecondary">Confirm Password</label>
                             <div className="relative group">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />

@@ -173,6 +173,21 @@ export interface Department {
   employee_count?: number;
 }
 
+export interface Task {
+  id: string;
+  company_id: string;
+  created_by: string;
+  assigned_to: string | null;
+  title: string;
+  description: string | null;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: 'pending' | 'in_progress' | 'completed' | 'blocked';
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
+  assigned_to_employee?: { id: string; full_name: string } | null;
+}
+
 export interface ProfileUser {
   id: string;
   user_id: string;

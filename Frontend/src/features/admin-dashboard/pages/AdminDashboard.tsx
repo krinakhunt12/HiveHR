@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/shared/layouts/DashboardLayout';
 import {
@@ -215,7 +215,7 @@ const AdminDashboard = () => {
                             className="pl-10 pr-4 py-2.5 bg-white border border-primary/5 rounded-xl text-sm outline-none w-64 focus:w-80 transition-all font-bold text-textPrimary placeholder:text-textSecondary/30 shadow-sm"
                         />
                     </div>
-                    <Button variant="outline" size="icon" className="h-11 w-11 p-0 rounded-xl border-primary/5 text-textSecondary bg-white shadow-sm">
+                    <Button variant="outline" size="icon">
                         <Filter size={18} />
                     </Button>
                 </div>

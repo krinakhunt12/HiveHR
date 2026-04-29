@@ -18,13 +18,12 @@ import { Skeleton, SkeletonButton, SkeletonCard, SkeletonTable } from '@/shared/
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
-import { useListLeaves, useLeaveMutations, useLeaveBalance } from '@/shared/api/hooks/hrHooks';
+import { useListLeaves, useLeaveMutations, useLeaveBalance, useLeaveConfigurations } from '@/shared/api/hooks/hrHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { useAuthStore } from '@/shared/auth/store';
 import { detectRole } from '@/shared/utils/authUtils';
 import { LeaveRequestModal } from '../components/LeaveRequestModal';
 import { LeaveSettingsModal } from '../components/LeaveSettingsModal';
-import { Info } from 'lucide-react';
 
 interface LeaveManagementViewProps {
     isAdmin?: boolean;
@@ -50,6 +49,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
     const { data: balances = [] } = useLeaveBalance({ enabled: !isPrivileged });
     const { review } = useLeaveMutations();
+    const { data: configs = [], isLoading: loadingConfigs } = useLeaveConfigurations({ enabled: isPrivileged && !isSuperAdmin });
 
     const handleAction = async (id: string, status: 'approved' | 'rejected') => {
         try {
@@ -123,18 +123,13 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 </div>
                 <div className="flex gap-3">
                     {isAdmin && (
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsSettingsModalOpen(true)}
-                            className="gap-2 px-4 text-xs font-semibold border-primary/10 hover:bg-primary/5"
-                        >
-                            <Settings size={18} /> Leave Rules
+                        <Button onClick={() => setIsSettingsModalOpen(true)}>
+                            <Plus size={16} /> Add Leave Rules
                         </Button>
                     )}
                     {!isAdmin && (
                         <Button
                             onClick={() => setIsRequestModalOpen(true)}
-                            className="gap-2 px-6 h-11 text-xs font-medium"
                         >
                             <Plus size={18} /> Request Time Off
                         </Button>
@@ -144,14 +139,56 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {isPrivileged ? (
-                    <div className="col-span-full py-10 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col items-center justify-center text-center px-6">
-                        <Info className="text-primary mb-4" size={32} />
-                        <h3 className="text-lg font-bold text-textPrimary">{isSuperAdmin ? 'Admin View' : 'Admin View'}</h3>
-                        <p className="text-sm text-textSecondary mt-2 max-w-md">
-                            {isSuperAdmin
-                                ? 'As a Super Admin, you are viewing the global dashboard. Leave limits are set for each employee.'
-                                : 'As an Admin, you can manage and review team requests below.'}
-                        </p>
+                    <div className="col-span-full p-8 bg-primary/[0.02] rounded-[2rem] border border-primary/5">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                                    <Settings size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-textPrimary">Leave Configuration</h3>
+                                    <p className="text-xs font-medium text-textSecondary mt-1">Current leave types and annual allowances.</p>
+                                </div>
+                            </div>
+                            {isCompanyAdmin && (
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={() => setIsSettingsModalOpen(true)}
+                                >
+                                    <Settings size={14} /> Edit Configuration
+                                </Button>
+                            )}
+                        </div>
+
+                        {loadingConfigs ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+                            </div>
+                        ) : configs.length === 0 ? (
+                            <div className="py-10 text-center border-2 border-dashed border-primary/5 rounded-2xl">
+                                <p className="text-sm font-medium text-textSecondary">No leave types configured yet.</p>
+                                {isCompanyAdmin && (
+                                    <Button variant="link" onClick={() => setIsSettingsModalOpen(true)} className="text-primary font-bold mt-2">
+                                        Configure Now
+                                    </Button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {configs.map((config: any) => (
+                                    <div key={config.id} className="p-5 rounded-2xl bg-white border border-primary/5 flex items-center justify-between group hover:border-primary/20 transition-all shadow-sm">
+                                        <div>
+                                            <p className="text-xs font-semibold text-textSecondary mb-1">{config.leave_type}</p>
+                                            <p className="text-lg font-semibold text-textPrimary">{config.annual_allowance} <span className="text-xs font-medium text-textSecondary">Days/Year</span></p>
+                                        </div>
+                                        <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                            <Calendar size={16} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ) : balances.length > 0 ? (
                     balances.map((b: any) => (
@@ -174,8 +211,8 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                 <div className="lg:col-span-2 space-y-8">
                     <Card className="card-premium overflow-hidden bg-white">
                         <CardHeader className="py-6 px-8 border-b border-primary/5 bg-primary/[0.01] flex flex-row items-center justify-between">
-                            <CardTitle className="text-base font-bold text-textPrimary flex items-center gap-2">
-                                <History size={18} className="text-primary" /> Past Requests
+                            <CardTitle className="tracking-tight font-sans text-sm font-semibold text-textSecondary uppercase flex items-center gap-2">
+                                <History size={18} /> Past Requests
                             </CardTitle>
                             <div className="flex gap-2">
                                 <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-primary/10"><Filter size={14} /></Button>

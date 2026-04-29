@@ -14,9 +14,11 @@ import {
     BarChart3,
     ArrowUpRight,
     ArrowDownRight,
-    FileText
+    FileText,
+    Activity
 } from 'lucide-react';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
+import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
 import { Card } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
@@ -31,7 +33,7 @@ import { EditEmployeeModal } from '../components/EditEmployeeModal';
 import { EmployeeViewModal } from '../components/EmployeeViewModal';
 import { PoliciesView } from '@/features/policies/pages/PoliciesView';
 
-type View = 'overview' | 'directory' | 'time' | 'leaves' | 'policies';
+type View = 'overview' | 'directory' | 'time' | 'leaves' | 'policies' | 'tasks';
 
 const CompanyDashboard = () => {
     const location = useLocation();
@@ -40,7 +42,7 @@ const CompanyDashboard = () => {
     // Determine current view from URL: /dashboard/company/policies -> policies
     const pathSegments = location.pathname.split('/');
     const lastSegment = pathSegments[pathSegments.length - 1];
-    const views: View[] = ['overview', 'directory', 'time', 'leaves', 'policies'];
+    const views: View[] = ['overview', 'directory', 'time', 'leaves', 'policies', 'tasks'];
     const currentView = (views.includes(lastSegment as View) ? lastSegment : 'overview') as View;
     
     const [query, setQuery] = useState('');
@@ -105,6 +107,7 @@ const CompanyDashboard = () => {
         { icon: <Clock />, label: 'Attendance', path: 'time' },
         { icon: <Wind />, label: 'Leaves', path: 'leaves' },
         { icon: <FileText />, label: 'Policies', path: 'policies' },
+        { icon: <Activity />, label: 'Tasks', path: 'tasks' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -339,8 +342,8 @@ const CompanyDashboard = () => {
                     <p className="text-sm font-medium text-textSecondary mt-1.5">Synchronized attendance and compute metrics.</p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" className="px-6 text-xs font-bold">Export Logs</Button>
-                    <Button variant="outline" className="px-6 text-xs font-bold">Shift Schedule</Button>
+                    <Button variant="outline">Export Logs</Button>
+                    <Button variant="outline">Shift Schedule</Button>
                 </div>
             </div>
 
@@ -356,7 +359,7 @@ const CompanyDashboard = () => {
                     <div className="space-y-6">
                         {attendanceRecords.length === 0 ? (
                             <div className="py-12 text-center">
-                                <p className="text-sm text-textSecondary">No attendance logs for today yet.</p>
+                                <p className="text-xs font-medium text-textSecondary mt-1">No attendance logs for today yet.</p>
                             </div>
                         ) : (
                             attendanceRecords.slice(0, 5).map((record, i) => (
@@ -439,6 +442,7 @@ const CompanyDashboard = () => {
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={true} />}
                 {currentView === 'time' && renderOperationsView()}
                 {currentView === 'policies' && <PoliciesView isAdmin={true} />}
+                {currentView === 'tasks' && <TaskManagementView isAdmin={true} />}
             </main>
             <AddEmployeeModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
             <EmployeeViewModal

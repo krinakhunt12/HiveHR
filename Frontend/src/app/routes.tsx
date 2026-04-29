@@ -110,6 +110,7 @@ export const router = createBrowserRouter([
               { path: "time", element: null },
               { path: "leaves", element: null },
               { path: "policies", element: null },
+              { path: "tasks", element: null },
             ]
           },
           {
@@ -124,6 +125,7 @@ export const router = createBrowserRouter([
               { path: "dashboard", element: null },
               { path: "leaves", element: null },
               { path: "policies", element: null },
+              { path: "tasks", element: null },
             ]
           },
         ],

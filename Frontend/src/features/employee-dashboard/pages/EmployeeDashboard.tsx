@@ -7,18 +7,20 @@ import {
     AlertCircle,
     LayoutDashboard,
     Wind,
-    FileText
+    FileText,
+    Activity
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Skeleton, SkeletonButton, SkeletonCard } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
 import { useTodayAttendance, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
+import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
 import { ForcePasswordChangeModal } from '@/features/auth/components/ForcePasswordChangeModal';
 
 import { PoliciesView } from '@/features/policies/pages/PoliciesView';
 
-type View = 'dashboard' | 'leaves' | 'policies';
+type View = 'dashboard' | 'leaves' | 'policies' | 'tasks';
 
 const EmployeeDashboard = () => {
     const location = useLocation();
@@ -27,7 +29,7 @@ const EmployeeDashboard = () => {
     // Determine current view from URL: /dashboard/employee/policies -> policies
     const pathSegments = location.pathname.split('/');
     const lastSegment = pathSegments[pathSegments.length - 1];
-    const views: View[] = ['dashboard', 'leaves', 'policies'];
+    const views: View[] = ['dashboard', 'leaves', 'policies', 'tasks'];
     const currentView = (views.includes(lastSegment as View) ? lastSegment : 'dashboard') as View;
 
     const { data: user, refetch: refetchMe } = useGetMe();
@@ -102,6 +104,7 @@ const EmployeeDashboard = () => {
         { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: 'dashboard' },
         { icon: <Wind size={18} />, label: 'Leaves', path: 'leaves' },
         { icon: <FileText size={18} />, label: 'Policies', path: 'policies' },
+        { icon: <Activity size={18} />, label: 'My Tasks', path: 'tasks' },
     ];
 
     const customNavItems = navItems.map(item => ({
@@ -120,7 +123,7 @@ const EmployeeDashboard = () => {
                 <div className="flex flex-col md:flex-row gap-4 items-center">
                     {hasAttendance && !attendanceToday.check_out_at && (
                         <div className="text-right mr-4">
-                            <p className="text-xs text-slate-400 font-medium mb-1">Target Punch Out (9h)</p>
+                            <p className="text-xs text-textSecondary font-medium mb-1">Target Punch Out (9h)</p>
                             <p className="text-lg font-medium text-primary tracking-tight">{estimatedPunchOut}</p>
                         </div>
                     )}
@@ -248,6 +251,7 @@ const EmployeeDashboard = () => {
                 {currentView === 'dashboard' && renderDashboard()}
                 {currentView === 'leaves' && <LeaveManagementView isAdmin={false} />}
                 {currentView === 'policies' && <PoliciesView isAdmin={false} />}
+                {currentView === 'tasks' && <TaskManagementView isAdmin={false} />}
             </main>
 
             <ForcePasswordChangeModal

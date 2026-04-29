@@ -10,7 +10,7 @@ const Integrations = () => {
             <div className="lg:w-1/2">
               <span className="text-sm font-bold  text-[var(--color-primary)]/70 mb-4 block">Connected Ecosystem</span>
               <h2 className="text-3xl lg:text-5xl font-semibold text-[var(--color-text-main)] mb-6 tracking-tight">Syncs with your entire stack.</h2>
-              <p className="text-base lg:text-lg text-slate-400 font-medium leading-relaxed mb-10">
+              <p className="text-base lg:text-lg text-textSecondary font-medium leading-relaxed mb-10">
                 Native integrations with the tools your team already uses. No more manual data entry or fragmented workflows.
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -22,7 +22,7 @@ const Integrations = () => {
                 ].map((item) => (
                   <div key={item.name} className="p-4 rounded-xl border border-slate-50 bg-slate-50/30">
                     <p className="text-sm font-semibold text-[var(--color-text-main)] mb-1">{item.name}</p>
-                    <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">{item.desc}</p>
+                    <p className="text-sm text-textSecondary font-medium uppercase tracking-wider">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -46,7 +46,7 @@ const Integrations = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-2xl font-semibold">Developer-first API</h2>
-            <p className="text-slate-500 mt-2">Build custom integrations with nuestra robust REST API.</p>
+            <p className="text-textSecondary mt-2">Build custom integrations with nuestra robust REST API.</p>
           </div>
           <div className="bg-slate-900 rounded-3xl p-8 lg:p-12 text-white">
             <pre className="text-sm text-indigo-300 overflow-x-auto">
