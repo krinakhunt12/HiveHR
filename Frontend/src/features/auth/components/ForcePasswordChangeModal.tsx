@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUpdatePassword } from '@/shared/api/hooks/authHooks';
 import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
-import { ShieldCheck, Lock, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 
@@ -15,6 +15,8 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
     const { toast } = useToast();
     const updatePassword = useUpdatePassword();
     const [formData, setFormData] = useState({ newPassword: '', confirmPassword: '' });
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isVisible, setIsVisible] = useState(true);
 
@@ -98,12 +100,19 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                                 </div>
                                 <Input
                                     required
-                                    type="password"
+                                    type={showNewPassword ? "text" : "password"}
                                     value={formData.newPassword}
                                     onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
-                                    className="pl-10"
+                                    className="pl-10 pr-10"
                                     placeholder="Min 8 characters"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-textSecondary hover:text-primary transition-colors focus:outline-none"
+                                >
+                                    {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                             </div>
                         </div>
 
@@ -116,12 +125,19 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                                 </div>
                                 <Input
                                     required
-                                    type="password"
+                                    type={showConfirmPassword ? "text" : "password"}
                                     value={formData.confirmPassword}
                                     onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                    className="pl-10"
+                                    className="pl-10 pr-10"
                                     placeholder="Repeat password"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-textSecondary hover:text-primary transition-colors focus:outline-none"
+                                >
+                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                             </div>
                         </div>
 

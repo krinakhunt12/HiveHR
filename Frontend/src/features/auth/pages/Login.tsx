@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, Users, ArrowRight, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Users, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
@@ -11,6 +11,7 @@ const Login = () => {
   const [role, setRole] = React.useState<AppRole>('employee');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const login = useLogin();
 
@@ -36,7 +37,7 @@ const Login = () => {
         <CardContent className="pt-8 px-8 pb-10">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-1.5 flex flex-col items-start w-full">
-              <label className="text-sm font-semibold text-muted  ml-0.5">Work Email</label>
+              <label className="text-sm font-medium text-muted  ml-0.5">Work Email</label>
               <div className="relative group w-full">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
                 <Input
@@ -58,13 +59,20 @@ const Login = () => {
               <div className="relative group w-full">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim"
+                  className="pl-10 pr-10 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim"
                   placeholder="••••••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-dim hover:text-primary transition-colors focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 

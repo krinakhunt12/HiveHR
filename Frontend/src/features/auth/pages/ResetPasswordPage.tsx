@@ -5,7 +5,7 @@ import { Input } from '@/shared/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { useUpdatePassword } from '@/shared/api/hooks/authHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
-import { Lock, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Lock, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '@/shared/auth/store';
 import { roleDashboardPath } from '@/shared/auth/roles';
 import { detectRole } from '@/shared/utils/authUtils';
@@ -13,6 +13,8 @@ import { detectRole } from '@/shared/utils/authUtils';
 const ResetPasswordPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { toast } = useToast();
     const navigate = useNavigate();
     const { session, setSession } = useAuthStore();
@@ -60,13 +62,20 @@ const ResetPasswordPage = () => {
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
                                     <Input
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
-                                        className="bg-bg border border-soft rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
+                                        className="bg-bg border border-soft rounded-2xl py-3 pl-11 pr-10 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
                                         placeholder="Min. 8 characters"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dim hover:text-primary transition-colors focus:outline-none"
+                                    >
+                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
                                 </div>
                             </div>
                             <div>
@@ -74,13 +83,20 @@ const ResetPasswordPage = () => {
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
                                     <Input
-                                        type="password"
+                                        type={showConfirmPassword ? "text" : "password"}
                                         required
                                         value={confirmPassword}
                                         onChange={e => setConfirmPassword(e.target.value)}
-                                        className="bg-bg border border-soft rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
+                                        className="bg-bg border border-soft rounded-2xl py-3 pl-11 pr-10 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
                                         placeholder="Repeat your password"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dim hover:text-primary transition-colors focus:outline-none"
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
                                 </div>
                             </div>
                         </div>
