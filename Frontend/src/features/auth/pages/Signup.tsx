@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Building2, Users, ShieldCheck, ArrowRight, AlertCircle, Lock, Briefcase } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { useSignup } from '@/shared/api/hooks/authHooks';
 import { type AppRole } from '@/shared/auth/roles';
@@ -62,11 +63,11 @@ const Signup = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 flex flex-col items-start w-full">
                 <label className="text-sm font-semibold text-muted  ml-0.5">First name</label>
-                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Jane" />
+                <Input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Jane" />
               </div>
               <div className="space-y-1.5 flex flex-col items-start w-full">
                 <label className="text-sm font-semibold text-muted  ml-0.5">Last name</label>
-                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Doe" />
+                <Input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Doe" />
               </div>
             </div>
 
@@ -74,7 +75,7 @@ const Signup = () => {
               <label className="text-sm font-semibold text-muted  ml-0.5">Corporate email</label>
               <div className="relative group w-full">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="jane@company.io" />
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="jane@company.io" />
               </div>
             </div>
 
@@ -82,7 +83,7 @@ const Signup = () => {
               <label className="text-sm font-semibold text-muted  ml-0.5">Password</label>
               <div className="relative group w-full">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Minimum 8 characters" />
+                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Minimum 8 characters" />
               </div>
             </div>
 
@@ -104,7 +105,7 @@ const Signup = () => {
                 <label className="text-sm font-semibold text-muted  ml-0.5">Company name</label>
                 <div className="relative group w-full">
                   <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
-                  <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Acme Corporation" />
+                  <Input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="pl-10 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Acme Corporation" />
                 </div>
               </div>
             )}
@@ -113,18 +114,18 @@ const Signup = () => {
               <>
                 <div className="space-y-1.5 flex flex-col items-start w-full">
                   <label className="text-sm font-semibold text-muted  ml-0.5">Company ID</label>
-                  <input type="text" value={companyId} onChange={(e) => setCompanyId(e.target.value)} className="w-full px-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="UUID of company" />
+                  <Input type="text" value={companyId} onChange={(e) => setCompanyId(e.target.value)} className="bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="UUID of company" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5 flex flex-col items-start w-full">
                     <label className="text-sm font-semibold text-muted  ml-0.5">Employee Code</label>
-                    <input type="text" value={employeeCode} onChange={(e) => setEmployeeCode(e.target.value)} className="w-full px-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="EMP001" />
+                    <Input type="text" value={employeeCode} onChange={(e) => setEmployeeCode(e.target.value)} className="bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="EMP001" />
                   </div>
                   <div className="space-y-1.5 flex flex-col items-start w-full">
                     <label className="text-sm font-semibold text-muted  ml-0.5">Designation</label>
                     <div className="relative group w-full">
                       <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
-                      <input type="text" value={designation} onChange={(e) => setDesignation(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Software Engineer" />
+                      <Input type="text" value={designation} onChange={(e) => setDesignation(e.target.value)} className="pl-10 bg-bg/50 border border-soft rounded-lg text-sm outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium text-main placeholder:text-dim" placeholder="Software Engineer" />
                     </div>
                   </div>
                 </div>

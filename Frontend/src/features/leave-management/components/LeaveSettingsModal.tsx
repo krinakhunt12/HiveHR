@@ -4,9 +4,10 @@ import { useToast } from '@/shared/ui/toast/useToast';
 import { useLeaveConfigurations, useLeaveConfigMutations } from '@/shared/api/hooks/hrHooks';
 import { Save, Plus, Trash2, ShieldCheck, Lock } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { useAuthStore } from '@/shared/auth/store';
 import { detectRole } from '@/shared/utils/authUtils';
-import { FormSkeleton } from '@/shared/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 
 interface LeaveSettingsModalProps {
     isOpen: boolean;
@@ -142,7 +143,18 @@ export const LeaveSettingsModal = ({ isOpen, onClose, mode = 'edit' }: LeaveSett
                             </p>
                         </div>
                     ) : loading && configs.length === 0 ? (
-                        <FormSkeleton fields={3} className="border-none shadow-none p-0" />
+                        <div className="space-y-6 animate-pulse">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="space-y-3">
+                                    <Skeleton className="h-4 w-32 rounded-md opacity-40" />
+                                    <Skeleton className="h-12 w-full rounded-xl" />
+                                </div>
+                            ))}
+                            <div className="flex gap-4 pt-4 border-t border-primary/5">
+                                <Skeleton className="h-11 flex-1 rounded-xl opacity-40" />
+                                <Skeleton className="h-11 flex-1 rounded-xl" />
+                            </div>
+                        </div>
                     ) : configs.length === 0 ? (
                         <div className="py-12 border-2 border-dashed border-soft rounded-2xl flex flex-col items-center justify-center text-center space-y-4">
                             <div className="w-12 h-12 bg-primary/5 rounded-full flex items-center justify-center text-primary">
@@ -167,26 +179,26 @@ export const LeaveSettingsModal = ({ isOpen, onClose, mode = 'edit' }: LeaveSett
                                     <label className="text-sm font-medium text-textSecondary">
                                         Leave Type
                                     </label>
-                                    <input
+                                    <Input
                                         type="text"
                                         required
                                         placeholder="e.g. Vacation, Sick, Personal"
                                         value={config.leave_type}
                                         onChange={e => handleUpdate(index, 'leave_type', e.target.value)}
-                                        className="input-premium h-11 bg-bg border-soft focus:bg-surface"
+                                        className="h-11 bg-bg border-soft focus:bg-surface"
                                     />
                                 </div>
                                 <div className="w-full sm:w-40 space-y-2 text-left">
                                     <label className="text-sm font-medium text-textSecondary">
                                         Annual Days
                                     </label>
-                                    <input
+                                    <Input
                                         type="number"
                                         required
                                         min="0"
                                         value={config.annual_allowance}
                                         onChange={e => handleUpdate(index, 'annual_allowance', parseInt(e.target.value) || 0)}
-                                        className="input-premium h-11 bg-bg border-soft focus:bg-surface"
+                                        className="h-11 bg-bg border-soft focus:bg-surface"
                                     />
                                 </div>
                                 <Button

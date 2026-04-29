@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
-import { Skeleton, SkeletonButton, CardSkeleton, TableSkeleton } from '@/shared/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
@@ -24,6 +24,7 @@ import { useAuthStore } from '@/shared/auth/store';
 import { detectRole } from '@/shared/utils/authUtils';
 import { LeaveRequestModal } from '../components/LeaveRequestModal';
 import { LeaveSettingsModal } from '../components/LeaveSettingsModal';
+import { LEAVE_STATUSES, ROLES } from '@/shared/constants';
 
 interface LeaveManagementViewProps {
     isAdmin?: boolean;
@@ -37,8 +38,8 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
     const { session } = useAuthStore();
     const role = detectRole(session?.user);
-    const isSuperAdmin = role === 'admin';
-    const isCompanyAdmin = role === 'company_admin';
+    const isSuperAdmin = role === ROLES.ADMIN;
+    const isCompanyAdmin = role === ROLES.COMPANY_ADMIN;
     const isPrivileged = isSuperAdmin || isCompanyAdmin;
 
     const {
@@ -56,9 +57,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
         try {
             await review.mutateAsync({ id, payload: { status } });
             toast({
-                title: status === 'approved' ? 'Request Approved' : 'Request Rejected',
+                title: status === LEAVE_STATUSES.APPROVED ? 'Request Approved' : 'Request Rejected',
                 description: `Leave status has been updated to ${status}.`,
-                type: status === 'approved' ? 'success' : 'error'
+                type: status === LEAVE_STATUSES.APPROVED ? 'success' : 'error'
             });
         } catch (err: any) {
             toast({
@@ -82,34 +83,90 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
     if (isLoading) {
         return (
-            <div className="space-y-10 text-left">
+            <div className="space-y-10 text-left animate-pulse">
+                {/* Header Skeleton */}
                 <div className="flex justify-between items-center">
-                    <div className="space-y-2">
-                        <Skeleton className="h-8 w-64 rounded-xl" />
-                        <Skeleton className="h-4 w-96 rounded-md opacity-60" />
+                    <div className="space-y-3">
+                        <Skeleton className="h-9 w-64 rounded-xl" />
+                        <Skeleton className="h-4 w-96 rounded-lg opacity-40" />
                     </div>
-                    <div className="flex gap-3">
-                        <SkeletonButton className="h-11 w-48" />
-                    </div>
+                    <Skeleton className="h-11 w-44 rounded-xl" />
                 </div>
+
+                {/* Summary Cards Skeleton (3 Columns) */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <CardSkeleton count={3} hasHeader={false} className="h-40" />
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="h-40 rounded-md border border-primary/5 bg-white p-8 space-y-4">
+                            <Skeleton className="h-4 w-24 rounded-md opacity-40" />
+                            <Skeleton className="h-10 w-32 rounded-lg" />
+                            <Skeleton className="h-2 w-full rounded-full opacity-20" />
+                        </div>
+                    ))}
                 </div>
+
+                {/* Main Content Layout (Table + Sidebar) */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    {/* Past Requests Table Mockup */}
                     <div className="lg:col-span-2">
-                        <TableSkeleton rows={6} columns={4} />
+                        <div className="rounded-md border border-primary/5 bg-white overflow-hidden">
+                            <div className="px-8 py-6 border-b border-primary/5 bg-primary/[0.01] flex justify-between items-center">
+                                <Skeleton className="h-4 w-32 rounded-md" />
+                                <div className="flex gap-2">
+                                    <Skeleton className="h-8 w-8 rounded-lg" />
+                                    <Skeleton className="h-8 w-8 rounded-lg" />
+                                </div>
+                            </div>
+                            <div className="p-0">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <div key={i} className="px-8 py-6 flex items-center justify-between border-b border-primary/5 last:border-0">
+                                        <div className="flex items-center gap-4">
+                                            <Skeleton className="h-10 w-10 rounded-xl" />
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-32 rounded-md" />
+                                                <Skeleton className="h-3 w-20 rounded-md opacity-40" />
+                                            </div>
+                                        </div>
+                                        <Skeleton className="h-4 w-40 rounded-md" />
+                                        <Skeleton className="h-6 w-20 rounded-lg" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Pending Approvals Sidebar Mockup */}
                     <div className="space-y-8">
-                        <Skeleton className="h-[400px] rounded-[2rem]" />
-                        <CardSkeleton count={1} hasHeader={false} className="h-48" />
+                        <div className="rounded-md border border-primary/5 bg-white overflow-hidden">
+                            <div className="px-8 py-6 border-b border-primary/5 bg-primary/[0.01]">
+                                <Skeleton className="h-4 w-40 rounded-md" />
+                            </div>
+                            <div className="p-8 space-y-8">
+                                {[1, 2].map(i => (
+                                    <div key={i} className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <Skeleton className="h-10 w-10 rounded-xl" />
+                                            <div className="space-y-1.5">
+                                                <Skeleton className="h-3.5 w-24 rounded-md" />
+                                                <Skeleton className="h-2.5 w-16 rounded-md opacity-40" />
+                                            </div>
+                                        </div>
+                                        <Skeleton className="h-20 w-full rounded-2xl" />
+                                        <div className="flex gap-3">
+                                            <Skeleton className="h-10 flex-1 rounded-xl" />
+                                            <Skeleton className="h-10 flex-1 rounded-xl" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         );
     }
 
-    const pendingRequests = leaves.filter((r: any) => r.status === 'pending');
-    const historyRequests = leaves.filter((r: any) => r.status !== 'pending');
+    const pendingRequests = leaves.filter((r: any) => r.status === LEAVE_STATUSES.PENDING);
+    const historyRequests = leaves.filter((r: any) => r.status !== LEAVE_STATUSES.PENDING);
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
@@ -141,7 +198,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {isPrivileged ? (
-                    <div className="col-span-full p-8 bg-primary/[0.02] rounded-[2rem] border border-primary/5">
+                    <div className="col-span-full p-8 bg-primary/[0.02] rounded-md border border-primary/5">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
@@ -153,9 +210,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                 </div>
                             </div>
                             {isCompanyAdmin && (
-                                <Button 
-                                    variant="outline" 
-                                    size="sm" 
+                                <Button
+                                    variant="outline"
+                                    size="sm"
                                     onClick={() => {
                                         setSettingsModalMode('edit');
                                         setIsSettingsModalOpen(true);
@@ -168,7 +225,15 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
 
                         {loadingConfigs ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <CardSkeleton count={4} hasHeader={false} className="h-20" />
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="p-5 rounded-2xl bg-white border border-primary/5 flex items-center justify-between h-20">
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-3 w-16 rounded-md opacity-40" />
+                                            <Skeleton className="h-5 w-24 rounded-md" />
+                                        </div>
+                                        <Skeleton className="h-8 w-8 rounded-lg opacity-20" />
+                                    </div>
+                                ))}
                             </div>
                         ) : configs.length === 0 ? (
                             <div className="py-10 text-center border-2 border-dashed border-primary/5 rounded-2xl">
@@ -257,7 +322,7 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
                                                     <td className="px-8 py-5">
                                                         <span className={cn(
                                                             "px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-[0.15em] border shadow-sm",
-                                                            req.status === 'approved' ? 'bg-success/5 text-success border-success/10' : 'bg-error/5 text-error border-error/10'
+                                                            req.status === LEAVE_STATUSES.APPROVED ? 'bg-success/5 text-success border-success/10' : 'bg-error/5 text-error border-error/10'
                                                         )}>
                                                             {req.status}
                                                         </span>
@@ -347,9 +412,9 @@ export const LeaveManagementView: React.FC<LeaveManagementViewProps> = ({ isAdmi
             </div>
 
             <LeaveRequestModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
-            <LeaveSettingsModal 
-                isOpen={isSettingsModalOpen} 
-                onClose={() => setIsSettingsModalOpen(false)} 
+            <LeaveSettingsModal
+                isOpen={isSettingsModalOpen}
+                onClose={() => setIsSettingsModalOpen(false)}
                 mode={settingsModalMode}
             />
         </div>

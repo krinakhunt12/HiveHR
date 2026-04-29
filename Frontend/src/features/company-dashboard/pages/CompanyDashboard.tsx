@@ -20,8 +20,9 @@ import {
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
 import { TaskManagementView } from '@/features/tasks/pages/TaskManagementView';
 import { Card } from '@/shared/ui/card';
-import { Skeleton, CardSkeleton, TableSkeleton } from '@/shared/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { cn } from '@/shared/utils/cn';
@@ -32,23 +33,25 @@ import { AddEmployeeModal } from '../components/AddEmployeeModal';
 import { EditEmployeeModal } from '../components/EditEmployeeModal';
 import { EmployeeViewModal } from '../components/EmployeeViewModal';
 import { PoliciesView } from '@/features/policies/pages/PoliciesView';
+import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
 type View = 'overview' | 'directory' | 'time' | 'leaves' | 'policies' | 'tasks';
 
 const CompanyDashboard = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    
+
     // Determine current view from URL: /dashboard/company/policies -> policies
     const pathSegments = location.pathname.split('/');
     const lastSegment = pathSegments[pathSegments.length - 1];
     const views: View[] = ['overview', 'directory', 'time', 'leaves', 'policies', 'tasks'];
     const currentView = (views.includes(lastSegment as View) ? lastSegment : 'overview') as View;
-    
+
     const [query, setQuery] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
     const [viewingEmployee, setViewingEmployee] = useState<Employee | null>(null);
+    const [employeeToDelete, setEmployeeToDelete] = useState<{ id: string, name: string } | null>(null);
     const { session } = useAuthStore();
     const { toast } = useToast();
 
@@ -90,14 +93,19 @@ const CompanyDashboard = () => {
     const activeEmployees = employees.filter((item: Employee) => item.status === 'active').length;
 
     // --- ACTIONS ---
-    const handleDeleteEmployee = async (id: string, name: string) => {
-        if (!window.confirm(`Are you sure you want to remove ${name}? This action cannot be undone.`)) return;
+    const handleConfirmDeleteEmployee = async () => {
+        if (!employeeToDelete) return;
         try {
-            await removeEmployee.mutateAsync(id);
-            toast({ title: 'Member Offboarded', description: `${name} has been removed from the directory.`, type: 'success' });
+            await removeEmployee.mutateAsync(employeeToDelete.id);
+            toast({ title: 'Member Offboarded', description: `${employeeToDelete.name} has been removed from the directory.`, type: 'success' });
+            setEmployeeToDelete(null);
         } catch (err: any) {
             toast({ title: 'Action Failed', description: err.message || 'Failed to remove member', type: 'error' });
         }
+    };
+
+    const handleDeleteEmployee = (id: string, name: string) => {
+        setEmployeeToDelete({ id, name });
     }
 
     // --- UI CONFIG ---
@@ -166,7 +174,7 @@ const CompanyDashboard = () => {
                                 <h3 className="text-lg font-bold font-display text-textPrimary">Resource Velocity</h3>
                                 <p className="text-xs font-medium text-textSecondary mt-1">Personnel expansion metrics</p>
                             </div>
-                            <div className="flex items-center gap-4 text-xs font-bold text-textSecondary">
+                            <div className="flex items-center gap-4 text-xs font-medium text-textSecondary">
                                 <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /> Projected</div>
                                 <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary/20" /> Actual</div>
                             </div>
@@ -214,12 +222,12 @@ const CompanyDashboard = () => {
                     <h2 className="text-2xl font-semibold tracking-tight">Personnel Registry</h2>
                     <p className="text-sm font-medium text-textSecondary mt-1.5">Managing {employees.length} enterprise members.</p>
                 </div>
-                <div className="flex items-center gap-4 bg-white px-5 py-1.5 rounded-2xl border border-primary/5 w-full md:w-[400px] shadow-sm">
-                    <Search size={18} className="text-textSecondary" />
-                    <input
+                <div className="relative w-full md:w-[400px]">
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary" />
+                    <Input
                         type="text"
                         placeholder="Search by name, ID or role..."
-                        className="bg-transparent border-none outline-none text-sm font-medium w-full py-2.5 placeholder:text-textSecondary/30 text-textPrimary"
+                        className="pl-10"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
@@ -231,11 +239,11 @@ const CompanyDashboard = () => {
                     <table className="w-full text-left">
                         <thead className="bg-primary/[0.02] border-b border-primary/5">
                             <tr>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Member Info</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Designation</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Timeline</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary">Status</th>
-                                <th className="px-8 py-5 text-xs font-bold text-textSecondary text-right">Actions</th>
+                                <th className="px-8 py-5 text-xs font-semibold text-textSecondary">Member Info</th>
+                                <th className="px-8 py-5 text-xs font-semibold text-textSecondary">Designation</th>
+                                <th className="px-8 py-5 text-xs font-semibold text-textSecondary">Timeline</th>
+                                <th className="px-8 py-5 text-xs font-semibold text-textSecondary">Status</th>
+                                <th className="px-8 py-5 text-xs font-semibold text-textSecondary text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-primary/5">
@@ -420,12 +428,63 @@ const CompanyDashboard = () => {
     if (isLoading) {
         return (
             <DashboardLayout navItems={customNavItems as any}>
-                <div className="space-y-12">
-                    <Skeleton className="h-14 w-80 rounded-2xl" />
-                    <div className="grid grid-cols-4 gap-8">
-                        <CardSkeleton count={4} hasHeader={false} className="h-36" />
+                <div className="space-y-12 animate-pulse">
+                    {/* Header Skeleton */}
+                    <div className="flex justify-between items-end">
+                        <div className="space-y-3">
+                            <Skeleton className="h-10 w-80 rounded-2xl" />
+                            <Skeleton className="h-5 w-64 rounded-xl opacity-40" />
+                        </div>
+                        <Skeleton className="h-11 w-44 rounded-2xl" />
                     </div>
-                    <TableSkeleton rows={8} columns={5} />
+
+                    {/* Stats Cards Skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="h-32 rounded-md border border-primary/5 bg-white p-8 flex flex-col justify-between">
+                                <div className="flex justify-between items-start">
+                                    <Skeleton className="h-4 w-24 rounded-md opacity-40" />
+                                    <Skeleton className="h-8 w-8 rounded-md opacity-20" />
+                                </div>
+                                <div className="flex justify-between items-end">
+                                    <Skeleton className="h-8 w-20 rounded-lg" />
+                                    <Skeleton className="h-4 w-12 rounded-md opacity-30" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Chart & CTA Skeleton */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2 h-[400px] rounded-md border border-primary/5 bg-white p-8 space-y-10">
+                            <div className="flex justify-between items-center">
+                                <div className="space-y-2">
+                                    <Skeleton className="h-5 w-40 rounded-md" />
+                                    <Skeleton className="h-3 w-32 rounded-md opacity-40" />
+                                </div>
+                                <div className="flex gap-4">
+                                    <Skeleton className="h-3 w-16 rounded-md opacity-20" />
+                                    <Skeleton className="h-3 w-16 rounded-md opacity-20" />
+                                </div>
+                            </div>
+                            <div className="h-48 flex items-end gap-4 px-2">
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(i => (
+                                    <Skeleton key={i} className="flex-1 rounded-t-xl" style={{ height: `${Math.random() * 60 + 30}%` }} />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="h-[400px] rounded-md bg-slate-200/50 p-8 flex flex-col justify-between">
+                            <div className="space-y-6">
+                                <Skeleton className="h-12 w-12 rounded-xl opacity-40" />
+                                <div className="space-y-3">
+                                    <Skeleton className="h-7 w-full rounded-lg" />
+                                    <Skeleton className="h-4 w-full rounded-md opacity-60" />
+                                    <Skeleton className="h-4 w-2/3 rounded-md opacity-60" />
+                                </div>
+                            </div>
+                            <Skeleton className="h-12 w-full rounded-lg" />
+                        </div>
+                    </div>
                 </div>
             </DashboardLayout>
         );
@@ -451,6 +510,17 @@ const CompanyDashboard = () => {
                 isOpen={!!editingEmployee}
                 onClose={() => setEditingEmployee(null)}
                 employee={editingEmployee}
+            />
+
+            <ConfirmModal
+                isOpen={!!employeeToDelete}
+                onClose={() => setEmployeeToDelete(null)}
+                onConfirm={handleConfirmDeleteEmployee}
+                title="Remove Employee"
+                description={`Are you sure you want to remove ${employeeToDelete?.name}? This action cannot be undone and they will lose access to all organizational systems.`}
+                isLoading={removeEmployee.isPending}
+                confirmText="Remove"
+                variant="destructive"
             />
         </DashboardLayout>
     );
@@ -478,7 +548,7 @@ const StatCard = ({ title, value, icon, trend, positive }: any) => {
                     )}
                 </div>
                 <div>
-                    <p className="text-xs font-bold text-textSecondary uppercase mb-2">{title}</p>
+                    <p className="text-xs font-semibold text-textSecondary uppercase mb-2">{title}</p>
                     <p className="text-2xl font-bold text-textPrimary font-display tracking-tight leading-none">{value}</p>
                 </div>
             </div>

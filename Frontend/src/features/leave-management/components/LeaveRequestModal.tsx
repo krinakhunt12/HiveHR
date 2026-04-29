@@ -4,6 +4,8 @@ import { useLeaveMutations, useLeaveConfigurations } from '@/shared/api/hooks/hr
 import { useToast } from '@/shared/ui/toast/useToast';
 import { Calendar, MessageSquare, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
 
 interface LeaveRequestModalProps {
     isOpen: boolean;
@@ -87,14 +89,14 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     disabled={submit.isPending}
                                     type="date"
                                     min={new Date().toISOString().split('T')[0]}
                                     value={formData.start_date}
                                     onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="h-12 pl-12 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -104,14 +106,14 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     disabled={submit.isPending}
                                     type="date"
                                     min={formData.start_date || new Date().toISOString().split('T')[0]}
                                     value={formData.end_date}
                                     onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="h-12 pl-12 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -124,12 +126,12 @@ export const LeaveRequestModal = ({ isOpen, onClose }: LeaveRequestModalProps) =
                             <div className="absolute left-4 top-4 flex items-center justify-center pointer-events-none">
                                 <MessageSquare className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                             </div>
-                            <textarea
+                            <Textarea
                                 required
                                 disabled={submit.isPending}
                                 value={formData.reason}
                                 onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                className="w-full min-h-[140px] pl-12 pr-4 py-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="min-h-[140px] pl-12 pr-4 py-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                                 placeholder="State the reason for your absence..."
                             />
                         </div>

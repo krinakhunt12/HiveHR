@@ -1,6 +1,5 @@
 import type { AppRole } from "@/shared/auth/roles";
-
-export const AUTH_SESSION_KEY = "hivehr_auth_session";
+import { AUTH_SESSION_KEY } from "@/shared/constants";
 
 export interface AuthSession {
   access_token: string;

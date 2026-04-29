@@ -4,6 +4,7 @@ import { useEmployeeMutations, type CreateEmployeePayload } from '@/shared/api/h
 import { useToast } from '@/shared/ui/toast/useToast';
 import { UserPlus, Mail, Briefcase, Hash, Shield, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 
 interface AddEmployeeModalProps {
     isOpen: boolean;
@@ -55,11 +56,11 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <UserPlus className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                             </div>
-                            <input
+                            <Input
                                 required
                                 value={formData.full_name}
                                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                className="pl-10"
                                 placeholder="e.g. Samuel Green"
                             />
                         </div>
@@ -72,12 +73,12 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Mail className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                             </div>
-                            <input
+                            <Input
                                 required
                                 type="email"
                                 value={formData.email}
                                 onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                className="pl-10"
                                 placeholder="samuel@farmgrid.io"
                             />
                         </div>
@@ -90,12 +91,12 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Briefcase className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                             </div>
-                            <input
+                            <Input
                                 required
                                 value={formData.designation}
                                 onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
-                                placeholder="Ecosystem Manager"
+ className="pl-10"
+                                 placeholder="Ecosystem Manager"
                             />
                         </div>
                     </div>
@@ -107,12 +108,12 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Hash className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                             </div>
-                            <input
+                            <Input
                                 required
                                 value={formData.employee_code}
                                 onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
-                                placeholder="AGRI-2024-XP"
+ className="pl-10"
+                                 placeholder="AGRI-2024-XP"
                             />
                         </div>
                     </div>
@@ -127,7 +128,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                             <select
                                 value={formData.role}
                                 onChange={e => setFormData({ ...formData, role: e.target.value as CreateEmployeePayload['role'] })}
-                                className="w-full h-12 pl-12 pr-10 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none cursor-pointer"
+                                className="w-full h-10 pl-12 pr-10 bg-surface/50 border border-border outline-none rounded-md  appearance-none cursor-pointer"
                             >
                                 <option value="employee">Standard Employee</option>
                                 <option value="company_admin">Company Administrator</option>
@@ -147,25 +148,23 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <Calendar className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                             </div>
-                            <input
+                            <Input
                                 type="date"
                                 required
                                 value={formData.joined_on}
                                 onChange={e => setFormData({ ...formData, joined_on: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none"
-                            />
+ className="pl-10"                            />
                         </div>
                     </div>
                 </div>
 
                 <div className="pt-8 flex items-center justify-end gap-4 border-t border-border/40">
-                    <Button variant="outline" type="button" onClick={onClose} className="gap-2">
+                    <Button variant="outline" type="button" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
                         type="submit"
                         loading={create.isPending}
-                        className="px-8 h-11 rounded-xl"
                     >
                         <span>Confirm Admission</span>
                         {!create.isPending && <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />}

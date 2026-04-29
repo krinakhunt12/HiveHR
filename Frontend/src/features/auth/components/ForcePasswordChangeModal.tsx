@@ -4,6 +4,7 @@ import { useAuthStore } from '@/shared/auth/store';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { ShieldCheck, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 
 interface ForcePasswordChangeModalProps {
     isOpen: boolean;
@@ -75,7 +76,7 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/95 backdrop-blur-xl animate-in fade-in duration-500">
-            <div className="relative bg-surface rounded-[2.5rem] border border-border/50  w-full max-w-lg overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
+            <div className="relative bg-surface rounded-md border border-border/50  w-full max-w-lg overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
                 <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
 
                 <div className="px-10 pt-12 pb-8 text-center">
@@ -95,12 +96,12 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     type="password"
                                     value={formData.newPassword}
                                     onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                    className="pl-10"
                                     placeholder="Min 8 characters"
                                 />
                             </div>
@@ -113,12 +114,12 @@ export const ForcePasswordChangeModal = ({ isOpen, onSuccess }: ForcePasswordCha
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Lock className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     type="password"
                                     value={formData.confirmPassword}
                                     onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                    className="pl-10"
                                     placeholder="Repeat password"
                                 />
                             </div>

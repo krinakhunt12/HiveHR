@@ -1,23 +1,18 @@
 import { useState } from 'react';
+import { cn } from '@/shared/utils/cn';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Input } from '@/shared/ui/input';
 import { Separator } from '@/shared/ui/separator';
-import { Skeleton, CardSkeleton } from '@/shared/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { usePolicies, usePolicyMutations, type CompanyPolicy } from '../hooks/usePolicies';
-import { Search, ChevronLeft, BookOpen, Clock, Laptop, Users, Lock, Plus, Trash2 } from 'lucide-react';
+import { POLICY_CATEGORIES } from '@/shared/constants';
+import { Search, ChevronLeft, Plus, Trash2 } from 'lucide-react';
 import { AddPolicyModal } from '../components/AddPolicyModal';
-
-const CATEGORIES = [
-  { id: 'all', name: 'All Policies', icon: BookOpen },
-  { id: 'HR', name: 'HR', icon: Users },
-  { id: 'IT', name: 'IT', icon: Laptop },
-  { id: 'Security', name: 'Security', icon: Lock },
-  { id: 'Attendance', name: 'Attendance', icon: Clock },
-];
+import { ConfirmModal } from '@/shared/ui/ConfirmModal';
 
 export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
   const { data: policies = [], isLoading, error, refetch } = usePolicies();
@@ -35,21 +30,43 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-pulse">
         <div className="space-y-2">
-          <Skeleton className="h-8 w-48 rounded-md" />
-          <Skeleton className="h-4 w-64 rounded-md opacity-60" />
+          <Skeleton className="h-9 w-56 rounded-xl" />
+          <Skeleton className="h-4 w-72 rounded-lg opacity-40" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Sidebar Filter Skeleton */}
           <aside className="space-y-4">
-            <div className="p-4 rounded-[2rem] border border-primary/5 bg-white space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full rounded-xl" />
+            <div className="p-2 border rounded-lg bg-surface space-y-1">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full rounded-md opacity-60" />
               ))}
             </div>
           </aside>
+
+          {/* Policy Cards Grid Skeleton */}
           <main className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <CardSkeleton count={4} hasHeader={false} />
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex flex-col h-64 rounded-lg border bg-surface p-6 space-y-4">
+                <div className="flex justify-between">
+                  <Skeleton className="h-5 w-20 rounded-full opacity-30" />
+                  <Skeleton className="h-5 w-5 rounded-md opacity-20" />
+                </div>
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-6 w-3/4 rounded-md" />
+                  <Skeleton className="h-3 w-1/4 rounded-md opacity-40" />
+                  <div className="pt-4 space-y-2">
+                    <Skeleton className="h-3 w-full rounded-md opacity-30" />
+                    <Skeleton className="h-3 w-5/6 rounded-md opacity-30" />
+                  </div>
+                </div>
+                <div className="pt-4 border-t flex justify-between items-center">
+                  <Skeleton className="h-3 w-24 rounded-md opacity-40" />
+                  <Skeleton className="h-8 w-24 rounded-lg" />
+                </div>
+              </div>
+            ))}
           </main>
         </div>
       </div>
@@ -81,12 +98,12 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
         </div>
         <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
           <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-textSecondary" />
             <Input
               placeholder="Search policies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-10"
             />
           </div>
           {isAdmin && (
@@ -102,18 +119,25 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Sidebar */}
         <aside className="space-y-4">
-          <Card className="p-2 border-none shadow-none md:border md:shadow-sm">
+          <Card className="p-2 border border-border shadow-sm bg-white">
+            <div className="p-4 border-b border-border mb-2">
+              <h4 className="text-sm font-medium text-textSecondary uppercase">Filter by Category</h4>
+            </div>
             <div className="space-y-1">
-              {CATEGORIES.map((cat) => (
-                <Button
+              {POLICY_CATEGORIES.map((cat) => (
+                <button
                   key={cat.id}
-                  variant={activeCategory === cat.id ? "secondary" : "ghost"}
-                  className="w-full justify-start gap-2"
                   onClick={() => setActiveCategory(cat.id)}
+                  className={cn(
+                    "w-full text-left px-4 py-2.5 rounded-md text-sm font-medium capitalize transition-all flex items-center gap-3",
+                    activeCategory === cat.id
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "text-textSecondary hover:text-textPrimary hover:bg-background"
+                  )}
                 >
                   <cat.icon className="h-4 w-4" />
                   {cat.name}
-                </Button>
+                </button>
               ))}
             </div>
           </Card>
@@ -123,7 +147,7 @@ export const PoliciesView = ({ isAdmin = false }: { isAdmin?: boolean }) => {
         <main className="md:col-span-3">
           {filteredPolicies.length === 0 ? (
             <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed">
-              <p className="text-sm text-textSecondary mb-4">No policies found matching your criteria.</p>
+              <p className="text-sm font-medium text-textSecondary leading-relaxed mb-4">No policies found matching your criteria.</p>
               <Button variant="outline" size="sm" onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}>
                 Clear Filters
               </Button>
@@ -152,27 +176,45 @@ const PolicyCard = ({ policy, onView, isAdmin }: { policy: CompanyPolicy, onView
   const { toast } = useToast();
   const isNew = new Date(policy.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const handleDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete "${policy.title}"?`)) return;
     try {
       await remove.mutateAsync(policy.id);
       toast({ title: 'Policy Deleted', description: 'The policy has been removed.', type: 'success' });
+      setIsDeleteModalOpen(false);
     } catch (err: any) {
       // Error handled by QueryProvider
     }
   };
 
   return (
-    <Card className="flex flex-col h-full transition-colors hover:bg-accent/5">
+    <>
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Policy"
+        description={`Are you sure you want to delete "${policy.title}"? This action cannot be undone.`}
+        isLoading={remove.isPending}
+        confirmText="Delete"
+        variant="destructive"
+      />
+      <Card className="flex flex-col h-full transition-colors hover:bg-accent/5">
       <CardHeader className="p-4 md:p-6 space-y-2">
         <div className="flex justify-between items-start">
           <div className="flex gap-2">
-            {policy.is_mandatory && <Badge variant="destructive">Mandatory</Badge>}
-            {isNew && <Badge variant="secondary">New</Badge>}
+            {policy.is_mandatory && <Badge variant="destructive" className='font-medium'>Mandatory</Badge>}
+            {isNew && <Badge variant="secondary" className='font-medium'>New</Badge>}
           </div>
           {isAdmin && (
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={handleDelete}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors" 
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -198,7 +240,8 @@ const PolicyCard = ({ policy, onView, isAdmin }: { policy: CompanyPolicy, onView
           </Button>
         )}
       </CardFooter>
-    </Card>
+      </Card>
+    </>
   );
 };
 

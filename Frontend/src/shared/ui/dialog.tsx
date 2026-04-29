@@ -32,7 +32,7 @@ export const Dialog = ({ isOpen, onClose, title, children, className }: DialogPr
                 "relative bg-background rounded-xl border  w-full max-w-xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300",
                 className
             )}>
-                <div className="flex items-center justify-between px-10 py-8 border-b border-border/50 bg-slate-50/50">
+                <div className="flex items-center justify-between px-10 py-6 border-b border-border/50 bg-slate-50/50">
                     <h3 className="text-2xl font-bold text-foreground tracking-tight font-sans">{title}</h3>
                     <Button
                     variant="ghost"
@@ -42,7 +42,7 @@ export const Dialog = ({ isOpen, onClose, title, children, className }: DialogPr
                         <X size={20} />
                     </Button>
                 </div>
-                <div className="p-10 max-h-[85vh] overflow-y-auto">
+                <div className="p-8 max-h-[85vh] overflow-y-auto">
                     {children}
                 </div>
             </div>

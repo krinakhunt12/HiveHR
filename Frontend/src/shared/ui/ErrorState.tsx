@@ -1,5 +1,5 @@
 import React from 'react';
-import {  AlertCircle, RefreshCcw } from 'lucide-react';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { cn } from '@/shared/utils/cn';
 import { Button } from './button';
 
@@ -33,10 +33,10 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       </div>
       <div className="space-y-4 max-w-sm mx-auto">
         <h3 className="text-xl font-bold text-textPrimary tracking-tight font-display">{title}</h3>
-        <p className="text-sm font-semibold text-textSecondary leading-relaxed">
+        <p className="text-sm font-medium text-textSecondary leading-relaxed">
           {description}
         </p>
-        
+
         {errorMessage && (
           <div className="mt-4 p-4 rounded-xl bg-error/5 border border-error/5 text-xs font-bold text-error/80 font-mono break-words">
             {errorMessage}
@@ -45,10 +45,10 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 
         {onRetry && (
           <div className="pt-6">
-            <Button 
-                onClick={onRetry} 
-                variant="outline"
-                className="font-bold text-xs border-primary/10 hover:bg-primary/5 h-11 px-8 rounded-xl"
+            <Button
+              onClick={onRetry}
+              variant="outline"
+              className="font-bold text-xs border-primary/10 hover:bg-primary/5 h-11 px-8 rounded-xl"
             >
               <RefreshCcw size={14} className="mr-2" /> Attempt Reconnect
             </Button>

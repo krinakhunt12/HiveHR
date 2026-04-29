@@ -7,7 +7,7 @@ function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-primary/5", className)}
+      className={cn("animate-pulse rounded-md bg-slate-200/50 dark:bg-slate-800/50", className)}
       {...props}
     />
   )
@@ -15,12 +15,12 @@ function Skeleton({
 
 function SkeletonText({ lines = 1, className }: { lines?: number; className?: string }) {
   return (
-    <div className={cn("space-y-2.5", className)}>
+    <div className={cn("space-y-2", className)}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton 
           key={i} 
           className={cn(
-            "h-3.5 w-full rounded-md",
+            "h-3 w-full rounded-md",
             i === lines - 1 && lines > 1 ? "w-2/3" : ""
           )} 
         />
@@ -40,18 +40,12 @@ function SkeletonAvatar({ size = "md", className }: { size?: "sm" | "md" | "lg" 
 }
 
 function SkeletonButton({ className }: { className?: string }) {
-  return <Skeleton className={cn("h-10 w-28 rounded-xl", className)} />
+  return <Skeleton className={cn("h-10 w-28 rounded-md", className)} />
 }
 
 export { 
   Skeleton, 
   SkeletonText, 
   SkeletonAvatar, 
-  SkeletonButton
+  SkeletonButton 
 }
-
-export * from './skeletons/CardSkeleton'
-export * from './skeletons/TableSkeleton'
-export * from './skeletons/FormSkeleton'
-export * from './skeletons/ProfileSkeleton'
-export * from './skeletons/ListSkeleton'

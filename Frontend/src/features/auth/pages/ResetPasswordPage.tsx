@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/ui/card';
 import { useUpdatePassword } from '@/shared/api/hooks/authHooks';
 import { useToast } from '@/shared/ui/toast/useToast';
@@ -58,12 +59,12 @@ const ResetPasswordPage = () => {
                                 <label className="text-sm font-bold  text-dim mb-1.5 block">New Password</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
-                                    <input
+                                    <Input
                                         type="password"
                                         required
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
-                                        className="w-full bg-bg border border-soft rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
+                                        className="bg-bg border border-soft rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
                                         placeholder="Min. 8 characters"
                                     />
                                 </div>
@@ -72,12 +73,12 @@ const ResetPasswordPage = () => {
                                 <label className="text-sm font-bold  text-dim mb-1.5 block">Confirm Password</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim w-4 h-4" />
-                                    <input
+                                    <Input
                                         type="password"
                                         required
                                         value={confirmPassword}
                                         onChange={e => setConfirmPassword(e.target.value)}
-                                        className="w-full bg-bg border border-soft rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
+                                        className="bg-bg border border-soft rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
                                         placeholder="Repeat your password"
                                     />
                                 </div>

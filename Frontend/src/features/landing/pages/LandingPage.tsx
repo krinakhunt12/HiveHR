@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, CheckCircle2, Clock, CreditCard, ShieldCheck, Users, Zap } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { Card } from '@/shared/ui/card';
 import MarketingLayout from '@/shared/layouts/MarketingLayout';
 import { FeatureCard, Testimonial, PricingCard } from '@/shared/components/MarketingComponents';
@@ -327,7 +328,7 @@ const LandingPage = () => {
                   <div className="space-y-6">
                     <div>
                       <label className="text-xs font-bold uppercase tracking-[0.2em] text-surface/60 mb-3 block ml-1">Company Email</label>
-                      <input type="text" placeholder="name@company.com" className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 placeholder:text-surface/30 focus:outline-none focus:ring-4 focus:ring-white/10 transition-all text-sm font-bold" />
+                      <Input type="text" placeholder="name@company.com" className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 placeholder:text-surface/30 focus:outline-none focus:ring-4 focus:ring-white/10 transition-all text-sm font-bold h-auto" />
                     </div>
                     <Button className="w-full h-14 bg-surface text-primary hover:bg-surface/95 font-bold text-xs uppercase tracking-[0.2em] rounded-xl ">Request Access</Button>
                   </div>

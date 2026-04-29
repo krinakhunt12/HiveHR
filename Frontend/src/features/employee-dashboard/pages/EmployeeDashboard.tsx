@@ -11,7 +11,7 @@ import {
     Activity
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-import { Skeleton, SkeletonButton, CardSkeleton } from '@/shared/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/utils/cn';
 import { useTodayAttendance, useAttendanceMutations, useGetMe } from '@/shared/api/hooks/hrHooks';
 import { LeaveManagementView } from '@/features/leave-management/pages/LeaveManagementView';
@@ -220,22 +220,53 @@ const EmployeeDashboard = () => {
     if (isLoading) {
         return (
             <DashboardLayout navItems={customNavItems as any}>
-                <div className="space-y-12">
+                <div className="space-y-12 animate-pulse">
+                    {/* Header Skeleton */}
                     <div className="flex justify-between items-end">
-                        <div className="space-y-2">
-                            <Skeleton className="h-8 w-48 rounded-xl" />
-                            <Skeleton className="h-4 w-64 rounded-md" />
+                        <div className="space-y-3">
+                            <Skeleton className="h-10 w-80 rounded-2xl" />
+                            <Skeleton className="h-5 w-64 rounded-xl opacity-40" />
                         </div>
                         <div className="flex gap-3">
-                            <SkeletonButton className="w-32" />
-                            <SkeletonButton className="w-32" />
+                            <Skeleton className="h-11 w-32 rounded-xl" />
+                            <Skeleton className="h-11 w-32 rounded-xl" />
                         </div>
                     </div>
+
+                    {/* Quick Stats Skeleton (3 Columns) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <CardSkeleton count={3} hasHeader={false} className="h-32" />
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="h-36 rounded-2xl border border-primary/5 bg-white p-8 space-y-4">
+                                <div className="flex justify-between">
+                                    <Skeleton className="h-4 w-24 rounded-md opacity-40" />
+                                    <Skeleton className="h-8 w-8 rounded-lg opacity-20" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-8 w-32 rounded-lg" />
+                                    <Skeleton className="h-2 w-full rounded-full opacity-10" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
+
+                    {/* Detail Cards Skeleton (2 Columns) */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <CardSkeleton count={2} hasHeader={false} className="h-64" />
+                        {[1, 2].map(i => (
+                            <div key={i} className="h-64 rounded-md border border-primary/5 bg-white p-10 space-y-8">
+                                <div className="flex items-center gap-4">
+                                    <Skeleton className="h-12 w-12 rounded-xl opacity-40" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-5 w-48 rounded-md" />
+                                        <Skeleton className="h-3 w-32 rounded-md opacity-40" />
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <Skeleton className="h-4 w-full rounded-md opacity-20" />
+                                    <Skeleton className="h-4 w-5/6 rounded-md opacity-20" />
+                                    <Skeleton className="h-4 w-4/6 rounded-md opacity-20" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </DashboardLayout>

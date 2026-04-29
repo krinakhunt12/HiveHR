@@ -15,9 +15,11 @@ import {
 } from '@/features/policies/hooks/usePolicies';
 import { useToast } from '@/shared/ui/toast/useToast';
 import { Button } from '@/shared/ui/button';
-import { CardSkeleton } from '@/shared/ui/skeleton';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
+import { ConfirmModal } from '@/shared/ui/ConfirmModal';
+import { Input } from '@/shared/ui/input';
 
 interface PolicyModalProps {
     isOpen: boolean;
@@ -78,7 +80,7 @@ const PolicyModal = ({ isOpen, onClose, initialData, onSuccess }: PolicyModalPro
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                         <label className="text-xs font-bold  text-textSecondary">Policy Title</label>
-                        <input
+                        <Input
                             required
                             type="text"
                             className="input-premium w-full bg-background/50"
@@ -142,6 +144,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPolicy, setEditingPolicy] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [policyToDelete, setPolicyToDelete] = useState<{ id: string, title: string } | null>(null);
 
     const policies = Array.isArray(response) ? response : [];
 
@@ -150,11 +153,12 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
         p.category?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleDelete = async (id: string, title: string) => {
-        if (!window.confirm(`Delete policy "${title}"? This cannot be undone.`)) return;
+    const handleConfirmDelete = async () => {
+        if (!policyToDelete) return;
         try {
-            await remove.mutateAsync(id);
+            await remove.mutateAsync(policyToDelete.id);
             toast({ title: 'Policy Deleted', description: 'The policy has been removed from the handbook.', type: 'success' });
+            setPolicyToDelete(null);
         } catch (err: any) {
             // Error handled globally
         }
@@ -173,8 +177,17 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <CardSkeleton count={3} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="flex flex-col h-64 rounded-lg border bg-surface p-6 space-y-4">
+                        <Skeleton className="h-10 w-10 rounded-lg opacity-20" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-6 w-3/4 rounded-md" />
+                            <Skeleton className="h-3 w-1/4 rounded-md opacity-40" />
+                        </div>
+                        <Skeleton className="h-24 w-full rounded-md opacity-20" />
+                    </div>
+                ))}
             </div>
         );
     }
@@ -196,12 +209,11 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                 )}
             </div>
 
-            <div className="flex items-center gap-4 bg-surface px-4 py-1.5 rounded-xl border border-border shadow-none w-full md:w-96 focus-within:ring-4 focus-within:ring-primary/5 transition-all">
-                <Search size={16} className="text-textSecondary" />
-                <input
+            <div className="relative w-full md:w-96">
+                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-textSecondary" />
+                <Input
                     type="text"
                     placeholder="Search policies..."
-                    className="bg-transparent border-none outline-none text-sm font-medium w-full py-2 placeholder:text-textSecondary"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -242,8 +254,7 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                loading={remove.isPending && remove.variables === p.id}
-                                                onClick={() => handleDelete(p.id, p.title)}
+                                                onClick={() => setPolicyToDelete({ id: p.id, title: p.title })}
                                                 className="h-8 w-8 text-textSecondary hover:text-error hover:bg-error/10"
                                             >
                                                 <Trash2 size={16} />
@@ -278,6 +289,17 @@ export const PolicyManagementView = ({ isAdmin = false }: { isAdmin?: boolean })
                 onClose={() => setIsModalOpen(false)}
                 initialData={editingPolicy}
                 onSuccess={() => { }}
+            />
+
+            <ConfirmModal
+                isOpen={!!policyToDelete}
+                onClose={() => setPolicyToDelete(null)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Policy"
+                description={`Are you sure you want to delete "${policyToDelete?.title}"? This cannot be undone.`}
+                isLoading={remove.isPending}
+                confirmText="Delete"
+                variant="destructive"
             />
         </div>
     );

@@ -16,7 +16,7 @@ const DropdownMenu = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <div className="relative inline-block" ref={containerRef}>
+    <div className="relative inline-block cursor-pointer" ref={containerRef}>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child as React.ReactElement<any>, { isOpen, setIsOpen });
@@ -34,7 +34,7 @@ const DropdownMenuTrigger = ({
 }: { 
   children: React.ReactNode; 
   asChild?: boolean;
-  setIsOpen?: (open: boolean) => void;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const handleClick = () => setIsOpen?.((prev: boolean) => !prev);
 
@@ -59,7 +59,7 @@ const DropdownMenuContent = ({
 }: { 
   children: React.ReactNode; 
   isOpen?: boolean;
-  setIsOpen?: (open: boolean) => void;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   className?: string;
   align?: "start" | "end";
 }) => {
@@ -94,7 +94,7 @@ const DropdownMenuItem = ({
     <button
       disabled={disabled}
       className={cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       onClick={(e) => {

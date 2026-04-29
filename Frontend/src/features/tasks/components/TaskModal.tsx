@@ -6,6 +6,7 @@ import { Textarea } from '@/shared/ui/textarea';
 import { useListEmployees, useTaskMutations, type Task } from '@/shared/api/hooks/hrHooks';
 import { Save, Calendar, User, Flag } from 'lucide-react';
 import { useToast } from '@/shared/ui/toast/useToast';
+import { TASK_PRIORITIES } from '@/shared/constants';
 
 interface TaskFormData {
     title: string;
@@ -113,14 +114,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task }) =
                                 <Flag size={14} /> Priority
                             </label>
                             <select
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 capitalize"
                                 value={formData.priority}
                                 onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
                             >
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="critical">Critical</option>
+                                {TASK_PRIORITIES.map((priority) => (
+                                    <option key={priority} value={priority}>
+                                        {priority}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>

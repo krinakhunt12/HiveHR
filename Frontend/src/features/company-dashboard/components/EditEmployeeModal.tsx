@@ -4,6 +4,7 @@ import { useEmployeeMutations, type Employee } from '@/shared/api/hooks/hrHooks'
 import { useToast } from '@/shared/ui/toast/useToast';
 import { User, Briefcase, Hash, Shield, Save } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 
 interface EditEmployeeModalProps {
     isOpen: boolean;
@@ -62,11 +63,11 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                 <User className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                             </div>
-                            <input
+                            <Input
                                 required
                                 value={formData.full_name}
                                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                className="pl-10"
                                 placeholder="Stakeholder Name"
                             />
                         </div>
@@ -80,11 +81,11 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Briefcase className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     value={formData.designation}
                                     onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                    className="pl-10 border border-border outline-none rounded-md placeholder:text-textSecondary"
                                     placeholder="Designation"
                                 />
                             </div>
@@ -95,11 +96,11 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                                     <Hash className="w-4.5 h-4.5 text-textSecondary group-focus-within:text-primary transition-colors" />
                                 </div>
-                                <input
+                                <Input
                                     required
                                     value={formData.employee_code}
                                     onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
-                                    className="w-full h-12 pl-12 pr-4 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm placeholder:text-textSecondary"
+                                    className="pl-10"
                                     placeholder="ID Code"
                                 />
                             </div>
@@ -116,7 +117,7 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
                             <select
                                 value={formData.status}
                                 onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                className="w-full h-12 pl-12 pr-10 bg-surface/50 border border-border rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary/40 focus:bg-surface transition-all outline-none text-sm appearance-none cursor-pointer"
+                                className="w-full h-10 pl-12 pr-10 bg-surface/50 border border-border outline-none rounded-md  appearance-none cursor-pointer"
                             >
                                 <option value="active">Active Presence</option>
                                 <option value="inactive">Currently Inactive</option>
@@ -134,20 +135,18 @@ export const EditEmployeeModal = ({ isOpen, onClose, employee }: EditEmployeeMod
 
                 <div className="pt-8 flex items-center justify-end gap-4 border-t border-border/40">
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         type="button"
                         onClick={onClose}
-                        className="px-6 h-11 text-sm font-medium text-textSecondary hover:text-textPrimary transition-colors"
                     >
                         Dismiss
                     </Button>
                     <Button
                         type="submit"
                         loading={update.isPending}
-                        className="px-8 h-11 rounded-xl"
                     >
-                        <span>Save Changes</span>
                         {!update.isPending && <Save size={16} className="ml-2" />}
+                        <span>Save Changes</span>a
                     </Button>
                 </div>
             </form>

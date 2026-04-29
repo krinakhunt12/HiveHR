@@ -18,7 +18,7 @@ export function LoadingState() {
         <Skeleton className="h-40 rounded-2xl" />
         <Skeleton className="h-40 rounded-2xl" />
       </div>
-      <Skeleton className="h-[400px] w-full rounded-[2rem]" />
+      <Skeleton className="h-[400px] w-full rounded-md" />
     </div>
   );
 }
