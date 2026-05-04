@@ -70,7 +70,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           {isSidebarExpanded && (
             <div className="ml-3 overflow-hidden">
               <span className="block font-medium text-lg text-textPrimary tracking-tight leading-none font-sans">HiveHR</span>
-              <span className="text-xs font-bold text-primary mt-1.5 block">{userRoleDisplay}</span>
+              <span className="text-xs font-semibold text-primary mt-1.5 block">{userRoleDisplay}</span>
             </div>
           )}
         </div>

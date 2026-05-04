@@ -95,8 +95,8 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                                 required
                                 value={formData.designation}
                                 onChange={e => setFormData({ ...formData, designation: e.target.value })}
- className="pl-10"
-                                 placeholder="Ecosystem Manager"
+                                className="pl-10"
+                                placeholder="Ecosystem Manager"
                             />
                         </div>
                     </div>
@@ -112,8 +112,8 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                                 required
                                 value={formData.employee_code}
                                 onChange={e => setFormData({ ...formData, employee_code: e.target.value })}
- className="pl-10"
-                                 placeholder="AGRI-2024-XP"
+                                className="pl-10"
+                                placeholder="AGRI-2024-XP"
                             />
                         </div>
                     </div>
@@ -153,7 +153,7 @@ export const AddEmployeeModal = ({ isOpen, onClose }: AddEmployeeModalProps) => 
                                 required
                                 value={formData.joined_on}
                                 onChange={e => setFormData({ ...formData, joined_on: e.target.value })}
- className="pl-10"                            />
+                                className="pl-10" />
                         </div>
                     </div>
                 </div>
